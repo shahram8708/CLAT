@@ -7,10 +7,48 @@
     <h1 style="font-size: clamp(72px, 14vw, 160px); color: var(--cl-red); font-weight: 800;">404</h1>
     <h2 class="section-title">Page Not Found</h2>
     <p class="text-muted mb-4">The page you are looking for may have been moved or the link may be incorrect.</p>
-    <div class="d-flex justify-content-center gap-3 flex-wrap">
-      <a href="{{ url_for('main.index') }}" class="btn btn-cl-primary">Back to Homepage</a>
-      <a href="/courses" class="btn btn-outline-dark rounded-pill">Browse Courses</a>
-      <a href="{{ url_for('main.contact') }}" class="btn btn-outline-dark rounded-pill">Contact Us</a>
+
+    <div class="row justify-content-center mt-4">
+      <div class="col-lg-8">
+        <div class="row g-3">
+          <div class="col-md-4">
+            <a href="/" class="d-block cl-card p-3 text-center text-decoration-none">
+              <i class="fas fa-home fa-2x mb-2" style="color: var(--cl-red);"></i>
+              <p class="mb-0 small fw-bold">Homepage</p>
+            </a>
+          </div>
+          <div class="col-md-4">
+            <a href="/courses" class="d-block cl-card p-3 text-center text-decoration-none">
+              <i class="fas fa-book fa-2x mb-2" style="color: var(--cl-red);"></i>
+              <p class="mb-0 small fw-bold">All Programs</p>
+            </a>
+          </div>
+          <div class="col-md-4">
+            <a href="/contact" class="d-block cl-card p-3 text-center text-decoration-none">
+              <i class="fas fa-envelope fa-2x mb-2" style="color: var(--cl-red);"></i>
+              <p class="mb-0 small fw-bold">Contact Us</p>
+            </a>
+          </div>
+          <div class="col-md-4">
+            <a href="/demo" class="d-block cl-card p-3 text-center text-decoration-none">
+              <i class="fas fa-calendar-check fa-2x mb-2" style="color: var(--cl-red);"></i>
+              <p class="mb-0 small fw-bold">Book Free Demo</p>
+            </a>
+          </div>
+          <div class="col-md-4">
+            <a href="/scholarship" class="d-block cl-card p-3 text-center text-decoration-none">
+              <i class="fas fa-medal fa-2x mb-2" style="color: var(--cl-red);"></i>
+              <p class="mb-0 small fw-bold">Scholarship Test</p>
+            </a>
+          </div>
+          <div class="col-md-4">
+            <a href="/test-series" class="d-block cl-card p-3 text-center text-decoration-none">
+              <i class="fas fa-clipboard-list fa-2x mb-2" style="color: var(--cl-red);"></i>
+              <p class="mb-0 small fw-bold">Mock Tests</p>
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>

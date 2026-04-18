@@ -7,6 +7,14 @@
 {% endblock %}
 
 {% block admin_content %}
+<nav aria-label="breadcrumb" class="mb-3">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/admin">Admin Dashboard</a></li>
+    <li class="breadcrumb-item"><a href="/admin/blog">Blog Posts</a></li>
+    <li class="breadcrumb-item active">{% if is_new %}New Post{% else %}Edit: {{ post.title }}{% endif %}</li>
+  </ol>
+</nav>
+
 <div class="row g-3">
   <div class="col-lg-8">
     <div class="bg-white border rounded-3" style="padding: 32px;">
@@ -62,6 +70,12 @@
         <div class="d-flex gap-2">
           <button type="submit" class="btn btn-cl-primary">Save Post</button>
           <a href="/admin/blog" class="btn btn-outline-secondary">Cancel</a>
+          {% if not is_new and post.is_published %}
+            <a href="/blog/{{ post.category }}/{{ post.slug }}" target="_blank" rel="noopener noreferrer"
+               class="btn btn-outline-info btn-sm">
+              <i class="fas fa-external-link-alt me-1"></i>View Live Post →
+            </a>
+          {% endif %}
         </div>
       </form>
     </div>

@@ -3,6 +3,13 @@
 {% block admin_page_title %}Students{% endblock %}
 
 {% block admin_content %}
+<nav aria-label="breadcrumb" class="mb-3">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
+    <li class="breadcrumb-item active">Students</li>
+  </ol>
+</nav>
+
 <div class="bg-white border rounded-3 p-3 mb-3">
   <form method="GET" action="/admin/students" class="row g-2 align-items-end">
     <div class="col-lg-6">

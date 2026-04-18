@@ -3,6 +3,13 @@
 {% block admin_page_title %}Payments{% endblock %}
 
 {% block admin_content %}
+<nav aria-label="breadcrumb" class="mb-3">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/admin">Admin Dashboard</a></li>
+    <li class="breadcrumb-item active">Payments</li>
+  </ol>
+</nav>
+
 <div class="row g-3 mb-3">
   <div class="col-lg-4">
     <div class="admin-stat-card h-100">
@@ -64,7 +71,13 @@
         {% for payment, user_email, test_series_name in payments.items %}
           <tr>
             <td>{{ payment.id }}</td>
-            <td>{{ user_email or '-' }}</td>
+            <td>
+              {% if user_email %}
+                <a href="/admin/students/{{ payment.user_id }}" class="text-decoration-none">{{ user_email }}</a>
+              {% else %}
+                -
+              {% endif %}
+            </td>
             <td>{{ test_series_name or '-' }}</td>
             <td>{{ payment.razorpay_order_id or '-' }}</td>
             <td>₹{{ payment.amount_inr | format_inr }}</td>

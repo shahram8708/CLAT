@@ -58,7 +58,15 @@
         {% for lead in leads.items %}
           <tr id="lead-row-{{ lead.id }}">
             <td>{{ lead.id }}</td>
-            <td>{{ lead.first_name }} {{ lead.last_name }}</td>
+            <td>
+              {% if lead.email %}
+                <a href="/admin/students?q={{ lead.email | urlencode }}" class="text-decoration-none fw-semibold">
+                  {{ lead.first_name }} {{ lead.last_name }}
+                </a>
+              {% else %}
+                <strong>{{ lead.first_name }} {{ lead.last_name }}</strong>
+              {% endif %}
+            </td>
             <td>{{ lead.phone }}</td>
             <td>{{ lead.email or '-' }}</td>
             <td>{{ lead.exam_interest or '-' }}</td>

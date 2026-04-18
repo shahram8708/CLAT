@@ -5,6 +5,14 @@
 {% block admin_content %}
 {% set initials = ((user.first_name[:1] if user.first_name else '') ~ (user.last_name[:1] if user.last_name else ''))|upper %}
 
+<nav aria-label="breadcrumb" class="mb-3">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/admin">Admin Dashboard</a></li>
+    <li class="breadcrumb-item"><a href="/admin/students">Students</a></li>
+    <li class="breadcrumb-item active">{{ user.get_full_name() }}</li>
+  </ol>
+</nav>
+
 <div class="bg-white border rounded-3 p-4 mb-4">
   <div class="row g-3 align-items-center">
     <div class="col-lg-5">
@@ -66,7 +74,16 @@
         <tbody>
           {% for enrollment in enrollments %}
             <tr>
-              <td>{{ enrollment.course.title if enrollment.course else '-' }}</td>
+              <td>
+                {% if enrollment.course %}
+                  <a href="/admin/courses/{{ enrollment.course.id }}/edit" class="text-decoration-none">
+                    {{ enrollment.course.title }}
+                  </a>
+                  <a href="/courses/{{ enrollment.course.slug }}" target="_blank" rel="noopener noreferrer" class="small ms-2 text-decoration-none">View →</a>
+                {% else %}
+                  -
+                {% endif %}
+              </td>
               <td>{{ enrollment.batch_name or '-' }}</td>
               <td>{{ enrollment.enrolled_at.strftime('%d %b %Y') if enrollment.enrolled_at else '-' }}</td>
               <td>₹{{ enrollment.fee_paid | format_inr if enrollment.fee_paid is not none else '0' }}</td>

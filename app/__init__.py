@@ -33,6 +33,18 @@ def create_app(config_name="development"):
 
     csp = {
         "default-src": "'self'",
+        "connect-src": [
+            "'self'",
+            "cdn.jsdelivr.net",
+            "checkout.razorpay.com",
+        ],
+        "frame-src": [
+            "'self'",
+            "www.google.com",
+            "www.youtube.com",
+            "youtube.com",
+            "www.youtube-nocookie.com",
+        ],
         "script-src": [
             "'self'",
             "cdn.jsdelivr.net",

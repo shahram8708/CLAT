@@ -298,7 +298,7 @@
 
       <div class="col-lg-7">
         <div class="cl-card">
-          <form id="demoBookingForm" action="{{ url_for('main.demo_booking') }}" method="post" novalidate>
+          <form id="demoBookingForm" action="{{ url_for('demo.demo_submit') }}" method="post" novalidate>
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
             <div class="row g-3 demo-form-grid">
@@ -322,7 +322,7 @@
 
               <div class="col-md-6">
                 <label class="form-label">Course Interest*</label>
-                <select name="course_interest" class="form-select" required>
+                <select name="exam_interest" class="form-select" required>
                   <option value="">Select Program</option>
                   <option value="CAT/MBA Entrance">CAT/MBA Entrance</option>
                   <option value="CLAT/AILET/Law">CLAT/AILET/Law</option>
@@ -336,9 +336,9 @@
                 <label class="form-label">Preferred Mode*</label>
                 <select name="preferred_mode" class="form-select" required>
                   <option value="">Select Mode</option>
-                  <option value="classroom">Classroom – Navrangpura Centre</option>
-                  <option value="online">Online – AFA</option>
-                  <option value="decide-after-demo">Decide After Demo</option>
+                  <option value="Classroom – Navrangpura Centre">Classroom – Navrangpura Centre</option>
+                  <option value="Online – AFA (Attend From Anywhere)">Online – AFA (Attend From Anywhere)</option>
+                  <option value="Decide After Demo">Decide After Demo</option>
                 </select>
               </div>
 

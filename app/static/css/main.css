@@ -16,13 +16,39 @@
   box-sizing: border-box;
 }
 
+html {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
 body {
   font-family: "Inter", sans-serif;
   background: var(--cl-bg);
   color: var(--cl-text);
   line-height: 1.6;
   margin: 0;
+  max-width: 100%;
   overflow-x: hidden;
+}
+
+@supports (overflow: clip) {
+  html,
+  body {
+    overflow-x: clip;
+  }
+}
+
+img,
+video,
+iframe,
+canvas,
+svg {
+  max-width: 100%;
+}
+
+pre,
+.table-responsive {
+  max-width: 100%;
 }
 
 h1,
@@ -121,12 +147,11 @@ a {
   justify-content: center;
   border: 2px solid var(--cl-white);
   color: var(--cl-white);
-  background: transparent;
+  background: black;
   border-radius: 999px;
   padding: 0.75rem 1.4rem;
   font-weight: 600;
   text-decoration: none;
-  transition: background 0.25s ease, color 0.25s ease, transform 0.25s ease;
 }
 
 .btn-cl-outline:hover,
@@ -152,6 +177,165 @@ a {
 #mainNavbar .dropdown-item.active {
   color: var(--cl-red);
   font-weight: 600;
+}
+
+#mainNavbar .scholarship-promo-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 168px;
+  height: 38px;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #b71c1c 0%, #e53935 52%, #ff7043 100%);
+  color: #fff !important;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(192, 57, 43, 0.34);
+  will-change: opacity, box-shadow, transform;
+  animation: scholarship-promo-blink 1.1s steps(1, end) infinite;
+}
+
+#mainNavbar .scholarship-promo-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, rgba(255, 255, 255, 0) 30%, rgba(255, 255, 255, 0.34) 50%, rgba(255, 255, 255, 0) 70%);
+  transform: translateX(-120%);
+  animation: scholarship-promo-shine 2.8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+#mainNavbar .scholarship-promo-link .promo-default,
+#mainNavbar .scholarship-promo-link .promo-hover {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: inline-block;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 1;
+}
+
+#mainNavbar .scholarship-promo-link .promo-default {
+  opacity: 1;
+  animation: scholarship-text-default 2.4s steps(1, end) infinite;
+}
+
+#mainNavbar .scholarship-promo-link .promo-hover {
+  opacity: 0;
+  animation: scholarship-text-offer 2.4s steps(1, end) infinite;
+}
+
+#mainNavbar .scholarship-promo-link:hover,
+#mainNavbar .scholarship-promo-link:focus-visible,
+#mainNavbar .scholarship-promo-link:active {
+  color: #fff !important;
+  box-shadow: 0 10px 26px rgba(192, 57, 43, 0.42);
+  transform: translateY(-1px);
+}
+
+#mainNavbar .scholarship-promo-link.active {
+  color: #fff !important;
+  box-shadow: 0 10px 26px rgba(192, 57, 43, 0.42);
+}
+
+#mainNavbar .scholarship-promo-link:hover .promo-default,
+#mainNavbar .scholarship-promo-link:focus-visible .promo-default,
+#mainNavbar .scholarship-promo-link:active .promo-default {
+  opacity: 0;
+  animation-play-state: paused;
+}
+
+#mainNavbar .scholarship-promo-link:hover .promo-hover,
+#mainNavbar .scholarship-promo-link:focus-visible .promo-hover,
+#mainNavbar .scholarship-promo-link:active .promo-hover {
+  opacity: 1;
+  animation-play-state: paused;
+}
+
+@keyframes scholarship-text-default {
+  0%,
+  44% {
+    opacity: 1;
+  }
+
+  45%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes scholarship-text-offer {
+  0%,
+  44% {
+    opacity: 0;
+  }
+
+  45%,
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes scholarship-promo-blink {
+  0%,
+  38%,
+  100% {
+    opacity: 1;
+    filter: brightness(1);
+  }
+
+  39%,
+  42% {
+    opacity: 0.35;
+    filter: brightness(1.25);
+  }
+
+  43%,
+  74% {
+    opacity: 1;
+    filter: brightness(1.08);
+  }
+
+  75%,
+  78% {
+    opacity: 0.5;
+    filter: brightness(1.2);
+  }
+}
+
+@keyframes scholarship-promo-shine {
+  0%,
+  20% {
+    transform: translateX(-120%);
+  }
+
+  35%,
+  100% {
+    transform: translateX(120%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #mainNavbar .scholarship-promo-link {
+    animation-duration: 1.7s;
+  }
+
+  #mainNavbar .scholarship-promo-link::after {
+    animation-duration: 5s;
+  }
+
+  #mainNavbar .scholarship-promo-link .promo-default,
+  #mainNavbar .scholarship-promo-link .promo-hover {
+    animation-duration: 3.4s;
+  }
 }
 
 .cl-card {

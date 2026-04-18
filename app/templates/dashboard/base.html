@@ -25,6 +25,24 @@
         <li class="nav-item">
           <a class="nav-link {% if request.endpoint in ['dashboard.profile', 'dashboard.profile_update'] %}active{% endif %}" href="/dashboard/profile"><i class="fa-solid fa-user me-1"></i>My Profile</a>
         </li>
+        {% if not current_user.scholarship_pct %}
+          <li class="nav-item">
+            <a class="nav-link {% if request.path == '/scholarship' %}active{% endif %}" href="/scholarship"><i class="fas fa-medal me-1"></i>Scholarship</a>
+          </li>
+        {% else %}
+          <li class="nav-item">
+            <a class="nav-link {% if request.path == '/scholarship/result' %}active{% endif %}" href="/scholarship/result"><i class="fas fa-medal me-1"></i>{{ current_user.scholarship_pct }}% Off</a>
+          </li>
+        {% endif %}
+        <li class="nav-item">
+          <a class="nav-link" href="/test-series"><i class="fas fa-clipboard-list me-1"></i>Mock Tests</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/demo"><i class="fas fa-calendar-check me-1"></i>Book Demo</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/"><i class="fas fa-globe me-1"></i>Website</a>
+        </li>
       </ul>
     </div>
   </div>
@@ -44,6 +62,45 @@
           <a class="nav-link {% if request.endpoint == 'dashboard.tests' %}active{% endif %}" href="/dashboard/tests"><i class="fa-solid fa-chart-line me-2"></i>Test History</a>
           <a class="nav-link {% if request.endpoint == 'dashboard.resources' %}active{% endif %}" href="/dashboard/resources"><i class="fa-solid fa-folder-open me-2"></i>Study Resources</a>
           <a class="nav-link {% if request.endpoint in ['dashboard.profile', 'dashboard.profile_update'] %}active{% endif %}" href="/dashboard/profile"><i class="fa-solid fa-user me-2"></i>My Profile</a>
+
+          <div class="nav-item">
+            <hr style="border-color: rgba(255,255,255,0.1); margin: 8px 16px;">
+          </div>
+
+          {% if not current_user.scholarship_pct %}
+            <div class="nav-item">
+              <a href="/scholarship" class="nav-link {% if request.path == '/scholarship' %}active{% endif %}">
+                <i class="fas fa-medal me-2"></i>Take Scholarship Test
+                <span class="badge bg-warning text-dark ms-1" style="font-size: 10px;">New</span>
+              </a>
+            </div>
+          {% else %}
+            <div class="nav-item">
+              <a href="/scholarship/result" class="nav-link {% if request.path == '/scholarship/result' %}active{% endif %}">
+                <i class="fas fa-medal me-2"></i>My Scholarship ({{ current_user.scholarship_pct }}% Off)
+              </a>
+            </div>
+          {% endif %}
+
+          <div class="nav-item">
+            <a href="/test-series" class="nav-link" target="_blank" rel="noopener noreferrer">
+              <i class="fas fa-clipboard-list me-2"></i>Mock Tests
+            </a>
+          </div>
+
+          <div class="nav-item">
+            <a href="/demo" class="nav-link">
+              <i class="fas fa-calendar-check me-2"></i>Book Demo Class
+            </a>
+          </div>
+
+          <hr style="border-color: rgba(255,255,255,0.1); margin: 8px 16px;">
+
+          <div class="nav-item">
+            <a href="/" class="nav-link">
+              <i class="fas fa-globe me-2"></i>Main Website
+            </a>
+          </div>
         </nav>
 
         <div class="mt-auto px-2 pb-3">

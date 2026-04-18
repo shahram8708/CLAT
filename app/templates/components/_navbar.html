@@ -1,8 +1,8 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top" id="mainNavbar">
   <div class="container">
     <a class="navbar-brand lh-sm" href="{{ url_for('main.index') }}">
-      <span class="fw-bold d-block" style="font-family: 'Poppins', sans-serif; color: var(--cl-navy);">Career Launcher Ahmedabad</span>
-      <small class="text-uppercase" style="font-size: 11px; color: var(--cl-blue);">Part of CL Educate Ltd.</small>
+      <span class="fw-bold d-block" style="font-family: 'Poppins', sans-serif; color: var(--cl-navy);">CLA</span>
+      <small class="text-uppercase" style="font-size: 11px; color: var(--cl-blue);">Career Launcher Ahmedabad</small>
     </a>
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbarCollapse" aria-controls="mainNavbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,19 +36,19 @@
           <a class="nav-link {% if request.path.startswith('/results') %}active{% endif %}" href="/results">Results</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link {% if request.path.startswith('/scholarship') %}active{% endif %}" href="/scholarship">
-            Scholarship
-            <span class="badge bg-danger ms-1">Up to 50% Off</span>
+          <a class="nav-link scholarship-promo-link {% if request.path.startswith('/scholarship') %}active{% endif %}" href="/scholarship">
+            <span class="promo-default">Scholarship</span>
+            <span class="promo-hover">Up to 50% Off</span>
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link {% if request.path.startswith('/test-series') %}active{% endif %}" href="/test-series">Test Series</a>
+          <a class="nav-link {% if request.path.startswith('/test-series') %}active{% endif %}" href="/test-series">Free</a>
         </li>
         <li class="nav-item">
           <a class="nav-link {% if request.path.startswith('/blog') %}active{% endif %}" href="/blog">Blog</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link {% if request.path.startswith('/free-resources') %}active{% endif %}" href="/free-resources">Free Resources</a>
+          <a class="nav-link {% if request.path.startswith('/free-resources') %}active{% endif %}" href="/free-resources">Hub</a>
         </li>
         <li class="nav-item">
           <a class="nav-link {% if request.endpoint == 'main.contact' or request.endpoint == 'main.contact_submit' %}active{% endif %}" href="{{ url_for('main.contact') }}">Contact</a>
@@ -56,10 +56,10 @@
       </ul>
 
       <div class="d-flex align-items-center gap-3 mt-3 mt-lg-0">
-        <a href="/demo" class="btn btn-cl-primary ms-3">Book Free Demo</a>
+        <a href="/demo" class="btn btn-cl-primary ms-3">Unlock</a>
         {% if current_user.is_authenticated %}
-          <a href="/dashboard" class="btn btn-outline-secondary btn-sm ms-2" title="My Dashboard">
-            <i class="fas fa-user-circle me-1"></i>{{ current_user.first_name }}
+          <a href="/dashboard" class="btn btn-outline-secondary btn-sm ms-2 d-inline-flex align-items-center text-nowrap" title="My Dashboard">
+            <i class="fas fa-user-circle me-1"></i><span>{{ current_user.first_name }}</span>
           </a>
           {% if current_user.role == 'admin' %}
             <a href="/admin" class="btn btn-warning btn-sm ms-1" title="Admin Panel">
@@ -67,8 +67,8 @@
             </a>
           {% endif %}
         {% else %}
-          <a href="/login" class="btn btn-outline-secondary btn-sm ms-2" title="Login">
-            <i class="fas fa-sign-in-alt me-1"></i>Login
+          <a href="/login" class="btn btn-outline-secondary btn-sm ms-2 d-inline-flex align-items-center text-nowrap" title="Login">
+            <i class="fas fa-sign-in-alt me-1"></i><span>Login</span>
           </a>
           <a href="/register" class="btn btn-outline-light btn-sm ms-1" title="Register">
             Register

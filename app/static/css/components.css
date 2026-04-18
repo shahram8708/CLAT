@@ -672,6 +672,7 @@ footer.site-footer {
   right: 20px;
   z-index: 10000;
   min-width: 300px;
+  max-width: calc(100vw - 24px);
 }
 
 .ql-container {

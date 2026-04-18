@@ -3,6 +3,13 @@
 {% block admin_page_title %}Courses{% endblock %}
 
 {% block admin_content %}
+<nav aria-label="breadcrumb" class="mb-3">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/admin">Admin Dashboard</a></li>
+    <li class="breadcrumb-item active">Courses</li>
+  </ol>
+</nav>
+
 <div class="bg-white border rounded-3 p-3">
   <div class="table-responsive">
     <table class="table table-hover align-middle admin-table mb-0">
@@ -25,7 +32,11 @@
           <tr>
             <td>{{ loop.index }}</td>
             <td>{{ course.icon or '📘' }}</td>
-            <td>{{ course.title }}</td>
+            <td>
+              <a href="/courses/{{ course.slug }}" target="_blank" rel="noopener noreferrer" class="text-decoration-none">
+                {{ course.title }} <i class="fas fa-external-link-alt ms-1 small"></i>
+              </a>
+            </td>
             <td><span class="badge text-bg-light border">{{ course.exam_category }}</span></td>
             <td>{{ course.mode | title if course.mode else '-' }}</td>
             <td>₹{{ course.fee_min | format_inr }} – ₹{{ course.fee_max | format_inr }}</td>
