@@ -30,6 +30,16 @@
   </div>
 </section>
 
+<div class="container py-3">
+  <div class="d-flex flex-wrap gap-2 justify-content-center">
+    <a href="/test-series/clat" class="btn btn-sm btn-outline-primary">Free CLAT Mock Test</a>
+    <a href="/test-series/cat" class="btn btn-sm btn-outline-primary">Free CAT Mock Test</a>
+    <a href="/scholarship" class="btn btn-sm btn-outline-warning">Scholarship Test</a>
+    <a href="/courses" class="btn btn-sm btn-outline-secondary">Explore Programs</a>
+    <a href="/demo" class="btn btn-sm btn-cl-primary">Book Free Demo</a>
+  </div>
+</div>
+
 <section class="section-space">
   <div class="container">
     <div class="row g-4">
@@ -55,11 +65,17 @@
                 Download Free
               </button>
             {% else %}
-              <a href="{{ resource.download_url }}" target="_blank" class="btn btn-cl-primary">Download Free</a>
+              <a href="{{ resource.download_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-cl-primary">Download Free</a>
             {% endif %}
           </article>
         </div>
       {% endfor %}
+    </div>
+
+    <div class="text-center mt-4">
+      <p class="text-muted">Want structured coaching with full study material?</p>
+      <a href="/courses" class="btn btn-cl-primary me-2">Explore Our Programs →</a>
+      <a href="/demo" class="btn btn-cl-outline">Book Free Demo →</a>
     </div>
   </div>
 </section>

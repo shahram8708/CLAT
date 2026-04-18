@@ -95,6 +95,13 @@
         {% endfor %}
       </div>
     {% endif %}
+
+    <div class="cl-card p-4 text-center mt-4">
+      <h5>Preparing for {{ exam }}?</h5>
+      <p class="text-muted mb-3">Explore our full {{ exam }} coaching program and save up to 50% with our scholarship test.</p>
+      <a href="/courses" class="btn btn-cl-primary me-2">View {{ exam }} Program →</a>
+      <a href="/scholarship" class="btn btn-cl-outline">Check Scholarship →</a>
+    </div>
   </div>
 </section>
 
@@ -112,6 +119,10 @@
         </div>
       {% endfor %}
     </div>
+    <div class="text-center mt-3">
+      <a href="/faculty" class="small text-decoration-none me-3" style="color: var(--cl-red);">Meet {{ exam }} Faculty →</a>
+      <a href="/results" class="small text-decoration-none" style="color: var(--cl-red);">See {{ exam }} Toppers →</a>
+    </div>
   </div>
 </section>
 
@@ -125,6 +136,9 @@
           {{ render_blog_card(post) }}
         </div>
       {% endfor %}
+    </div>
+    <div class="text-center mt-3">
+      <a href="/blog/{{ exam | lower }}" class="fw-semibold text-decoration-none" style="color: var(--cl-red);">Read More {{ exam }} Articles →</a>
     </div>
   </div>
 </section>

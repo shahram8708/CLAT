@@ -24,6 +24,9 @@
             <li><a class="dropdown-item" href="/courses/gmat-gre">GMAT/GRE</a></li>
             <li><a class="dropdown-item" href="/courses/cuet">CUET</a></li>
             <li><a class="dropdown-item" href="/courses/class-xi-xii-maths">Class XI–XII Maths</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="/scholarship"><i class="fas fa-medal me-2 text-warning"></i>Scholarship Test</a></li>
+            <li><a class="dropdown-item" href="/free-resources"><i class="fas fa-download me-2 text-success"></i>Free Resources</a></li>
           </ul>
         </li>
         <li class="nav-item">
@@ -33,10 +36,19 @@
           <a class="nav-link {% if request.path.startswith('/results') %}active{% endif %}" href="/results">Results</a>
         </li>
         <li class="nav-item">
+          <a class="nav-link {% if request.path.startswith('/scholarship') %}active{% endif %}" href="/scholarship">
+            Scholarship
+            <span class="badge bg-danger ms-1">Up to 50% Off</span>
+          </a>
+        </li>
+        <li class="nav-item">
           <a class="nav-link {% if request.path.startswith('/test-series') %}active{% endif %}" href="/test-series">Test Series</a>
         </li>
         <li class="nav-item">
           <a class="nav-link {% if request.path.startswith('/blog') %}active{% endif %}" href="/blog">Blog</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.path.startswith('/free-resources') %}active{% endif %}" href="/free-resources">Free Resources</a>
         </li>
         <li class="nav-item">
           <a class="nav-link {% if request.endpoint == 'main.contact' or request.endpoint == 'main.contact_submit' %}active{% endif %}" href="{{ url_for('main.contact') }}">Contact</a>
@@ -44,18 +56,22 @@
       </ul>
 
       <div class="d-flex align-items-center gap-3 mt-3 mt-lg-0">
-        <a href="#" class="btn btn-cl-primary ms-3" data-bs-toggle="modal" data-bs-target="#demoModal">Book Free Demo</a>
+        <a href="/demo" class="btn btn-cl-primary ms-3">Book Free Demo</a>
         {% if current_user.is_authenticated %}
-          <a href="/dashboard" class="text-dark" aria-label="Dashboard">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor" width="24" height="24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6.75a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.5 20.118a7.5 7.5 0 0 1 15 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.5-1.632Z" />
-            </svg>
+          <a href="/dashboard" class="btn btn-outline-secondary btn-sm ms-2" title="My Dashboard">
+            <i class="fas fa-user-circle me-1"></i>{{ current_user.first_name }}
           </a>
+          {% if current_user.role == 'admin' %}
+            <a href="/admin" class="btn btn-warning btn-sm ms-1" title="Admin Panel">
+              <i class="fas fa-shield-alt me-1"></i>Admin
+            </a>
+          {% endif %}
         {% else %}
-          <a href="/login" class="text-dark" aria-label="Login">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor" width="24" height="24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6.75a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.5 20.118a7.5 7.5 0 0 1 15 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.5-1.632Z" />
-            </svg>
+          <a href="/login" class="btn btn-outline-secondary btn-sm ms-2" title="Login">
+            <i class="fas fa-sign-in-alt me-1"></i>Login
+          </a>
+          <a href="/register" class="btn btn-outline-light btn-sm ms-1" title="Register">
+            Register
           </a>
         {% endif %}
       </div>

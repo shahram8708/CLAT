@@ -8,9 +8,15 @@ def _to_bool(value, default=False):
 
 
 def _database_url():
-    database_url = os.environ.get("DATABASE_URL", "sqlite:///instance/dev.db")
+    database_url = os.environ.get("DATABASE_URL", "sqlite:///dev.db").strip()
     if database_url.startswith("postgres://"):
         database_url = database_url.replace("postgres://", "postgresql://", 1)
+
+    # Flask-SQLAlchemy resolves relative sqlite paths against app.instance_path.
+    # Normalize legacy values to avoid ending up at instance/instance/<db>.db.
+    if database_url.startswith("sqlite:///instance/"):
+        database_url = database_url.replace("sqlite:///instance/", "sqlite:///", 1)
+
     return database_url
 
 

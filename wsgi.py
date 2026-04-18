@@ -3,7 +3,9 @@ from app.extensions import db
 from app.models.user import User
 
 
-app = create_app()
+flask_app = create_app()
+# Keep `app` for WSGI servers (e.g., gunicorn wsgi:app).
+app = flask_app
 
 
 def run_seeds():
@@ -15,7 +17,7 @@ def run_seeds():
 def ensure_admin_user():
     admin_user = User.query.filter_by(role="admin").first()
     if admin_user:
-        app.logger.info("Admin user already exists: %s", admin_user.email)
+        flask_app.logger.info("Admin user already exists: %s", admin_user.email)
         return admin_user
 
     admin_user = User(
@@ -30,30 +32,30 @@ def ensure_admin_user():
 
     db.session.add(admin_user)
     db.session.commit()
-    app.logger.info("Created default admin user: %s", admin_user.email)
+    flask_app.logger.info("Created default admin user: %s", admin_user.email)
     return admin_user
 
 
 def initialize_database():
-    app.logger.info("Initializing database tables.")
+    flask_app.logger.info("Initializing database tables.")
     db.create_all()
-    app.logger.info("Database tables are ready.")
+    flask_app.logger.info("Database tables are ready.")
 
-    app.logger.info("Running seed data.")
+    flask_app.logger.info("Running seed data.")
     try:
         run_seeds()
-        app.logger.info("Seed data complete.")
+        flask_app.logger.info("Seed data complete.")
     except Exception as exc:
         db.session.rollback()
-        app.logger.exception("Seed data failed: %s", exc)
+        flask_app.logger.exception("Seed data failed: %s", exc)
         raise
 
-    app.logger.info("Checking admin user.")
+    flask_app.logger.info("Checking admin user.")
     ensure_admin_user()
 
 
 if __name__ == "__main__":
-    with app.app_context():
+    with flask_app.app_context():
         initialize_database()
 
-    app.run(debug=True, use_reloader=False, host="0.0.0.0", port=5000)
+    flask_app.run(debug=True, use_reloader=False, host="0.0.0.0", port=5000)

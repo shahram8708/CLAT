@@ -5,9 +5,9 @@
         <h5 class="fw-bold">Career Launcher Ahmedabad</h5>
         <p class="mb-3">Ahmedabad's Most Trusted Coaching Institute</p>
         <div class="footer-social">
-          <a href="https://www.instagram.com" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-          <a href="https://www.youtube.com" target="_blank" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
-          <a href="https://wa.me/919978559986" target="_blank" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+          <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+          <a href="https://wa.me/919978559986" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
         </div>
       </div>
 
@@ -20,6 +20,7 @@
           <li><a href="/courses/gmat-gre">GMAT / GRE</a></li>
           <li><a href="/courses/cuet">CUET</a></li>
           <li><a href="/courses/class-xi-xii-maths">Class XI–XII Mathematics</a></li>
+          <li class="mt-2"><a href="/courses" style="color: var(--cl-red);">All Programs →</a></li>
         </ul>
       </div>
 
@@ -30,8 +31,10 @@
           <li><a href="/faculty">Faculty</a></li>
           <li><a href="/results">Results</a></li>
           <li><a href="{{ url_for('main.free_resources') }}">Free Resources</a></li>
-          <li><a href="/scholarship">Scholarships</a></li>
+          <li><a href="/scholarship">Scholarship Test</a></li>
           <li><a href="/blog">Blog</a></li>
+          <li><a href="/privacy-policy">Privacy Policy</a></li>
+          <li><a href="/terms">Terms & Conditions</a></li>
           <li><a href="{{ url_for('main.contact') }}">Contact</a></li>
         </ul>
       </div>
@@ -42,7 +45,15 @@
         <p class="mb-1"><a href="tel:+919978559986">+91 9978559986</a></p>
         <p class="mb-1"><a href="tel:+916353842725">+91 6353842725</a></p>
         <p class="mb-1"><a href="mailto:cl_ahmedabad@careerlauncher.com">cl_ahmedabad@careerlauncher.com</a></p>
-        <p class="mb-0">Mon–Sat 10AM–7PM, Sun 9AM–6PM</p>
+        <p class="mb-2">Mon–Sat 10AM–7PM, Sun 9AM–6PM</p>
+
+        <h6 class="mt-3 mb-2">Student Portal</h6>
+        <ul class="list-unstyled mb-0">
+          <li><a href="/login">Login to Dashboard</a></li>
+          <li><a href="/register">Create Account</a></li>
+          <li><a href="/scholarship">Take Scholarship Test</a></li>
+          <li><a href="/free-resources">Free Study Resources</a></li>
+        </ul>
       </div>
     </div>
 
@@ -57,6 +68,6 @@
 </footer>
 
 <a href="https://wa.me/919978559986?text=Hi%2C%20I%20want%20to%20book%20a%20free%20demo%20class%20at%20CL%20Ahmedabad"
-   class="whatsapp-float" target="_blank" aria-label="WhatsApp Us">
+  class="whatsapp-float" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp Us">
   <i class="fab fa-whatsapp"></i>
 </a>

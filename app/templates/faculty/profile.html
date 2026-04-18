@@ -3,6 +3,10 @@
 
 {% set parts = (faculty.name or '').split() %}
 {% set initials = ((parts[0][0] if parts|length > 0 else 'F') ~ (parts[1][0] if parts|length > 1 else ''))|upper %}
+{% set exam_slug_map = {'CAT': 'cat', 'CLAT': 'clat', 'IPMAT': 'ipmat', 'GMAT': 'gmat', 'CUET': 'cuet'} %}
+{% set primary_exam = (faculty.exam_tags_list[0] if faculty.exam_tags_list else '') %}
+{% set primary_exam_slug = exam_slug_map.get(primary_exam, '') %}
+{% set primary_exam_url = '/test-series/' ~ primary_exam_slug if primary_exam_slug else '/test-series' %}
 
 {% block title %}{{ meta_title or (faculty.name ~ ' — ' ~ faculty.title ~ ' | Career Launcher Ahmedabad') }}{% endblock %}
 {% block meta_description %}{{ faculty.bio_short }}{% endblock %}
@@ -84,6 +88,23 @@
         <span class="badge rounded-pill me-2 mb-2 px-3 py-2" style="background: var(--cl-red); color: #fff;">{{ exam }}</span>
       {% endfor %}
     </div>
+
+    <div class="mt-3">
+      {% for exam_tag in faculty.exam_tags_list %}
+        {% set exam_slug = exam_slug_map.get(exam_tag, '') %}
+        {% set exam_url = '/test-series/' ~ exam_slug if exam_slug else '/test-series' %}
+        <a href="{{ exam_url }}" class="btn btn-sm btn-outline-primary me-2 mb-2">
+          Free {{ exam_tag }} Mock Tests →
+        </a>
+      {% endfor %}
+    </div>
+    <div class="mt-2">
+      {% for exam_tag in faculty.exam_tags_list %}
+        <a href="/courses" class="btn btn-sm btn-outline-secondary me-2 mb-2">
+          View {{ exam_tag }} Course →
+        </a>
+      {% endfor %}
+    </div>
   </div>
 </section>
 
@@ -109,6 +130,10 @@
         </div>
       {% endfor %}
     </div>
+    <div class="d-flex flex-wrap gap-3">
+      <a href="/results" class="fw-semibold text-decoration-none" style="color: var(--cl-red);">See All Results →</a>
+      <a href="/scholarship" class="fw-semibold text-decoration-none" style="color: var(--cl-blue);">Appear for Scholarship Test →</a>
+    </div>
   </div>
 </section>
 {% endif %}
@@ -119,7 +144,10 @@
     <p class="mb-4" style="color: rgba(255, 255, 255, 0.8);">Book a free demo class and experience the teaching style yourself.</p>
     <div class="d-flex flex-wrap justify-content-center gap-3">
       <a href="/demo" class="btn btn-cl-primary">Book Free Demo →</a>
-      <a href="https://wa.me/919978559986?text=Hi%2C%20please%20share%20the%20class%20schedule%20for%20this%20faculty" target="_blank" class="btn btn-success rounded-pill px-4">WhatsApp for Class Schedule →</a>
+      <a href="{{ primary_exam_url }}" class="btn btn-cl-outline">
+        Take {{ primary_exam if primary_exam else 'Free' }} Mock Test →
+      </a>
+      <a href="https://wa.me/919978559986?text=Hi%2C%20please%20share%20the%20class%20schedule%20for%20this%20faculty" target="_blank" rel="noopener noreferrer" class="btn btn-success rounded-pill px-4">WhatsApp for Class Schedule →</a>
     </div>
   </div>
 </section>

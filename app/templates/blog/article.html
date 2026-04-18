@@ -6,6 +6,8 @@
 
 {% block content %}
 {% set author_name = post.author.get_full_name() if post.author else 'CL Ahmedabad Team' %}
+{% set test_series_categories = ['cat', 'clat', 'ipmat', 'cuet', 'gmat'] %}
+{% set exam_test_url = '/test-series/' ~ post.category if post.category in test_series_categories else '/test-series' %}
 
 {% if post.category == 'cat' %}
   {% set related_programs = [
@@ -119,6 +121,16 @@
             </div>
           </section>
         {% endif %}
+
+        <div class="text-center py-4 mt-4" style="background: var(--cl-bg);">
+          <p class="mb-2">Want to test your {{ post.category | upper }} preparation?</p>
+          <a href="{{ exam_test_url }}" class="btn btn-cl-primary me-2">
+            Take Free {{ post.category | upper }} Mock Test →
+          </a>
+          <a href="/scholarship" class="btn btn-cl-outline">
+            Check Scholarship Eligibility →
+          </a>
+        </div>
       </div>
 
       <div class="col-lg-4">
@@ -126,16 +138,22 @@
           <div class="cl-card blog-sidebar-card mb-4">
             <h5 style="color: var(--cl-navy);">Start Your Preparation Today</h5>
             <p class="text-muted mb-3">Get expert guidance, structured study plans, and personalised mentorship from CL Ahmedabad faculty.</p>
-            <a href="#" class="btn btn-cl-primary w-100 mb-2" data-bs-toggle="modal" data-bs-target="#demoModal">Book Free Demo →</a>
-            <a href="https://wa.me/919978559986?text=Hi%2C%20I%20want%20to%20book%20a%20free%20demo%20class%20at%20CL%20Ahmedabad" class="btn btn-success w-100" target="_blank" rel="noopener">WhatsApp Us</a>
+            <a href="/demo" class="btn btn-cl-primary w-100 mb-2">Book Free Demo →</a>
+            <a href="/scholarship" class="btn btn-outline-warning w-100 mt-2 btn-sm">
+              <i class="fas fa-medal me-1"></i>Check Scholarship →
+            </a>
+            <a href="https://wa.me/919978559986?text=Hi%2C%20I%20want%20to%20book%20a%20free%20demo%20class%20at%20CL%20Ahmedabad" class="btn btn-success w-100 mt-2" target="_blank" rel="noopener noreferrer">WhatsApp Us</a>
           </div>
 
           <div class="cl-card blog-sidebar-card mb-4">
-            <h6 class="mb-3" style="color: var(--cl-navy);">Related Programs</h6>
+            <h6 class="mb-3" style="color: var(--cl-navy);">Quick Links</h6>
             <ul class="list-unstyled mb-0">
               {% for link, label in related_programs %}
                 <li class="mb-2"><a href="{{ link }}" class="text-decoration-none" style="color: var(--cl-blue);">{{ label }}</a></li>
               {% endfor %}
+              <li class="mb-2 mt-3"><a href="{{ exam_test_url }}" class="text-decoration-none" style="color: var(--cl-red);">Free Mock Tests →</a></li>
+              <li class="mb-2"><a href="/free-resources" class="text-decoration-none" style="color: var(--cl-blue);">Free Study Resources →</a></li>
+              <li class="mb-0"><a href="/results" class="text-decoration-none" style="color: var(--cl-blue);">View All Results →</a></li>
             </ul>
           </div>
 
@@ -143,7 +161,7 @@
             <div class="cl-card blog-sidebar-card">
               <h6 class="mb-2" style="color: var(--cl-navy);">Free Mock Test</h6>
               <p class="small text-muted mb-3">Test your preparation with timed mocks and instant analysis.</p>
-              <a href="/test-series/{{ post.category }}" class="btn btn-cl-outline w-100" style="border-color: var(--cl-navy); color: var(--cl-navy);">Test Your Preparation</a>
+              <a href="{{ exam_test_url }}" class="btn btn-cl-outline w-100" style="border-color: var(--cl-navy); color: var(--cl-navy);">Test Your Preparation</a>
             </div>
           {% endif %}
         </div>

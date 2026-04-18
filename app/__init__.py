@@ -1,3 +1,4 @@
+import importlib
 import os
 from pathlib import Path
 
@@ -131,7 +132,7 @@ def create_app(config_name="development"):
 
     app.wsgi_app = WhiteNoise(app.wsgi_app, root="app/static/", prefix="static")
 
-    import app.models  # noqa: F401
+    importlib.import_module("app.models")
     from app.models import ScholarshipQuestion  # noqa: F401
 
     return app
