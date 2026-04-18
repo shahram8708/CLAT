@@ -1,0 +1,52 @@
+{% extends 'admin/base.html' %}
+
+{% block admin_page_title %}Courses{% endblock %}
+
+{% block admin_content %}
+<div class="bg-white border rounded-3 p-3">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle admin-table mb-0">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Icon</th>
+          <th>Title</th>
+          <th>Category</th>
+          <th>Mode</th>
+          <th>Fee Range (₹)</th>
+          <th>Batch Size</th>
+          <th>Active</th>
+          <th>Order</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for course in courses %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ course.icon or '📘' }}</td>
+            <td>{{ course.title }}</td>
+            <td><span class="badge text-bg-light border">{{ course.exam_category }}</span></td>
+            <td>{{ course.mode | title if course.mode else '-' }}</td>
+            <td>₹{{ course.fee_min | format_inr }} – ₹{{ course.fee_max | format_inr }}</td>
+            <td>{{ course.batch_size if course.batch_size is not none else '-' }}</td>
+            <td>
+              {% if course.is_active %}
+                <span class="text-success"><i class="fa-solid fa-circle-check"></i></span>
+              {% else %}
+                <span class="text-danger"><i class="fa-solid fa-circle-xmark"></i></span>
+              {% endif %}
+            </td>
+            <td>{{ course.display_order if course.display_order is not none else 0 }}</td>
+            <td><a href="/admin/courses/{{ course.id }}/edit" class="btn btn-outline-primary btn-sm">Edit →</a></td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="10" class="text-center text-muted py-4">No courses available.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

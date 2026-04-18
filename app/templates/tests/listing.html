@@ -80,7 +80,15 @@
                     <a href="/test-series/{{ exam_name | lower }}" class="btn btn-sm btn-cl-outline" style="background: var(--cl-navy); border-color: var(--cl-navy); color: #fff;">Start Free Test →</a>
                   {% else %}
                     <div class="test-price-paid mb-2">₹{{ series.price }}</div>
-                    <a href="/test-series/{{ exam_name | lower }}" class="btn btn-sm btn-cl-primary">Buy Now</a>
+                      <button
+                        type="button"
+                        class="btn btn-cl-primary btn-sm buy-now-btn"
+                        data-series-id="{{ series.id }}"
+                        data-price="{{ series.price }}"
+                        data-series-name="{{ series.name }}"
+                      >
+                        Buy Now
+                      </button>
                     <p class="small text-muted mt-2 mb-0">Includes full analysis + percentile report</p>
                   {% endif %}
                 </div>
@@ -138,4 +146,147 @@
     <a href="/test-series/clat" class="btn btn-cl-primary">Start Free Mock Test →</a>
   </div>
 </section>
+{% endblock %}
+
+{% block extra_js %}
+<meta name="csrf-token" content="{{ csrf_token() }}">
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+  window.isAuthenticated = {{ current_user.is_authenticated | tojson }};
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || "";
+
+    function showPaymentToast(message, isSuccess) {
+      const toastId = "paymentToast";
+      let toastEl = document.getElementById(toastId);
+
+      if (!toastEl) {
+        toastEl = document.createElement("div");
+        toastEl.id = toastId;
+        toastEl.className = "toast payment-toast";
+        toastEl.setAttribute("role", "status");
+        toastEl.setAttribute("aria-live", "polite");
+        toastEl.setAttribute("aria-atomic", "true");
+        toastEl.innerHTML = `
+          <div class="toast-header">
+            <strong class="me-auto">Career Launcher Ahmedabad</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+          <div class="toast-body"></div>
+        `;
+        document.body.appendChild(toastEl);
+      }
+
+      const body = toastEl.querySelector(".toast-body");
+      body.textContent = message;
+      body.className = `toast-body ${isSuccess ? "text-success" : "text-muted"}`;
+
+      const toast = bootstrap.Toast.getOrCreateInstance(toastEl, { delay: 2500 });
+      toast.show();
+    }
+
+    async function verifyPayment(payload) {
+      const response = await fetch("/payment/verify", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrfToken
+        },
+        body: JSON.stringify(payload)
+      });
+
+      return response.json();
+    }
+
+    async function createOrder(testSeriesId, amountInr) {
+      const response = await fetch("/payment/create-order", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrfToken
+        },
+        body: JSON.stringify({ test_series_id: Number(testSeriesId), amount_inr: Number(amountInr) })
+      });
+
+      const data = await response.json();
+      if (!response.ok || data.status !== "success") {
+        throw new Error(data.message || "Unable to initiate payment right now.");
+      }
+
+      return data;
+    }
+
+    document.querySelectorAll(".buy-now-btn").forEach((button) => {
+      button.addEventListener("click", async function () {
+        const testSeriesId = this.dataset.seriesId;
+        const amountInr = this.dataset.price;
+        const seriesName = this.dataset.seriesName;
+
+        if (!window.isAuthenticated) {
+          window.location.href = "/login?next=/test-series";
+          return;
+        }
+
+        this.disabled = true;
+        const originalLabel = this.textContent;
+        this.textContent = "Processing...";
+
+        try {
+          const orderData = await createOrder(testSeriesId, amountInr);
+
+          const options = {
+            key: orderData.key_id,
+            amount: orderData.amount,
+            currency: orderData.currency,
+            name: "Career Launcher Ahmedabad",
+            description: seriesName,
+            order_id: orderData.order_id,
+            prefill: {
+              name: orderData.user_name,
+              email: orderData.user_email,
+              contact: orderData.user_phone
+            },
+            theme: {
+              color: "#C0392B"
+            },
+            handler: async function (responsePayload) {
+              try {
+                const verifyData = await verifyPayment({
+                  razorpay_order_id: responsePayload.razorpay_order_id,
+                  razorpay_payment_id: responsePayload.razorpay_payment_id,
+                  razorpay_signature: responsePayload.razorpay_signature
+                });
+
+                if (verifyData.status === "success") {
+                  showPaymentToast("Payment successful!", true);
+                  setTimeout(function () {
+                    window.location.href = verifyData.redirect;
+                  }, 1000);
+                } else {
+                  showPaymentToast(verifyData.message || "Payment verification failed.", false);
+                }
+              } catch (error) {
+                showPaymentToast(error.message || "Payment verification failed.", false);
+              }
+            },
+            modal: {
+              ondismiss: function () {
+                showPaymentToast("Payment cancelled. You can try again anytime.", false);
+              }
+            }
+          };
+
+          const razorpayCheckout = new Razorpay(options);
+          razorpayCheckout.open();
+        } catch (error) {
+          showPaymentToast(error.message || "Payment gateway error. Please try again.", false);
+        } finally {
+          this.disabled = false;
+          this.textContent = originalLabel;
+        }
+      });
+    });
+  });
+</script>
 {% endblock %}

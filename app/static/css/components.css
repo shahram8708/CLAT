@@ -594,3 +594,127 @@ footer.site-footer {
   font-size: 28px;
   font-weight: 700;
 }
+
+.admin-stat-card {
+  background: #fff;
+  border-left: 4px solid #C0392B;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.admin-badge-new {
+  background: #3498DB;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.admin-badge-contacted {
+  background: #F39C12;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.admin-badge-enrolled {
+  background: #27AE60;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.admin-badge-dropped {
+  background: #E74C3C;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.admin-badge-success {
+  background: #27AE60;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.admin-badge-pending {
+  background: #F39C12;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.admin-badge-failed {
+  background: #E74C3C;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.payment-toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 10000;
+  min-width: 300px;
+}
+
+.ql-container {
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+}
+
+.ql-toolbar {
+  border-radius: 8px 8px 0 0 !important;
+  border-color: var(--cl-border) !important;
+}
+
+.ql-container.ql-snow {
+  border-radius: 0 0 8px 8px !important;
+  border-color: var(--cl-border) !important;
+}
+
+.seo-preview-title {
+  color: #1A0DAB;
+  font-size: 18px;
+  font-weight: 400;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.seo-preview-url {
+  color: #006621;
+  font-size: 14px;
+}
+
+.seo-preview-desc {
+  color: #545454;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.char-count-ok {
+  color: var(--cl-grey);
+  font-size: 12px;
+}
+
+.char-count-over {
+  color: var(--cl-red);
+  font-size: 12px;
+  font-weight: 600;
+}

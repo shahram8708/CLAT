@@ -1,0 +1,199 @@
+{% extends 'admin/base.html' %}
+
+{% block admin_page_title %}Dashboard{% endblock %}
+
+{% block admin_content %}
+<div class="row g-3 mb-4">
+  <div class="col-lg-3 col-md-6">
+    <div class="admin-stat-card h-100">
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <div>
+          <div class="text-muted small">Total Leads</div>
+          <div class="h3 mb-0">{{ total_leads }}</div>
+        </div>
+        <i class="fa-solid fa-person-lines-fill text-danger"></i>
+      </div>
+      <a href="/admin/leads" class="small text-decoration-none">View all leads →</a>
+    </div>
+  </div>
+
+  <div class="col-lg-3 col-md-6">
+    <div class="admin-stat-card h-100">
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <div>
+          <div class="text-muted small">Total Students</div>
+          <div class="h3 mb-0">{{ total_students }}</div>
+        </div>
+        <i class="fa-solid fa-users text-primary"></i>
+      </div>
+      <a href="/admin/students" class="small text-decoration-none">Manage students →</a>
+    </div>
+  </div>
+
+  <div class="col-lg-3 col-md-6">
+    <div class="admin-stat-card h-100">
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <div>
+          <div class="text-muted small">Total Enrollments</div>
+          <div class="h3 mb-0">{{ total_enrollments }}</div>
+        </div>
+        <i class="fa-solid fa-book-open text-success"></i>
+      </div>
+      <a href="/admin/courses" class="small text-decoration-none">View courses →</a>
+    </div>
+  </div>
+
+  <div class="col-lg-3 col-md-6">
+    <div class="admin-stat-card h-100">
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <div>
+          <div class="text-muted small">Total Revenue</div>
+          <div class="h3 mb-0">₹{{ total_revenue | format_inr }}</div>
+        </div>
+        <i class="fa-regular fa-credit-card text-warning"></i>
+      </div>
+      <a href="/admin/payments" class="small text-decoration-none">View payments →</a>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-lg-8">
+    <div class="bg-white rounded-3 border p-4 h-100">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0">Recent Lead Submissions</h5>
+        <a href="/admin/leads" class="small text-decoration-none">View All Leads →</a>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-hover align-middle admin-table mb-0">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Phone</th>
+              <th>Exam Interest</th>
+              <th>Source</th>
+              <th>Status</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for lead in recent_leads %}
+              <tr>
+                <td>{{ lead.first_name }} {{ lead.last_name }}</td>
+                <td>{{ lead.phone }}</td>
+                <td>{{ lead.exam_interest or '-' }}</td>
+                <td>{{ lead.source_page or '-' }}</td>
+                <td>
+                  {% if lead.status == 'new' %}
+                    <span class="admin-badge-new">New</span>
+                  {% elif lead.status == 'contacted' %}
+                    <span class="admin-badge-contacted">Contacted</span>
+                  {% elif lead.status == 'enrolled' %}
+                    <span class="admin-badge-enrolled">Enrolled</span>
+                  {% else %}
+                    <span class="admin-badge-dropped">Dropped</span>
+                  {% endif %}
+                </td>
+                <td>{{ lead.submitted_at.strftime('%d %b %Y, %I:%M %p') if lead.submitted_at else '-' }}</td>
+              </tr>
+            {% else %}
+              <tr>
+                <td colspan="6" class="text-center text-muted py-4">No leads found.</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="bg-white rounded-3 border p-4 mb-3">
+      <h5 class="mb-3">Quick Stats</h5>
+
+      <div class="mb-3">
+        <div class="d-flex justify-content-between small mb-1"><span>New: {{ lead_status_counts.new }}</span><span>{{ lead_status_percentages.new }}%</span></div>
+        <div class="progress" style="height: 8px;"><div class="progress-bar" style="width: {{ lead_status_percentages.new }}%; background: #3498DB;"></div></div>
+      </div>
+
+      <div class="mb-3">
+        <div class="d-flex justify-content-between small mb-1"><span>Contacted: {{ lead_status_counts.contacted }}</span><span>{{ lead_status_percentages.contacted }}%</span></div>
+        <div class="progress" style="height: 8px;"><div class="progress-bar" style="width: {{ lead_status_percentages.contacted }}%; background: #F39C12;"></div></div>
+      </div>
+
+      <div class="mb-3">
+        <div class="d-flex justify-content-between small mb-1"><span>Enrolled: {{ lead_status_counts.enrolled }}</span><span>{{ lead_status_percentages.enrolled }}%</span></div>
+        <div class="progress" style="height: 8px;"><div class="progress-bar" style="width: {{ lead_status_percentages.enrolled }}%; background: #27AE60;"></div></div>
+      </div>
+
+      <div class="mb-0">
+        <div class="d-flex justify-content-between small mb-1"><span>Dropped: {{ lead_status_counts.dropped }}</span><span>{{ lead_status_percentages.dropped }}%</span></div>
+        <div class="progress" style="height: 8px;"><div class="progress-bar" style="width: {{ lead_status_percentages.dropped }}%; background: #E74C3C;"></div></div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-3 border p-4">
+      <h6 class="mb-3">Recent Payments</h6>
+      {% for payment in recent_payments %}
+        <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+          <div>
+            <div class="fw-semibold">₹{{ payment.amount_inr | format_inr }}</div>
+            <div class="small text-muted">{{ payment.created_at.strftime('%d %b, %I:%M %p') if payment.created_at else '-' }}</div>
+          </div>
+          <div>
+            {% if payment.status == 'success' %}
+              <span class="admin-badge-success">Success</span>
+            {% elif payment.status == 'pending' %}
+              <span class="admin-badge-pending">Pending</span>
+            {% else %}
+              <span class="admin-badge-failed">Failed</span>
+            {% endif %}
+          </div>
+        </div>
+      {% else %}
+        <p class="text-muted mb-0">No payment records available.</p>
+      {% endfor %}
+      <div class="small text-muted mt-3">Pending amount: ₹{{ total_pending_amount | format_inr }}</div>
+    </div>
+  </div>
+</div>
+
+<div class="bg-white rounded-3 border p-4">
+  <h5 class="mb-3">Recent Test Attempts</h5>
+  <div class="table-responsive">
+    <table class="table table-hover align-middle admin-table mb-0">
+      <thead>
+        <tr>
+          <th>User Email</th>
+          <th>Test Name</th>
+          <th>Score</th>
+          <th>Date</th>
+          <th>Time Taken</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for attempt in recent_attempts %}
+          <tr>
+            <td>{{ attempt.user.email if attempt.user else '-' }}</td>
+            <td>{{ attempt.test.name if attempt.test else '-' }}</td>
+            <td>
+              {% if attempt.score is not none and attempt.max_score %}
+                {{ attempt.score }}/{{ attempt.max_score }}
+              {% else %}
+                -
+              {% endif %}
+            </td>
+            <td>{{ attempt.started_at.strftime('%d %b %Y') if attempt.started_at else '-' }}</td>
+            <td>{{ attempt.time_taken_mins if attempt.time_taken_mins is not none else '-' }} mins</td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="5" class="text-center text-muted py-4">No recent test attempts found.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

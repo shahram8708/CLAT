@@ -35,16 +35,53 @@ def create_app(config_name="development"):
         "script-src": [
             "'self'",
             "cdn.jsdelivr.net",
+            "cdn.quilljs.com",
             "checkout.razorpay.com",
             "fonts.googleapis.com",
             "'unsafe-inline'",
         ],
-        "style-src": ["'self'", "'unsafe-inline'", "fonts.googleapis.com", "cdn.jsdelivr.net"],
-        "font-src": ["fonts.gstatic.com", "cdn.jsdelivr.net"],
+        "style-src": [
+            "'self'",
+            "'unsafe-inline'",
+            "fonts.googleapis.com",
+            "cdn.jsdelivr.net",
+            "cdn.quilljs.com",
+            "cdnjs.cloudflare.com",
+        ],
+        "font-src": ["fonts.gstatic.com", "cdn.jsdelivr.net", "cdnjs.cloudflare.com"],
         "img-src": ["'self'", "data:", "*.googleapis.com"],
     }
     force_https = app.config.get("ENV") != "development"
     talisman.init_app(app, content_security_policy=csp, force_https=force_https)
+
+    @app.template_filter("format_inr")
+    def format_inr(value):
+        if value is None:
+            return "0"
+
+        try:
+            numeric_value = int(value)
+        except (TypeError, ValueError):
+            return "0"
+
+        sign = "-" if numeric_value < 0 else ""
+        digits = str(abs(numeric_value))
+
+        if len(digits) <= 3:
+            return f"{sign}{digits}"
+
+        last_three = digits[-3:]
+        prefix = digits[:-3]
+        chunks = []
+
+        while len(prefix) > 2:
+            chunks.insert(0, prefix[-2:])
+            prefix = prefix[:-2]
+
+        if prefix:
+            chunks.insert(0, prefix)
+
+        return f"{sign}{','.join(chunks + [last_three])}"
 
     from app.routes.auth import auth_bp
     from app.routes.blog import blog_bp
@@ -52,6 +89,8 @@ def create_app(config_name="development"):
     from app.routes.demo import demo_bp
     from app.routes.faculty import faculty_bp
     from app.routes.main import main_bp
+    from app.routes.admin import admin_bp
+    from app.routes.payment import payment_bp
     from app.routes.results import results_bp
     from app.routes.scholarship import scholarship_bp
     from app.routes.dashboard import dashboard_bp
@@ -71,6 +110,8 @@ def create_app(config_name="development"):
     app.register_blueprint(tests_bp, url_prefix="/test-series")
     app.register_blueprint(scholarship_bp, url_prefix="/scholarship")
     app.register_blueprint(dashboard_bp, url_prefix="/dashboard")
+    app.register_blueprint(admin_bp, url_prefix="/admin")
+    app.register_blueprint(payment_bp, url_prefix="/payment")
     app.register_blueprint(seo_bp, url_prefix="")
     # app.register_blueprint(admin_bp, url_prefix="/admin")
     # app.register_blueprint(course_bp, url_prefix="/courses")

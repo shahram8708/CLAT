@@ -1,0 +1,177 @@
+{% extends 'admin/base.html' %}
+
+{% block admin_page_title %}{% if is_new %}New Blog Post{% else %}Edit: {{ post.title }}{% endif %}{% endblock %}
+
+{% block admin_head %}
+<link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+{% endblock %}
+
+{% block admin_content %}
+<div class="row g-3">
+  <div class="col-lg-8">
+    <div class="bg-white border rounded-3" style="padding: 32px;">
+      <form method="POST" action="{% if is_new %}/admin/blog/new{% else %}/admin/blog/{{ post.id }}/edit{% endif %}" id="blogPostForm" novalidate>
+        {{ form.hidden_tag() }}
+
+        <div class="mb-3">
+          <label class="form-label" for="{{ form.title.id }}">{{ form.title.label.text }}</label>
+          {{ form.title(class='form-control' + (' is-invalid' if form.title.errors else ''), id=form.title.id) }}
+          {% for error in form.title.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="{{ form.slug.id }}">{{ form.slug.label.text }}</label>
+          {{ form.slug(class='form-control' + (' is-invalid' if form.slug.errors else ''), id=form.slug.id) }}
+          <div class="form-text">URL: /blog/category/slug</div>
+          {% for error in form.slug.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+        </div>
+
+        <div class="row g-3 mb-3">
+          <div class="col-md-8">
+            <label class="form-label" for="{{ form.category.id }}">{{ form.category.label.text }}</label>
+            {{ form.category(class='form-select' + (' is-invalid' if form.category.errors else ''), id=form.category.id) }}
+            {% for error in form.category.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+          </div>
+          <div class="col-md-4 d-flex align-items-end">
+            <div class="form-check mb-2">
+              {{ form.is_published(class='form-check-input', id=form.is_published.id) }}
+              <label class="form-check-label" for="{{ form.is_published.id }}">{{ form.is_published.label.text }}</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">{{ form.content.label.text }}</label>
+          <div id="quillEditor" style="height: 400px;"></div>
+          <textarea id="content" name="content" class="d-none">{{ form.content.data or '' }}</textarea>
+          {% for error in form.content.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="{{ form.excerpt.id }}">{{ form.excerpt.label.text }}</label>
+          {{ form.excerpt(class='form-control' + (' is-invalid' if form.excerpt.errors else ''), rows='3', id=form.excerpt.id) }}
+          {% for error in form.excerpt.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label" for="{{ form.featured_image.id }}">{{ form.featured_image.label.text }}</label>
+          {{ form.featured_image(class='form-control' + (' is-invalid' if form.featured_image.errors else ''), id=form.featured_image.id) }}
+          {% for error in form.featured_image.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+        </div>
+
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-cl-primary">Save Post</button>
+          <a href="/admin/blog" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="bg-white border rounded-3 p-4" style="position: sticky; top: 20px;" id="seoSidebarCard">
+      <h6 class="mb-3">SEO Settings</h6>
+
+      <div class="mb-3">
+        <label class="form-label" for="{{ form.meta_title.id }}">{{ form.meta_title.label.text }}</label>
+        {{ form.meta_title(class='form-control' + (' is-invalid' if form.meta_title.errors else ''), id=form.meta_title.id, maxlength='320') }}
+        <div id="metaTitleCount" class="char-count-ok mt-1">0/160</div>
+        {% for error in form.meta_title.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label" for="{{ form.meta_description.id }}">{{ form.meta_description.label.text }}</label>
+        {{ form.meta_description(class='form-control' + (' is-invalid' if form.meta_description.errors else ''), id=form.meta_description.id, rows='4', maxlength='640') }}
+        <div id="metaDescCount" class="char-count-ok mt-1">0/320</div>
+        {% for error in form.meta_description.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+
+      <h6 class="mb-2">Preview</h6>
+      <div class="border rounded-3 p-3 bg-light">
+        <div id="seoPreviewTitle" class="seo-preview-title">{{ form.meta_title.data or form.title.data or 'Your blog title appears here' }}</div>
+        <div id="seoPreviewUrl" class="seo-preview-url mt-1">/blog/{{ form.category.data or 'general' }}/{{ form.slug.data or 'your-slug' }}</div>
+        <div id="seoPreviewDesc" class="seo-preview-desc mt-2">{{ form.meta_description.data or form.excerpt.data or 'Your meta description preview appears here.' }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block admin_js %}
+<script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+<script>
+  (function () {
+    const form = document.getElementById("blogPostForm");
+    const contentField = document.getElementById("content");
+
+    const quill = new Quill("#quillEditor", {
+      theme: "snow",
+      modules: {
+        toolbar: [
+          ["bold", "italic", "underline", "strike"],
+          ["blockquote", "code-block"],
+          [{ header: [2, 3, 4, false] }],
+          [{ list: "ordered" }, { list: "bullet" }],
+          ["link", "image"],
+          ["clean"]
+        ]
+      }
+    });
+
+    const existingContent = contentField.value || "";
+    quill.root.innerHTML = existingContent;
+
+    form.addEventListener("submit", function () {
+      contentField.value = quill.root.innerHTML;
+    });
+
+    const titleInput = document.getElementById("{{ form.title.id }}");
+    const slugInput = document.getElementById("{{ form.slug.id }}");
+    const categoryInput = document.getElementById("{{ form.category.id }}");
+    const metaTitleInput = document.getElementById("{{ form.meta_title.id }}");
+    const metaDescInput = document.getElementById("{{ form.meta_description.id }}");
+    const excerptInput = document.getElementById("{{ form.excerpt.id }}");
+
+    const titlePreview = document.getElementById("seoPreviewTitle");
+    const urlPreview = document.getElementById("seoPreviewUrl");
+    const descPreview = document.getElementById("seoPreviewDesc");
+    const titleCount = document.getElementById("metaTitleCount");
+    const descCount = document.getElementById("metaDescCount");
+
+    function updateCounts() {
+      const titleValue = (metaTitleInput.value || "").trim();
+      const descValue = (metaDescInput.value || "").trim();
+
+      titleCount.textContent = `${titleValue.length}/160`;
+      descCount.textContent = `${descValue.length}/320`;
+
+      titleCount.className = titleValue.length > 160 ? "char-count-over mt-1" : "char-count-ok mt-1";
+      descCount.className = descValue.length > 320 ? "char-count-over mt-1" : "char-count-ok mt-1";
+    }
+
+    function updatePreview() {
+      const titleValue = (metaTitleInput.value || "").trim() || (titleInput.value || "").trim() || "Your blog title appears here";
+      const descValue = (metaDescInput.value || "").trim() || (excerptInput.value || "").trim() || "Your meta description preview appears here.";
+      const slugValue = (slugInput.value || "your-slug").trim();
+      const categoryValue = (categoryInput.value || "general").trim();
+
+      titlePreview.textContent = titleValue;
+      urlPreview.textContent = `/blog/${categoryValue}/${slugValue}`;
+      descPreview.textContent = descValue;
+    }
+
+    [titleInput, slugInput, categoryInput, metaTitleInput, metaDescInput, excerptInput].forEach((field) => {
+      field.addEventListener("input", function () {
+        updateCounts();
+        updatePreview();
+      });
+      field.addEventListener("change", function () {
+        updateCounts();
+        updatePreview();
+      });
+    });
+
+    updateCounts();
+    updatePreview();
+  })();
+</script>
+{% endblock %}

@@ -1,0 +1,87 @@
+{% extends 'admin/base.html' %}
+
+{% block admin_page_title %}Edit Course: {{ course.title }}{% endblock %}
+
+{% block admin_content %}
+<div class="bg-white border rounded-3" style="padding: 32px;">
+  <h4 class="mb-4">Edit Course Details</h4>
+
+  <form method="POST" action="/admin/courses/{{ course.id }}/edit" novalidate>
+    {{ form.hidden_tag() }}
+
+    <div class="row g-3">
+      <div class="col-12">
+        <label class="form-label" for="{{ form.title.id }}">{{ form.title.label.text }}</label>
+        {{ form.title(class='form-control' + (' is-invalid' if form.title.errors else '')) }}
+        {% for error in form.title.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label" for="{{ form.exam_category.id }}">{{ form.exam_category.label.text }}</label>
+        {{ form.exam_category(class='form-select' + (' is-invalid' if form.exam_category.errors else '')) }}
+        {% for error in form.exam_category.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label" for="{{ form.mode.id }}">{{ form.mode.label.text }}</label>
+        {{ form.mode(class='form-select' + (' is-invalid' if form.mode.errors else '')) }}
+        {% for error in form.mode.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+
+      <div class="col-12">
+        <label class="form-label" for="{{ form.description.id }}">{{ form.description.label.text }}</label>
+        {{ form.description(class='form-control' + (' is-invalid' if form.description.errors else ''), rows='3') }}
+        {% for error in form.description.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label" for="{{ form.duration.id }}">{{ form.duration.label.text }}</label>
+        {{ form.duration(class='form-control' + (' is-invalid' if form.duration.errors else '')) }}
+        {% for error in form.duration.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label" for="{{ form.icon.id }}">{{ form.icon.label.text }}</label>
+        {{ form.icon(class='form-control' + (' is-invalid' if form.icon.errors else ''), placeholder='🎓') }}
+        {% for error in form.icon.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label" for="{{ form.fee_min.id }}">{{ form.fee_min.label.text }}</label>
+        {{ form.fee_min(class='form-control' + (' is-invalid' if form.fee_min.errors else '')) }}
+        {% for error in form.fee_min.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label" for="{{ form.fee_max.id }}">{{ form.fee_max.label.text }}</label>
+        {{ form.fee_max(class='form-control' + (' is-invalid' if form.fee_max.errors else '')) }}
+        {% for error in form.fee_max.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label" for="{{ form.batch_size.id }}">{{ form.batch_size.label.text }}</label>
+        {{ form.batch_size(class='form-control' + (' is-invalid' if form.batch_size.errors else '')) }}
+        {% for error in form.batch_size.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label" for="{{ form.display_order.id }}">{{ form.display_order.label.text }}</label>
+        {{ form.display_order(class='form-control' + (' is-invalid' if form.display_order.errors else '')) }}
+        {% for error in form.display_order.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+
+      <div class="col-12">
+        <div class="form-check">
+          {{ form.is_active(class='form-check-input', id=form.is_active.id) }}
+          <label class="form-check-label" for="{{ form.is_active.id }}">{{ form.is_active.label.text }}</label>
+        </div>
+      </div>
+
+      <div class="col-12 d-flex gap-2 pt-2">
+        {{ form.submit(class='btn btn-cl-primary') }}
+        <a href="/admin/courses" class="btn btn-outline-secondary">Cancel</a>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}

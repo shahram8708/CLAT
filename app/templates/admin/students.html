@@ -1,0 +1,110 @@
+{% extends 'admin/base.html' %}
+
+{% block admin_page_title %}Students{% endblock %}
+
+{% block admin_content %}
+<div class="bg-white border rounded-3 p-3 mb-3">
+  <form method="GET" action="/admin/students" class="row g-2 align-items-end">
+    <div class="col-lg-6">
+      <label class="form-label mb-1">Search</label>
+      <input type="text" name="q" value="{{ search_query }}" class="form-control" placeholder="Search by name, email, phone...">
+    </div>
+    <div class="col-lg-4">
+      <label class="form-label mb-1">Exam</label>
+      <select name="exam" class="form-select">
+        <option value="">All Exams</option>
+        <option value="CAT" {% if exam_filter == 'CAT' %}selected{% endif %}>CAT</option>
+        <option value="CLAT" {% if exam_filter == 'CLAT' %}selected{% endif %}>CLAT</option>
+        <option value="IPMAT" {% if exam_filter == 'IPMAT' %}selected{% endif %}>IPMAT</option>
+        <option value="GMAT" {% if exam_filter == 'GMAT' %}selected{% endif %}>GMAT</option>
+        <option value="CUET" {% if exam_filter == 'CUET' %}selected{% endif %}>CUET</option>
+        <option value="Boards" {% if exam_filter == 'Boards' %}selected{% endif %}>Boards</option>
+      </select>
+    </div>
+    <div class="col-lg-2 d-grid">
+      <button class="btn btn-primary" type="submit">Filter</button>
+    </div>
+  </form>
+</div>
+
+<div class="bg-white border rounded-3 p-3">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle admin-table mb-0">
+      <thead>
+        <tr>
+          <th>#ID</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Exam</th>
+          <th>Scholarship</th>
+          <th>Status</th>
+          <th>Joined</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for student in students.items %}
+          <tr>
+            <td>{{ student.id }}</td>
+            <td>{{ student.get_full_name() }}</td>
+            <td>{{ student.email }}</td>
+            <td>{{ student.phone }}</td>
+            <td>{{ student.enrolled_exam or '-' }}</td>
+            <td>
+              {% if student.scholarship_pct is not none %}
+                <span class="text-success fw-semibold">{{ student.scholarship_pct }}% Off</span>
+              {% else %}
+                <span class="text-muted">Not taken</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if student.is_active %}
+                <span class="badge bg-success">Active</span>
+              {% else %}
+                <span class="badge bg-secondary">Inactive</span>
+              {% endif %}
+            </td>
+            <td>{{ student.created_at.strftime('%d %b %Y') if student.created_at else '-' }}</td>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <a href="/admin/students/{{ student.id }}" class="btn btn-outline-primary btn-sm">View →</a>
+                <form method="POST" action="/admin/students/{{ student.id }}/toggle-active" class="m-0">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button class="btn btn-outline-secondary btn-sm" type="submit">Toggle Active</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="9" class="text-center text-muted py-4">No students found.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if students.pages > 1 %}
+    <nav class="mt-3" aria-label="Student pagination">
+      <ul class="pagination mb-0">
+        <li class="page-item {% if not students.has_prev %}disabled{% endif %}">
+          <a class="page-link" href="{{ url_for('admin.students', page=students.prev_num, q=search_query, exam=exam_filter) if students.has_prev else '#' }}">Previous</a>
+        </li>
+        {% for page_num in students.iter_pages(left_edge=1, left_current=1, right_current=2, right_edge=1) %}
+          {% if page_num %}
+            <li class="page-item {% if page_num == students.page %}active{% endif %}">
+              <a class="page-link" href="{{ url_for('admin.students', page=page_num, q=search_query, exam=exam_filter) }}">{{ page_num }}</a>
+            </li>
+          {% else %}
+            <li class="page-item disabled"><span class="page-link">…</span></li>
+          {% endif %}
+        {% endfor %}
+        <li class="page-item {% if not students.has_next %}disabled{% endif %}">
+          <a class="page-link" href="{{ url_for('admin.students', page=students.next_num, q=search_query, exam=exam_filter) if students.has_next else '#' }}">Next</a>
+        </li>
+      </ul>
+    </nav>
+  {% endif %}
+</div>
+{% endblock %}

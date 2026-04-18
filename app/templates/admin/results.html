@@ -1,0 +1,89 @@
+{% extends 'admin/base.html' %}
+
+{% block admin_page_title %}Results / Toppers{% endblock %}
+
+{% block admin_content %}
+<div class="bg-white border rounded-3 p-3">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle admin-table mb-0">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Student Name</th>
+          <th>Exam</th>
+          <th>Year</th>
+          <th>Rank/Percentile</th>
+          <th>Target College</th>
+          <th>Active</th>
+          <th>Order</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for result in results %}
+          <tr id="result-row-{{ result.id }}">
+            <td>{{ loop.index }}</td>
+            <td>{{ result.student_name }}</td>
+            <td><span class="badge text-bg-light border">{{ result.exam }}</span></td>
+            <td>{{ result.year }}</td>
+            <td>{{ result.rank_percentile or '-' }}</td>
+            <td>{{ result.target_college or '-' }}</td>
+            <td>
+              <div class="form-check form-switch">
+                <input class="form-check-input result-toggle" type="checkbox" role="switch" data-result-id="{{ result.id }}" {% if result.is_active %}checked{% endif %}>
+              </div>
+            </td>
+            <td>{{ result.display_order if result.display_order is not none else 0 }}</td>
+            <td>
+              <span class="small text-muted" id="result-state-{{ result.id }}">{{ 'Visible' if result.is_active else 'Hidden' }}</span>
+            </td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="9" class="text-center text-muted py-4">No result records found.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block admin_js %}
+<script>
+  (function () {
+    const csrfToken = "{{ csrf_token() }}";
+
+    document.querySelectorAll(".result-toggle").forEach((toggle) => {
+      toggle.addEventListener("change", async function () {
+        const resultId = this.dataset.resultId;
+        const stateText = document.getElementById(`result-state-${resultId}`);
+        this.disabled = true;
+
+        try {
+          const response = await fetch(`/admin/results/${resultId}/toggle-active`, {
+            method: "POST",
+            headers: {
+              "X-CSRFToken": csrfToken
+            }
+          });
+          const data = await response.json();
+
+          if (!response.ok || data.status !== "ok") {
+            throw new Error("Unable to update result status.");
+          }
+
+          if (stateText) {
+            stateText.textContent = data.is_active ? "Visible" : "Hidden";
+          }
+        } catch (error) {
+          this.checked = !this.checked;
+          alert(error.message || "Could not update status.");
+        } finally {
+          this.disabled = false;
+        }
+      });
+    });
+  })();
+</script>
+{% endblock %}

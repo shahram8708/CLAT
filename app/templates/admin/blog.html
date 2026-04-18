@@ -1,0 +1,128 @@
+{% extends 'admin/base.html' %}
+
+{% block admin_page_title %}Blog Posts{% endblock %}
+
+{% block admin_content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div><span class="badge badge-soft">{{ posts.total }} total posts</span></div>
+  <a href="/admin/blog/new" class="btn btn-cl-primary">New Post →</a>
+</div>
+
+<div class="bg-white border rounded-3 p-3 mb-3">
+  <form method="GET" action="/admin/blog" class="row g-2 align-items-end">
+    <div class="col-md-4">
+      <label class="form-label mb-1">Category</label>
+      <select name="category" class="form-select">
+        <option value="">All Categories</option>
+        <option value="cat" {% if category_filter == 'cat' %}selected{% endif %}>CAT/MBA</option>
+        <option value="clat" {% if category_filter == 'clat' %}selected{% endif %}>CLAT/Law</option>
+        <option value="ipmat" {% if category_filter == 'ipmat' %}selected{% endif %}>IPMAT/BBA</option>
+        <option value="gmat" {% if category_filter == 'gmat' %}selected{% endif %}>GMAT/GRE</option>
+        <option value="cuet" {% if category_filter == 'cuet' %}selected{% endif %}>CUET</option>
+        <option value="general" {% if category_filter == 'general' %}selected{% endif %}>General</option>
+      </select>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label mb-1">Status</label>
+      <select name="status" class="form-select">
+        <option value="">All</option>
+        <option value="published" {% if status_filter == 'published' %}selected{% endif %}>Published</option>
+        <option value="draft" {% if status_filter == 'draft' %}selected{% endif %}>Draft</option>
+      </select>
+    </div>
+    <div class="col-md-2 d-grid">
+      <button class="btn btn-primary" type="submit">Filter</button>
+    </div>
+    <div class="col-md-2 d-grid">
+      {% if category_filter or status_filter %}
+        <a href="/admin/blog" class="btn btn-light border">Clear</a>
+      {% endif %}
+    </div>
+  </form>
+</div>
+
+<div class="bg-white border rounded-3 p-3">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle admin-table mb-0">
+      <thead>
+        <tr>
+          <th>#ID</th>
+          <th>Title</th>
+          <th>Category</th>
+          <th>Author</th>
+          <th>Status</th>
+          <th>Published Date</th>
+          <th>Read Time</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for post in posts.items %}
+          <tr>
+            <td>{{ post.id }}</td>
+            <td style="min-width: 260px;">{{ post.title }}</td>
+            <td><span class="badge text-bg-light border">{{ post.category | upper }}</span></td>
+            <td>{{ post.author.get_full_name() if post.author else '-' }}</td>
+            <td>
+              {% if post.is_published %}
+                <span class="badge bg-success">Published</span>
+              {% else %}
+                <span class="badge bg-secondary">Draft</span>
+              {% endif %}
+            </td>
+            <td>{{ post.published_at.strftime('%d %b %Y') if post.published_at else '-' }}</td>
+            <td>{{ post.read_time }} min</td>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <a href="/admin/blog/{{ post.id }}/edit" class="btn btn-outline-primary btn-sm">Edit →</a>
+                <form method="POST" action="/admin/blog/{{ post.id }}/delete" class="m-0 delete-post-form">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button class="btn btn-danger btn-sm" type="submit">Delete</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="8" class="text-center text-muted py-4">No blog posts found.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if posts.pages > 1 %}
+    <nav class="mt-3" aria-label="Blog pagination">
+      <ul class="pagination mb-0">
+        <li class="page-item {% if not posts.has_prev %}disabled{% endif %}">
+          <a class="page-link" href="{{ url_for('admin.blog_posts', page=posts.prev_num, category=category_filter, status=status_filter) if posts.has_prev else '#' }}">Previous</a>
+        </li>
+        {% for page_num in posts.iter_pages(left_edge=1, left_current=1, right_current=2, right_edge=1) %}
+          {% if page_num %}
+            <li class="page-item {% if page_num == posts.page %}active{% endif %}">
+              <a class="page-link" href="{{ url_for('admin.blog_posts', page=page_num, category=category_filter, status=status_filter) }}">{{ page_num }}</a>
+            </li>
+          {% else %}
+            <li class="page-item disabled"><span class="page-link">…</span></li>
+          {% endif %}
+        {% endfor %}
+        <li class="page-item {% if not posts.has_next %}disabled{% endif %}">
+          <a class="page-link" href="{{ url_for('admin.blog_posts', page=posts.next_num, category=category_filter, status=status_filter) if posts.has_next else '#' }}">Next</a>
+        </li>
+      </ul>
+    </nav>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block admin_js %}
+<script>
+  document.querySelectorAll(".delete-post-form").forEach((form) => {
+    form.addEventListener("submit", function (event) {
+      if (!confirm("Are you sure you want to delete this post?")) {
+        event.preventDefault();
+      }
+    });
+  });
+</script>
+{% endblock %}
