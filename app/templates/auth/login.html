@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% from 'components/_form_errors.html' import render_errors %}
+
+{% block title %}Login — Career Launcher Ahmedabad{% endblock %}
+{% block meta_description %}Login to your CL Ahmedabad student account to access your dashboard, enrolled courses, test history, and study resources.{% endblock %}
+
+{% block content %}
+<section class="auth-page-wrapper">
+  <div class="container">
+    <div class="cl-card auth-card">
+      <div class="text-center mb-4">
+        <h1 class="h3 mb-1" style="color: var(--cl-navy);">Career Launcher Ahmedabad</h1>
+        <p class="mb-0" style="color: var(--cl-grey);">Student Login</p>
+      </div>
+
+      <form method="POST" action="{{ url_for('auth.login_submit', next=request.args.get('next')) }}" novalidate>
+        {{ form.hidden_tag() }}
+
+        <div class="mb-3">
+          <label class="form-label" for="{{ form.email.id }}">{{ form.email.label.text }}</label>
+          {{ form.email(class='form-control' + (' is-invalid' if form.email.errors else ''), placeholder='Enter your registered email') }}
+          {{ render_errors(form.email) }}
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="{{ form.password.id }}">{{ form.password.label.text }}</label>
+          <div class="position-relative">
+            {{ form.password(class='form-control pe-5' + (' is-invalid' if form.password.errors else ''), id='loginPassword', placeholder='Enter your password') }}
+            <button type="button" class="password-toggle-btn" id="toggleLoginPassword" aria-label="Show or hide password">
+              <i class="fa-regular fa-eye"></i>
+            </button>
+          </div>
+          {{ render_errors(form.password) }}
+        </div>
+
+        <div class="form-check mb-4">
+          {{ form.remember_me(class='form-check-input', id='rememberMe') }}
+          <label class="form-check-label" for="rememberMe">{{ form.remember_me.label.text }}</label>
+        </div>
+
+        {{ form.submit(class='btn btn-cl-primary w-100 py-2', value='Login to My Account') }}
+
+        <p class="small text-center mt-3 mb-0" style="color: var(--cl-grey);">
+          Forgot your password? Contact us on
+          <a href="https://wa.me/919978559986?text=Hi%2C%20I%20need%20help%20logging%20in%20to%20my%20CL%20Ahmedabad%20account" target="_blank" rel="noopener" style="color: var(--cl-success);">WhatsApp</a>
+        </p>
+
+        <div class="d-flex align-items-center my-4">
+          <hr class="flex-grow-1 m-0">
+          <span class="px-3 small" style="color: var(--cl-grey);">OR</span>
+          <hr class="flex-grow-1 m-0">
+        </div>
+
+        <p class="text-center mb-0">
+          <a href="{{ url_for('auth.register') }}" class="fw-semibold text-decoration-none" style="color: var(--cl-red);">Create a New Account →</a>
+        </p>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const toggleButton = document.getElementById("toggleLoginPassword");
+    const passwordInput = document.getElementById("loginPassword");
+
+    if (!toggleButton || !passwordInput) {
+      return;
+    }
+
+    toggleButton.addEventListener("click", function () {
+      const isPassword = passwordInput.type === "password";
+      passwordInput.type = isPassword ? "text" : "password";
+      toggleButton.innerHTML = isPassword
+        ? '<i class="fa-regular fa-eye-slash"></i>'
+        : '<i class="fa-regular fa-eye"></i>';
+    });
+  });
+</script>
+{% endblock %}

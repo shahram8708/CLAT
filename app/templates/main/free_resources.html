@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+
+{% block title %}Free Resources | Career Launcher Ahmedabad{% endblock %}
+{% block meta_description %}Download free CAT, CLAT and IPMAT resources from Career Launcher Ahmedabad including previous year papers, mock tests and prep tools.{% endblock %}
+
+{% block content %}
+{% set resources = [
+  {'title': 'CLAT PYQ 2024', 'description': 'Previous year CLAT paper with answer key mapping and analysis pointers.', 'exam': 'CLAT', 'icon': '📘', 'gated': true, 'download_url': '#'},
+  {'title': 'CLAT PYQ 2023', 'description': 'Full paper for timed practice and sectional strategy review.', 'exam': 'CLAT', 'icon': '📘', 'gated': true, 'download_url': '#'},
+  {'title': 'CLAT PYQ 2022', 'description': 'Practice set with legal reasoning pattern familiarization.', 'exam': 'CLAT', 'icon': '📘', 'gated': true, 'download_url': '#'},
+  {'title': 'CLAT PYQ 2021', 'description': 'High quality exam level passage and analytical question set.', 'exam': 'CLAT', 'icon': '📘', 'gated': true, 'download_url': '#'},
+  {'title': 'CLAT PYQ 2020', 'description': 'Baseline paper for concept revision and speed calibration.', 'exam': 'CLAT', 'icon': '📘', 'gated': true, 'download_url': '#'},
+  {'title': 'CAT PYQ 2024', 'description': 'Latest CAT style pattern with QA, VARC and DILR references.', 'exam': 'CAT', 'icon': '📊', 'gated': true, 'download_url': '#'},
+  {'title': 'CAT PYQ 2023', 'description': 'Timed CAT practice file with difficulty indexing.', 'exam': 'CAT', 'icon': '📊', 'gated': true, 'download_url': '#'},
+  {'title': 'CAT PYQ 2022', 'description': 'Foundational mock style paper for 6 month prep planning.', 'exam': 'CAT', 'icon': '📊', 'gated': true, 'download_url': '#'},
+  {'title': 'IPMAT PYQ 2024', 'description': 'Quant and verbal balancing worksheet from latest exam trend.', 'exam': 'IPMAT', 'icon': '🧠', 'gated': true, 'download_url': '#'},
+  {'title': 'IPMAT PYQ 2023', 'description': 'Realistic difficulty set with topic wise cues.', 'exam': 'IPMAT', 'icon': '🧠', 'gated': true, 'download_url': '#'},
+  {'title': 'IPMAT PYQ 2022', 'description': 'Warm up paper for arithmetic and logical reasoning preparation.', 'exam': 'IPMAT', 'icon': '🧠', 'gated': true, 'download_url': '#'},
+  {'title': 'CLAT Sample Papers with Solutions', 'description': 'Curated sample papers with stepwise solution frameworks.', 'exam': 'CLAT', 'icon': '📝', 'gated': true, 'download_url': '#'},
+  {'title': 'CAT Percentile Predictor', 'description': 'Use official style estimators to benchmark expected percentile.', 'exam': 'CAT', 'icon': '📈', 'gated': false, 'download_url': 'https://www.careerlauncher.com'},
+  {'title': 'Daily Current Affairs', 'description': 'Stay updated with national and international current affairs.', 'exam': 'General', 'icon': '🗞️', 'gated': false, 'download_url': 'https://www.careerlauncher.com'},
+  {'title': 'Free CLAT Mock Test', 'description': 'Attempt a free CLAT mock to assess your preparation level.', 'exam': 'CLAT', 'icon': '⚖️', 'gated': false, 'download_url': '/test-series/clat'},
+  {'title': 'Free CAT Mock Test', 'description': 'Attempt a free CAT mock and evaluate your section wise strengths.', 'exam': 'CAT', 'icon': '🎯', 'gated': false, 'download_url': '/test-series/cat'}
+] %}
+
+<section class="hero-section" style="min-height: 44vh;">
+  <div class="container hero-content text-center">
+    <h1 class="hero-title">Free Resources — Start Preparing Today</h1>
+    <p class="hero-subtitle mx-auto">Download exam focused resources from our academic team and build preparation momentum from day one.</p>
+  </div>
+</section>
+
+<section class="section-space">
+  <div class="container">
+    <div class="row g-4">
+      {% for resource in resources %}
+        <div class="col-lg-4 col-md-6">
+          <article class="cl-card h-100 d-flex flex-column">
+            <div class="card-stripe"></div>
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <span style="font-size: 1.7rem;">{{ resource.icon }}</span>
+              <span class="badge-soft">{{ resource.exam }}</span>
+            </div>
+            <h5 class="fw-bold">{{ resource.title }}</h5>
+            <p class="small text-muted flex-grow-1">{{ resource.description }}</p>
+
+            {% if resource.gated %}
+              <button
+                type="button"
+                class="btn btn-cl-primary resource-download-btn"
+                data-bs-toggle="modal"
+                data-bs-target="#resourceEmailGate"
+                data-resource-title="{{ resource.title }}"
+                data-download-url="{{ resource.download_url }}">
+                Download Free
+              </button>
+            {% else %}
+              <a href="{{ resource.download_url }}" target="_blank" class="btn btn-cl-primary">Download Free</a>
+            {% endif %}
+          </article>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<div class="modal fade" id="resourceEmailGate" tabindex="-1" aria-labelledby="resourceEmailGateLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="resourceEmailGateLabel">Get Free Resource</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="small text-muted" id="resourceTitleText">Enter your email to unlock the download link.</p>
+        <form id="resourceEmailForm" action="{{ url_for('main.capture_resource_email') }}" method="post">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="resource_title" id="resourceTitleInput">
+          <input type="hidden" name="download_url" id="resourceDownloadInput">
+          <div class="mb-3">
+            <label for="resourceEmail" class="form-label">Email Address</label>
+            <input type="email" class="form-control" id="resourceEmail" name="email" required>
+          </div>
+          <button type="submit" class="btn btn-cl-primary w-100">Unlock Download</button>
+        </form>
+        <div id="resourceGateMessage" class="small mt-3"></div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const titleInput = document.getElementById("resourceTitleInput");
+  const downloadInput = document.getElementById("resourceDownloadInput");
+  const titleText = document.getElementById("resourceTitleText");
+  const messageBox = document.getElementById("resourceGateMessage");
+  const form = document.getElementById("resourceEmailForm");
+  const modalEl = document.getElementById("resourceEmailGate");
+
+  document.querySelectorAll(".resource-download-btn").forEach(function (button) {
+    button.addEventListener("click", function () {
+      const resourceTitle = button.getAttribute("data-resource-title") || "Free Resource";
+      const downloadUrl = button.getAttribute("data-download-url") || "#";
+      titleInput.value = resourceTitle;
+      downloadInput.value = downloadUrl;
+      titleText.textContent = "Enter your email to unlock: " + resourceTitle;
+      messageBox.textContent = "";
+      messageBox.className = "small mt-3";
+    });
+  });
+
+  form.addEventListener("submit", async function (event) {
+    event.preventDefault();
+    messageBox.textContent = "";
+
+    const formData = new FormData(form);
+
+    try {
+      const response = await fetch(form.action, {
+        method: "POST",
+        headers: {
+          Accept: "application/json"
+        },
+        body: formData
+      });
+
+      const data = await response.json();
+      if (response.ok && data.status === "ok") {
+        messageBox.className = "small mt-3 text-success";
+        messageBox.textContent = "Access granted. Your resource is ready.";
+
+        if (data.download_url && data.download_url !== "#") {
+          window.open(data.download_url, "_blank", "noopener");
+        }
+
+        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+        setTimeout(function () {
+          modal.hide();
+        }, 900);
+        return;
+      }
+
+      messageBox.className = "small mt-3 text-danger";
+      messageBox.textContent = (data.errors && data.errors.email) ? data.errors.email : "Unable to unlock resource. Please try again.";
+    } catch (error) {
+      messageBox.className = "small mt-3 text-danger";
+      messageBox.textContent = "Network error. Please try again.";
+    }
+  });
+});
+</script>
+{% endblock %}

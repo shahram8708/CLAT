@@ -1,0 +1,165 @@
+{% extends 'dashboard/base.html' %}
+
+{% block dashboard_title %}Dashboard Overview | Career Launcher Ahmedabad{% endblock %}
+
+{% block dashboard_content %}
+{% set optional_fields = [current_user.enrolled_exam, current_user.preferred_mode, current_user.phone] %}
+{% set filled_optional = optional_fields | select | list | length %}
+{% set completion_pct = ((filled_optional / 3) * 100) | round | int %}
+
+<div class="row g-3 mb-4">
+  <div class="col-lg-3 col-md-6 col-12">
+    <div class="dashboard-stat-card dashboard-section-card h-100">
+      <div class="d-flex justify-content-between align-items-start">
+        <i class="fa-solid fa-book-open" style="font-size: 24px; color: var(--cl-red);"></i>
+        <a href="/dashboard/courses" class="small text-decoration-none" style="color: var(--cl-red);">View →</a>
+      </div>
+      <h3 class="mb-0 mt-2" style="font-family: 'Poppins', sans-serif;">{{ enrollments | length }}</h3>
+      <p class="text-muted mb-0">Enrolled Courses</p>
+    </div>
+  </div>
+
+  <div class="col-lg-3 col-md-6 col-12">
+    <div class="dashboard-stat-card dashboard-section-card h-100">
+      <div class="d-flex justify-content-between align-items-start">
+        <i class="fa-solid fa-clipboard-check" style="font-size: 24px; color: var(--cl-red);"></i>
+        <a href="/dashboard/tests" class="small text-decoration-none" style="color: var(--cl-red);">View →</a>
+      </div>
+      <h3 class="mb-0 mt-2" style="font-family: 'Poppins', sans-serif;">{{ attempt_count }}</h3>
+      <p class="text-muted mb-0">Tests Taken</p>
+    </div>
+  </div>
+
+  <div class="col-lg-3 col-md-6 col-12">
+    <div class="dashboard-stat-card dashboard-section-card h-100">
+      <div class="d-flex justify-content-between align-items-start">
+        <i class="fa-solid fa-award" style="font-size: 24px; color: var(--cl-red);"></i>
+        {% if current_user.scholarship_pct is none %}
+          <a href="/scholarship" class="small text-decoration-none" style="color: var(--cl-red);">Check →</a>
+        {% endif %}
+      </div>
+      {% if current_user.scholarship_pct is not none %}
+        <h3 class="mb-0 mt-2" style="font-family: 'Poppins', sans-serif;">{{ scholarship_pct }}% Off</h3>
+      {% else %}
+        <h5 class="mb-0 mt-2" style="font-family: 'Poppins', sans-serif;">Not taken yet</h5>
+      {% endif %}
+      <p class="text-muted mb-0">Scholarship</p>
+    </div>
+  </div>
+
+  <div class="col-lg-3 col-md-6 col-12">
+    <div class="dashboard-stat-card dashboard-section-card h-100">
+      <div class="d-flex justify-content-between align-items-start">
+        <i class="fa-solid fa-user-check" style="font-size: 24px; color: var(--cl-red);"></i>
+        <a href="/dashboard/profile" class="small text-decoration-none" style="color: var(--cl-red);">Update →</a>
+      </div>
+      <h3 class="mb-1 mt-2" style="font-family: 'Poppins', sans-serif;">{{ completion_pct }}%</h3>
+      <div class="progress" role="progressbar" aria-label="Profile completion" aria-valuenow="{{ completion_pct }}" aria-valuemin="0" aria-valuemax="100" style="height: 8px;">
+        <div class="progress-bar" style="width: {{ completion_pct }}%; background: var(--cl-red);"></div>
+      </div>
+      <p class="text-muted mb-0 mt-2">Profile Completion</p>
+    </div>
+  </div>
+</div>
+
+<div class="dashboard-section-card">
+  <h5 style="color: var(--cl-navy);">My Enrolled Courses</h5>
+
+  {% if enrollments %}
+    <ul class="list-group list-group-flush mt-3">
+      {% for enrollment in enrollments %}
+        {% if enrollment.status == 'active' %}
+          {% set status_class = 'bg-success' %}
+        {% elif enrollment.status == 'completed' %}
+          {% set status_class = 'bg-primary' %}
+        {% else %}
+          {% set status_class = 'bg-warning text-dark' %}
+        {% endif %}
+        <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
+          <div>
+            <div class="fw-semibold">{{ enrollment.course.icon or '📘' }} {{ enrollment.course.title }}</div>
+            <div class="small text-muted">{{ enrollment.batch_name or 'Batch details pending' }} | Enrolled {{ enrollment.enrolled_at.strftime('%d %b %Y') }}</div>
+          </div>
+          <span class="badge {{ status_class }}">{{ enrollment.status | title }}</span>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="text-muted mb-2">You haven't enrolled in any course yet.</p>
+    <a href="/courses" class="text-decoration-none fw-semibold" style="color: var(--cl-red);">Explore Programs →</a>
+  {% endif %}
+</div>
+
+<div class="dashboard-section-card">
+  <h5 style="color: var(--cl-navy);">Recent Test Attempts</h5>
+
+  {% if recent_attempts %}
+    <div class="table-responsive mt-3">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Test Name</th>
+            <th>Date</th>
+            <th>Score</th>
+            <th>Percentile</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for attempt in recent_attempts %}
+            <tr>
+              <td>{{ attempt.test.name if attempt.test else 'Mock Test' }}</td>
+              <td>{{ attempt.started_at.strftime('%d %b %Y') if attempt.started_at else 'N/A' }}</td>
+              <td>
+                {% if attempt.score is not none and attempt.max_score %}
+                  {{ attempt.score }}/{{ attempt.max_score }}
+                {% else %}
+                  N/A
+                {% endif %}
+              </td>
+              <td>
+                {% if attempt_count < 10 or attempt.percentile is none %}
+                  N/A
+                {% else %}
+                  {{ attempt.percentile }}
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="text-muted mb-2">No test attempts yet.</p>
+    <a href="/test-series" class="text-decoration-none fw-semibold" style="color: var(--cl-red);">Browse Free Tests →</a>
+  {% endif %}
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-4">
+    <div class="dashboard-section-card h-100">
+      <i class="fa-solid fa-calendar-check" style="font-size: 24px; color: var(--cl-red);"></i>
+      <h6 class="fw-bold mt-2">Book a Demo</h6>
+      <p class="text-muted small mb-2">Plan your preparation roadmap with a free counselling session.</p>
+      <a href="/demo" class="text-decoration-none fw-semibold" style="color: var(--cl-red);">Open →</a>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="dashboard-section-card h-100">
+      <i class="fa-solid fa-vial-circle-check" style="font-size: 24px; color: var(--cl-red);"></i>
+      <h6 class="fw-bold mt-2">Take a Free Mock</h6>
+      <p class="text-muted small mb-2">Practice exam level questions and benchmark your performance.</p>
+      <a href="/test-series" class="text-decoration-none fw-semibold" style="color: var(--cl-red);">Open →</a>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="dashboard-section-card h-100">
+      <i class="fa-solid fa-percent" style="font-size: 24px; color: var(--cl-red);"></i>
+      <h6 class="fw-bold mt-2">Check Scholarship</h6>
+      <p class="text-muted small mb-2">Attempt the scholarship test and unlock up to 50% fee waiver.</p>
+      <a href="/scholarship" class="text-decoration-none fw-semibold" style="color: var(--cl-red);">Open →</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

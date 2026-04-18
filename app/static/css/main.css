@@ -1,0 +1,337 @@
+/* CSS Custom Properties */
+:root {
+  --cl-navy:    #1A1A2E;
+  --cl-red:     #C0392B;
+  --cl-blue:    #2C3E7A;
+  --cl-bg:      #F4F6FA;
+  --cl-white:   #FFFFFF;
+  --cl-text:    #1C1C2E;
+  --cl-grey:    #6C757D;
+  --cl-border:  #DEE2E6;
+  --cl-success: #27AE60;
+  --cl-warning: #F39C12;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Inter", sans-serif;
+  background: var(--cl-bg);
+  color: var(--cl-text);
+  line-height: 1.6;
+  margin: 0;
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: "Poppins", sans-serif;
+  font-weight: 700;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.section-space {
+  padding: 80px 0;
+}
+
+.section-title {
+  color: var(--cl-navy);
+  font-weight: 800;
+  margin-bottom: 0.75rem;
+}
+
+.section-subtitle {
+  color: var(--cl-grey);
+  max-width: 760px;
+}
+
+.hero-section {
+  position: relative;
+  background-color: var(--cl-navy);
+  min-height: 100vh;
+  padding: 110px 0 80px;
+  display: flex;
+  align-items: center;
+  color: var(--cl-white);
+  overflow: hidden;
+}
+
+.hero-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.18) 1px, transparent 1px);
+  background-size: 22px 22px;
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+}
+
+.hero-title {
+  font-size: clamp(36px, 5vw, 56px);
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--cl-white);
+}
+
+.hero-subtitle {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.85);
+  max-width: 760px;
+}
+
+.btn-cl-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  background: var(--cl-red);
+  color: var(--cl-white);
+  border: 2px solid var(--cl-red);
+  padding: 0.75rem 1.4rem;
+  border-radius: 999px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+
+.btn-cl-primary:hover,
+.btn-cl-primary:focus {
+  color: var(--cl-white);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(192, 57, 43, 0.3);
+  background: #a82f24;
+}
+
+.btn-cl-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--cl-white);
+  color: var(--cl-white);
+  background: transparent;
+  border-radius: 999px;
+  padding: 0.75rem 1.4rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.25s ease, color 0.25s ease, transform 0.25s ease;
+}
+
+.btn-cl-outline:hover,
+.btn-cl-outline:focus {
+  background: var(--cl-white);
+  color: var(--cl-navy);
+  transform: translateY(-2px);
+}
+
+#mainNavbar {
+  padding-top: 0.9rem;
+  padding-bottom: 0.9rem;
+  transition: all 0.25s ease;
+}
+
+#mainNavbar.scrolled {
+  padding-top: 0.55rem;
+  padding-bottom: 0.55rem;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+}
+
+#mainNavbar .nav-link.active,
+#mainNavbar .dropdown-item.active {
+  color: var(--cl-red);
+  font-weight: 600;
+}
+
+.cl-card {
+  background: var(--cl-white);
+  border: 1px solid var(--cl-border);
+  border-radius: 16px;
+  padding: 1.35rem;
+  box-shadow: 0 6px 14px rgba(26, 26, 46, 0.06);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  height: 100%;
+}
+
+.cl-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(44, 62, 122, 0.35);
+  box-shadow: 0 14px 28px rgba(26, 26, 46, 0.12);
+}
+
+.card-stripe {
+  height: 4px;
+  width: 100%;
+  background: var(--cl-red);
+  border-radius: 999px;
+  margin-bottom: 0.9rem;
+}
+
+.stat-number {
+  font-family: "Poppins", sans-serif;
+  font-size: 54px;
+  line-height: 1;
+  font-weight: 800;
+  color: var(--cl-red);
+  margin-bottom: 0.4rem;
+}
+
+.stat-label {
+  color: var(--cl-grey);
+  font-size: 14px;
+  margin: 0;
+}
+
+.ticker-wrap {
+  overflow: hidden;
+  white-space: nowrap;
+  background: var(--cl-white);
+  border: 1px solid var(--cl-border);
+  border-radius: 999px;
+  padding: 0.65rem 1rem;
+  margin-top: 1.75rem;
+}
+
+.ticker-content {
+  display: inline-block;
+  white-space: nowrap;
+  color: var(--cl-navy);
+  font-weight: 600;
+  animation: ticker-scroll 30s linear infinite;
+}
+
+@keyframes ticker-scroll {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.faculty-photo {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 3px solid var(--cl-red);
+  object-fit: cover;
+  object-position: center;
+}
+
+.faculty-card {
+  background: var(--cl-white);
+  border: 1px solid var(--cl-border);
+  border-radius: 14px;
+  padding: 1.2rem;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  height: 100%;
+}
+
+.faculty-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--cl-navy);
+  box-shadow: 0 14px 30px rgba(26, 26, 46, 0.14);
+}
+
+.result-card {
+  background: var(--cl-white);
+  border-radius: 12px;
+  padding: 24px;
+  height: 100%;
+  color: var(--cl-text);
+}
+
+.result-avatar {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: rgba(192, 57, 43, 0.12);
+  color: var(--cl-red);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-family: "Poppins", sans-serif;
+}
+
+.form-control,
+.form-select,
+textarea {
+  border: 1px solid var(--cl-border);
+}
+
+.form-control:focus,
+.form-select:focus,
+textarea:focus {
+  border-color: var(--cl-blue);
+  box-shadow: 0 0 0 0.2rem rgba(44, 62, 122, 0.15);
+}
+
+.tag-pill,
+.exam-tag {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.26rem 0.62rem;
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(44, 62, 122, 0.08);
+  color: var(--cl-blue);
+  margin: 0.15rem;
+}
+
+.badge-soft {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.35rem 0.72rem;
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(192, 57, 43, 0.12);
+  color: var(--cl-red);
+}
+
+.whatsapp-float {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #25D366;
+  color: #fff;
+  font-size: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
+  z-index: 9999;
+  text-decoration: none;
+}
+
+.whatsapp-float:hover {
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.contact-strip {
+  background: var(--cl-white);
+  border-top: 1px solid var(--cl-border);
+  border-bottom: 1px solid var(--cl-border);
+}
+
+.contact-strip-item {
+  padding: 1.15rem 0.75rem;
+}

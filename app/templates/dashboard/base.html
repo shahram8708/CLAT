@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}{% block dashboard_title %}Student Dashboard | Career Launcher Ahmedabad{% endblock %}{% endblock %}
+
+{% block content %}
+{% set first_initial = (current_user.first_name[:1] or '')|upper %}
+{% set last_initial = (current_user.last_name[:1] or '')|upper %}
+
+<div class="container-fluid px-0">
+  <div class="d-lg-none bg-white border-bottom py-2">
+    <div class="container-fluid px-3">
+      <ul class="nav nav-tabs flex-nowrap overflow-auto" style="white-space: nowrap;">
+        <li class="nav-item">
+          <a class="nav-link {% if request.endpoint == 'dashboard.overview' %}active{% endif %}" href="/dashboard"><i class="fa-solid fa-house me-1"></i>Overview</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.endpoint == 'dashboard.courses' %}active{% endif %}" href="/dashboard/courses"><i class="fa-solid fa-book-open me-1"></i>My Courses</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.endpoint == 'dashboard.tests' %}active{% endif %}" href="/dashboard/tests"><i class="fa-solid fa-chart-line me-1"></i>Test History</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.endpoint == 'dashboard.resources' %}active{% endif %}" href="/dashboard/resources"><i class="fa-solid fa-folder-open me-1"></i>Study Resources</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.endpoint in ['dashboard.profile', 'dashboard.profile_update'] %}active{% endif %}" href="/dashboard/profile"><i class="fa-solid fa-user me-1"></i>My Profile</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="row g-0">
+    <aside class="col-lg-2 d-none d-lg-block">
+      <div class="dashboard-sidebar d-flex flex-column h-100 position-sticky top-0">
+        <div class="text-center px-3 mb-4">
+          <div class="dashboard-user-avatar d-flex align-items-center justify-content-center">{{ first_initial }}{{ last_initial }}</div>
+          <p class="mb-1 mt-2 fw-bold" style="color: #fff; font-size: 14px;">{{ current_user.get_full_name() }}</p>
+          <span class="badge" style="background: rgba(255,255,255,0.2); color: #fff;">{{ current_user.enrolled_exam or 'Student' }}</span>
+        </div>
+
+        <nav class="nav flex-column px-2 gap-1">
+          <a class="nav-link {% if request.endpoint == 'dashboard.overview' %}active{% endif %}" href="/dashboard"><i class="fa-solid fa-house me-2"></i>Overview</a>
+          <a class="nav-link {% if request.endpoint == 'dashboard.courses' %}active{% endif %}" href="/dashboard/courses"><i class="fa-solid fa-book-open me-2"></i>My Courses</a>
+          <a class="nav-link {% if request.endpoint == 'dashboard.tests' %}active{% endif %}" href="/dashboard/tests"><i class="fa-solid fa-chart-line me-2"></i>Test History</a>
+          <a class="nav-link {% if request.endpoint == 'dashboard.resources' %}active{% endif %}" href="/dashboard/resources"><i class="fa-solid fa-folder-open me-2"></i>Study Resources</a>
+          <a class="nav-link {% if request.endpoint in ['dashboard.profile', 'dashboard.profile_update'] %}active{% endif %}" href="/dashboard/profile"><i class="fa-solid fa-user me-2"></i>My Profile</a>
+        </nav>
+
+        <div class="mt-auto px-2 pb-3">
+          <a class="nav-link" href="/logout"><i class="fa-solid fa-right-from-bracket me-2"></i>Logout</a>
+        </div>
+      </div>
+    </aside>
+
+    <main class="col-lg-10 col-12 dashboard-main">
+      <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <h3 class="mb-2 mb-md-0" style="color: var(--cl-navy);">Welcome back, {{ current_user.first_name }}! 👋</h3>
+        <span class="text-muted">{{ current_date }}</span>
+      </div>
+      {% block dashboard_content %}{% endblock %}
+    </main>
+  </div>
+</div>
+{% endblock %}

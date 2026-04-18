@@ -1,0 +1,69 @@
+{% macro render_blog_card(post) %}
+{% set category_key = (post.category or 'general')|lower %}
+{% set category_labels = {
+  'cat': 'CAT/MBA',
+  'clat': 'CLAT/Law',
+  'ipmat': 'IPMAT/BBA',
+  'gmat': 'GMAT/GRE',
+  'cuet': 'CUET',
+  'general': 'General'
+} %}
+
+{% if category_key == 'cat' %}
+  {% set category_color = 'var(--cl-blue)' %}
+{% elif category_key == 'clat' %}
+  {% set category_color = 'var(--cl-red)' %}
+{% elif category_key == 'ipmat' %}
+  {% set category_color = 'var(--cl-success)' %}
+{% elif category_key == 'gmat' %}
+  {% set category_color = '#8E44AD' %}
+{% elif category_key == 'cuet' %}
+  {% set category_color = 'var(--cl-warning)' %}
+{% else %}
+  {% set category_color = 'var(--cl-grey)' %}
+{% endif %}
+
+<div class="blog-card-wrapper h-100" data-category="{{ category_key }}">
+  <article class="cl-card p-0 h-100 overflow-hidden d-flex flex-column">
+    <div class="position-relative">
+      {% if post.featured_image %}
+        <img src="{{ post.featured_image }}" alt="{{ post.title }}" class="w-100" style="height: 200px; object-fit: cover;">
+      {% else %}
+        <div class="blog-card-image-placeholder" style="background: {{ category_color }};">
+          {{ category_labels.get(category_key, 'General') }}
+        </div>
+      {% endif %}
+
+      <span class="badge position-absolute top-0 start-0 m-3" style="background: {{ category_color }}; color: #fff;">
+        {{ category_labels.get(category_key, 'General') }}
+      </span>
+    </div>
+
+    <div class="p-3 d-flex flex-column flex-grow-1">
+      <h5 class="fw-bold mb-2" style="color: var(--cl-navy); line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+        {{ post.title }}
+      </h5>
+
+      {% if post.excerpt %}
+        <p class="mb-3" style="color: var(--cl-grey); font-size: 14px; line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+          {{ post.excerpt }}
+        </p>
+      {% endif %}
+
+      <div class="small text-muted mt-auto mb-2">
+        {% if post.published_at %}
+          {{ post.published_at.strftime('%d %b %Y') }}
+        {% else %}
+          Recently Published
+        {% endif %}
+        <span class="mx-2">•</span>
+        {{ post.read_time }} min read
+      </div>
+
+      <a href="{{ url_for('blog.article', category=post.category, slug=post.slug) }}" class="fw-semibold text-decoration-none" style="color: var(--cl-red);">
+        Read Article →
+      </a>
+    </div>
+  </article>
+</div>
+{% endmacro %}

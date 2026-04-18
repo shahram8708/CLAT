@@ -1,0 +1,240 @@
+{% extends 'base.html' %}
+
+{% block title %}Merit Scholarship Test — Up to 50% Fee Waiver | Career Launcher Ahmedabad{% endblock %}
+{% block meta_description %}Take CL Ahmedabad's scholarship test and win up to 50% off on your coaching fee. Free to attempt. Results instant. Certificate downloadable.{% endblock %}
+
+{% block content %}
+<section style="background: var(--cl-navy); padding: 80px 0;">
+  <div class="container">
+    <h1 style="color: #fff; font-family: 'Poppins', sans-serif; font-weight: 800;">Merit Scholarship Program</h1>
+    <p style="color: rgba(255, 255, 255, 0.88); max-width: 860px; font-size: 18px;">
+      Earn up to 50% off on your coaching fee. Take our 20 minute aptitude test and find out your scholarship band instantly.
+    </p>
+    <div class="d-flex flex-wrap gap-2 mt-4">
+      <span class="badge rounded-pill px-3 py-2" style="background: rgba(255,255,255,0.16); color: #fff;">🆓 Free to Attempt</span>
+      <span class="badge rounded-pill px-3 py-2" style="background: rgba(255,255,255,0.16); color: #fff;">⚡ Instant Result</span>
+      <span class="badge rounded-pill px-3 py-2" style="background: rgba(255,255,255,0.16); color: #fff;">📄 Certificate Downloadable</span>
+      <span class="badge rounded-pill px-3 py-2" style="background: rgba(255,255,255,0.16); color: #fff;">✅ Valid 30 Days</span>
+    </div>
+  </div>
+</section>
+
+<section style="background: #fff; padding: 60px 0;">
+  <div class="container">
+    <h2 class="section-title mb-4">Scholarship Bands</h2>
+    <div class="table-responsive">
+      <table class="table table-bordered align-middle scholarship-band-table">
+        <thead class="table-light">
+          <tr>
+            <th>Score Range</th>
+            <th>Scholarship Awarded</th>
+            <th>Band Name</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for band in bands %}
+            <tr class="{% if band.scholarship_pct == 50 %}top-band{% endif %}">
+              <td>
+                {% if band.scholarship_pct == 50 %}⭐ {% endif %}{{ band.score_range }}
+              </td>
+              <td>{{ band.scholarship_pct }}%</td>
+              <td>{{ band.band_name }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <p class="mb-0" style="color: var(--cl-grey);">All registered students receive a minimum 10% participation benefit regardless of score.</p>
+  </div>
+</section>
+
+<section style="background: var(--cl-bg); padding: 60px 0;">
+  <div class="container">
+    <h2 class="section-title mb-4 text-center">How the Scholarship Test Works</h2>
+    <div class="row g-3 scholarship-progress-steps">
+      <div class="col-lg-3 col-md-6">
+        <div class="cl-card h-100 text-center">
+          <div style="font-size: 34px;">📝</div>
+          <h6 class="fw-bold mt-2">Step 1</h6>
+          <p class="mb-0 text-muted">Register below with your details.</p>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <div class="cl-card h-100 text-center">
+          <div style="font-size: 34px;">🔓</div>
+          <h6 class="fw-bold mt-2">Step 2</h6>
+          <p class="mb-0 text-muted">Get instant access to the 20 question aptitude test.</p>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <div class="cl-card h-100 text-center">
+          <div style="font-size: 34px;">⚡</div>
+          <h6 class="fw-bold mt-2">Step 3</h6>
+          <p class="mb-0 text-muted">Submit your answers and view your result immediately.</p>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <div class="cl-card h-100 text-center">
+          <div style="font-size: 34px;">🎓</div>
+          <h6 class="fw-bold mt-2">Step 4</h6>
+          <p class="mb-0 text-muted">Download your certificate and enroll with scholarship.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="background: #fff; padding: 60px 0;" id="scholarship-register">
+  <div class="container">
+    <div class="row g-4 align-items-start">
+      <div class="col-lg-5">
+        <h3 class="fw-bold mb-3" style="color: var(--cl-navy);">Register for the Scholarship Test</h3>
+        <p class="text-muted">Take this free scholarship test and unlock your coaching discount instantly.</p>
+        <ul class="ps-3">
+          <li class="mb-2">20 aptitude questions across arithmetic, reasoning, verbal, and awareness.</li>
+          <li class="mb-2">Takes around 20 minutes to complete.</li>
+          <li class="mb-2">One attempt per registered student for fair evaluation.</li>
+          <li class="mb-2">Downloadable scholarship certificate immediately after submission.</li>
+        </ul>
+        <p class="mb-0">Need help before registering? <a href="{{ whatsapp_link }}" target="_blank" rel="noopener" style="color: var(--cl-success);">Chat on WhatsApp</a></p>
+      </div>
+
+      <div class="col-lg-7">
+        <div class="cl-card" style="padding: 32px;">
+          <form method="POST" action="/scholarship/register" novalidate>
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label" for="firstName">First Name</label>
+                <input type="text" class="form-control" id="firstName" name="first_name" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="lastName">Last Name</label>
+                <input type="text" class="form-control" id="lastName" name="last_name" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="phoneNumber">Phone</label>
+                <input type="tel" class="form-control" id="phoneNumber" name="phone" maxlength="10" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="emailAddress">Email</label>
+                <input type="email" class="form-control" id="emailAddress" name="email" required>
+              </div>
+              <div class="col-12">
+                <label class="form-label" for="examInterest">Exam Interest</label>
+                <select class="form-select" id="examInterest" name="exam_interest" required>
+                  <option value="">Select Program</option>
+                  <option value="CAT/MBA Entrance">CAT/MBA Entrance</option>
+                  <option value="CLAT/AILET/Law">CLAT/AILET/Law</option>
+                  <option value="IPMAT/BBA">IPMAT/BBA</option>
+                  <option value="GMAT/GRE">GMAT/GRE</option>
+                  <option value="CUET">CUET</option>
+                  <option value="Class XI–XII Mathematics">Class XI–XII Mathematics</option>
+                </select>
+              </div>
+              <div class="col-12">
+                <button type="submit" class="btn btn-cl-primary w-100">Register and Take Test →</button>
+              </div>
+            </div>
+          </form>
+
+          <p class="small text-muted mt-3 mb-0">
+            Already have an account?
+            <a href="/login?next=/scholarship/test" class="fw-semibold text-decoration-none" style="color: var(--cl-red);">Login to take the test →</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="background: var(--cl-bg); padding: 60px 0;">
+  <div class="container">
+    <h2 class="section-title text-center mb-4">Frequently Asked Questions</h2>
+    <div class="accordion" id="scholarshipFaq">
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="faqOne">
+          <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapseOne" aria-expanded="true" aria-controls="faqCollapseOne">
+            Who is eligible for the scholarship test?
+          </button>
+        </h2>
+        <div id="faqCollapseOne" class="accordion-collapse collapse show" aria-labelledby="faqOne" data-bs-parent="#scholarshipFaq">
+          <div class="accordion-body">Any student interested in CAT, CLAT, IPMAT, GMAT, CUET, or Class XI to XII Mathematics preparation can attempt it.</div>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="faqTwo">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapseTwo" aria-expanded="false" aria-controls="faqCollapseTwo">
+            How long is the scholarship valid?
+          </button>
+        </h2>
+        <div id="faqCollapseTwo" class="accordion-collapse collapse" aria-labelledby="faqTwo" data-bs-parent="#scholarshipFaq">
+          <div class="accordion-body">The awarded scholarship remains valid for enrollment within 30 days from your result date.</div>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="faqThree">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapseThree" aria-expanded="false" aria-controls="faqCollapseThree">
+            Can I retake the scholarship test?
+          </button>
+        </h2>
+        <div id="faqCollapseThree" class="accordion-collapse collapse" aria-labelledby="faqThree" data-bs-parent="#scholarshipFaq">
+          <div class="accordion-body">The scholarship test is available as a single fair attempt per registered student account.</div>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="faqFour">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapseFour" aria-expanded="false" aria-controls="faqCollapseFour">
+            Can this scholarship be combined with other discounts?
+          </button>
+        </h2>
+        <div id="faqCollapseFour" class="accordion-collapse collapse" aria-labelledby="faqFour" data-bs-parent="#scholarshipFaq">
+          <div class="accordion-body">Scholarships are generally not stackable with other promotional discounts unless explicitly approved by the admissions team.</div>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="faqFive">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapseFive" aria-expanded="false" aria-controls="faqCollapseFive">
+            What should I do after downloading the certificate?
+          </button>
+        </h2>
+        <div id="faqCollapseFive" class="accordion-collapse collapse" aria-labelledby="faqFive" data-bs-parent="#scholarshipFaq">
+          <div class="accordion-body">Book a counselling call, select your batch, and complete enrollment before certificate validity expires.</div>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="faqSix">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapseSix" aria-expanded="false" aria-controls="faqCollapseSix">
+            Are online students also eligible for this scholarship?
+          </button>
+        </h2>
+        <div id="faqCollapseSix" class="accordion-collapse collapse" aria-labelledby="faqSix" data-bs-parent="#scholarshipFaq">
+          <div class="accordion-body">Yes. Scholarship benefits apply to classroom, online, and hybrid enrollments as per the selected program.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "CL Ahmedabad Merit Scholarship Program",
+  "description": "Take CL Ahmedabad's scholarship test and win up to 50% scholarship on your coaching fee.",
+  "url": "https://careerlauncherahmedabad.com/scholarship",
+  "provider": {
+    "@type": "EducationalOrganization",
+    "name": "Career Launcher Ahmedabad"
+  }
+}
+</script>
+{% endblock %}

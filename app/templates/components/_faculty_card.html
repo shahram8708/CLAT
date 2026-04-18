@@ -1,0 +1,45 @@
+{% macro render_faculty_card(faculty) %}
+{% set name_parts = (faculty.name or '').split() %}
+{% set initials = ((name_parts[0][0] if name_parts|length > 0 else 'F') ~ (name_parts[1][0] if name_parts|length > 1 else ''))|upper %}
+<div class="faculty-card-wrapper h-100 text-center" data-exams='{{ (faculty.exam_tags_list or []) | tojson }}'>
+  <article class="cl-card h-100 d-flex flex-column align-items-center text-center">
+    {% if faculty.photo_url %}
+      <img src="{{ faculty.photo_url }}" alt="{{ faculty.name }}" class="faculty-photo mb-3">
+    {% else %}
+      <svg class="mb-3" width="100" height="100" viewBox="0 0 100 100" aria-label="{{ faculty.name }} avatar" role="img">
+        <circle cx="50" cy="50" r="50" fill="var(--cl-blue)"></circle>
+        <text x="50" y="58" text-anchor="middle" fill="#ffffff" font-size="36" font-weight="700" font-family="Poppins, sans-serif">{{ initials }}</text>
+      </svg>
+    {% endif %}
+
+    <h6 class="fw-bold mb-1">{{ faculty.name }}</h6>
+    <p class="small text-muted mb-2" style="max-width: 100%; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
+      {{ faculty.title }}
+    </p>
+
+    {% if faculty.exam_score %}
+      <span class="badge mb-2" style="background: var(--cl-red); color: #fff; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+        {{ faculty.exam_score|truncate(40, True, '...') }}
+      </span>
+    {% endif %}
+
+    <p class="mb-3" style="font-size: 14px; color: var(--cl-grey); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;">
+      {{ faculty.bio_short }}
+    </p>
+
+    {% if faculty.exam_tags_list %}
+      <div class="mb-3">
+        {% for exam in faculty.exam_tags_list %}
+          <span class="badge rounded-pill me-1 mb-1" style="background: var(--cl-navy); color: #fff; font-weight: 500;">{{ exam }}</span>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <div class="mt-auto">
+      <a href="{{ url_for('faculty.profile', slug=faculty.slug) }}" class="fw-semibold text-decoration-none" style="color: var(--cl-red);">
+        View Profile →
+      </a>
+    </div>
+  </article>
+</div>
+{% endmacro %}

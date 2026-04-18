@@ -1,0 +1,357 @@
+{% extends 'base.html' %}
+
+{% block title %}Career Launcher Ahmedabad | CAT, CLAT, IPMAT, CUET Coaching{% endblock %}
+{% block meta_description %}Join Career Launcher Ahmedabad for expert coaching in CAT, CLAT, IPMAT, GMAT, CUET and Class XI to XII Mathematics with top faculty and proven results.{% endblock %}
+
+{% block content %}
+{% set fallback_courses = [
+  {'slug': 'cat-mba', 'title': 'CAT / MBA Entrance', 'description': 'Master CAT, XAT, SNAP, NMAT and other MBA entrances with disciplined mentoring and mock analysis.', 'duration': '10–12 Months', 'mode': 'hybrid', 'icon': '🎓', 'exams': ['CAT', 'XAT', 'SNAP', 'NMAT', 'CMAT', 'MAH-CET']},
+  {'slug': 'clat-ailet', 'title': 'CLAT / AILET / Law Entrance', 'description': 'Comprehensive legal aptitude preparation with classroom rigor and expert strategy sessions.', 'duration': '6–12 Months', 'mode': 'classroom', 'icon': '⚖️', 'exams': ['CLAT', 'AILET', 'SLAT', 'NLAT', 'MAH-CET Law']},
+  {'slug': 'ipmat-bba', 'title': 'IPMAT / BBA Entrance', 'description': 'Small-batch program for IPMAT, Nirma BBA and top undergraduate management entrances.', 'duration': '6–10 Months', 'mode': 'classroom', 'icon': '🏛️', 'exams': ['IPMAT', 'Nirma BBA', 'CUSAT BBA', 'IPUCET', 'DU JAT']},
+  {'slug': 'gmat-gre', 'title': 'GMAT / GRE Study Abroad', 'description': 'Personalized mentoring for study abroad aspirants targeting elite global universities.', 'duration': 'Flexible (3–6 Months)', 'mode': 'online', 'icon': '🌍', 'exams': ['GMAT', 'GRE']},
+  {'slug': 'cuet', 'title': 'CUET (Central University Entrance)', 'description': 'Focused preparation for CUET UG and PG with domain plus general test support.', 'duration': '4–6 Months', 'mode': 'hybrid', 'icon': '📚', 'exams': ['CUET-UG', 'CUET-PG']},
+  {'slug': 'class-xi-xii-maths', 'title': 'Class XI–XII Mathematics', 'description': 'Board-first and competitive math foundation classes for school and entrance success.', 'duration': 'Full Academic Year', 'mode': 'classroom', 'icon': '📐', 'exams': ['CBSE', 'ICSE', 'JEE Mains (Maths)']}
+] %}
+
+{% set fallback_faculty = [
+  {'name': 'Bhavik Thakkar', 'title': 'Quantitative Aptitude & DI-LR Expert', 'exam_score': '99.99 Percentile in CAT', 'bio_short': '15+ years mentoring CAT aspirants with a structured approach to Quant and LRDI.', 'exam_tags': ['CAT', 'IPMAT', 'GMAT', 'CUET'], 'photo_url': None},
+  {'name': 'Akshit Mishra', 'title': 'VARC, Legal Reasoning & GK Expert', 'exam_score': '99+ Percentile in CLAT', 'bio_short': 'Practising advocate and PhD scholar guiding CLAT and AILET aspirants.', 'exam_tags': ['CLAT', 'AILET', 'SLAT', 'NLAT'], 'photo_url': None},
+  {'name': 'Hemant Gajaria', 'title': 'Mathematics & Quantitative Specialist', 'exam_score': 'Mathematics Specialist', 'bio_short': 'Engineering graduate focused on IPMAT, CUET and boards mathematics.', 'exam_tags': ['IPMAT', 'CUET', 'Boards', 'GMAT'], 'photo_url': None},
+  {'name': 'Chandraveer Jain', 'title': 'LRDI & Quantitative Aptitude Expert', 'exam_score': 'MBA from IIM Kozhikode', 'bio_short': 'Pattern-based LRDI instructor known for exam-day problem-solving techniques.', 'exam_tags': ['CAT', 'CLAT', 'IPMAT', 'XAT'], 'photo_url': None}
+] %}
+
+{% set fallback_results = [
+  {'student_name': 'Shantanu', 'rank_percentile': '99.61 %ile', 'target_college': 'IIM Ahmedabad', 'testimonial': 'CL Ahmedabad\'s structured approach and Bhavik sir\'s Quant sessions transformed my preparation completely.'},
+  {'student_name': 'Phoenix', 'rank_percentile': 'AIR 7', 'target_college': 'GNLU Gandhinagar', 'testimonial': 'Akshit sir\'s legal reasoning classes gave me the edge in CLAT 2025.'},
+  {'student_name': 'Aryan Trivedi', 'rank_percentile': '99.94 %ile', 'target_college': 'IIM Ahmedabad', 'testimonial': 'The mock benchmarking and targeted mentoring built real exam confidence.'}
+] %}
+
+<section class="hero-section">
+  <div class="container hero-content">
+    <span class="badge text-bg-danger mb-3 px-3 py-2">🏆 Ahmedabad's #1 Coaching Institute</span>
+    <h1 class="hero-title">Your IIM / NLU Dream Starts HERE.</h1>
+    <p class="hero-subtitle mt-3 mb-4">Expert coaching for CAT, CLAT, IPMAT, BBA and more. Join Ahmedabad's most trusted name in competitive exam preparation with 30+ years of legacy.</p>
+    <div class="d-flex flex-wrap gap-3">
+      <a href="/demo" class="btn-cl-primary">Book Free Demo Class →</a>
+      <a href="/courses" class="btn-cl-outline">Explore Courses</a>
+    </div>
+    <div class="hero-trust-bar mt-4">
+      <span>National Brand</span>
+      <span class="dot">•</span>
+      <span>IIT-IIM Alumni Network</span>
+      <span class="dot">•</span>
+      <span>30+ Years Legacy</span>
+      <span class="dot">•</span>
+      <span>200+ Centers India</span>
+    </div>
+  </div>
+</section>
+
+<section class="section-space" id="stats-section">
+  <div class="container">
+    <div class="row g-4 text-center">
+      <div class="col-lg-3 col-md-6 col-6">
+        <div class="stat-number" data-target="520+">0</div>
+        <p class="stat-label">Students with 99+ Percentile in CAT 2024</p>
+      </div>
+      <div class="col-lg-3 col-md-6 col-6">
+        <div class="stat-number" data-target="30+">0</div>
+        <p class="stat-label">Years of Excellence</p>
+      </div>
+      <div class="col-lg-3 col-md-6 col-6">
+        <div class="stat-number" data-target="99.9+">0</div>
+        <p class="stat-label">Percentile Achieved Every Year</p>
+      </div>
+      <div class="col-lg-3 col-md-6 col-6">
+        <div class="stat-number" data-target="7500+">0</div>
+        <p class="stat-label">Students Mentored</p>
+      </div>
+    </div>
+
+    <div class="ticker-wrap">
+      <div class="ticker-content">
+        CAT • XAT • SNAP • CLAT • AILET • IPMAT • BBA • GMAT • GRE • NIRMA • CUET • NMAT • CMAT • SET • IIM-K BMS • IIM-B UG • SLAT • NLAT • MAH-CET &nbsp;&nbsp;&nbsp;&nbsp; CAT • XAT • SNAP • CLAT • AILET • IPMAT • BBA • GMAT • GRE • NIRMA • CUET • NMAT • CMAT • SET • IIM-K BMS • IIM-B UG • SLAT • NLAT • MAH-CET
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-space pt-0">
+  <div class="container">
+    <div class="text-center mb-4">
+      <h2 class="section-title">Programs Built for Toppers.</h2>
+      <p class="section-subtitle mx-auto">Choose from classroom, online, and hybrid pathways tailored for your exam timeline, current level, and target institute.</p>
+    </div>
+
+    {% if courses and courses|length > 0 %}
+      {% set course_items = courses %}
+      {% set use_model_courses = true %}
+    {% else %}
+      {% set course_items = fallback_courses %}
+      {% set use_model_courses = false %}
+    {% endif %}
+
+    <div class="row g-4 course-grid">
+      {% for course in course_items %}
+        {% if use_model_courses %}
+          {% set exam_tags = course.exams_list %}
+          {% set mode_label = course.mode|title if course.mode else 'Hybrid' %}
+          {% set duration_label = course.duration or 'Program Duration' %}
+          {% set course_url = '/courses/' ~ course.slug %}
+          {% set icon_value = course.icon or '📘' %}
+          {% set description_text = course.description or 'Comprehensive exam preparation with structured mentoring, test series and performance tracking.' %}
+        {% else %}
+          {% set exam_tags = course.exams %}
+          {% set mode_label = course.mode|title %}
+          {% set duration_label = course.duration %}
+          {% set course_url = '/courses/' ~ course.slug %}
+          {% set icon_value = course.icon %}
+          {% set description_text = course.description %}
+        {% endif %}
+
+        <div class="col-lg-4 col-md-6">
+          <article class="cl-card h-100">
+            <div class="card-stripe"></div>
+            <div class="course-card-emoji mb-2">{{ icon_value }}</div>
+            <h5 class="fw-bold mb-2">{{ course.title }}</h5>
+            <p class="text-muted small mb-3">{{ description_text }}</p>
+            <div class="d-flex gap-2 flex-wrap mb-3">
+              <span class="course-meta-badge">{{ duration_label }}</span>
+              <span class="course-meta-badge">{{ mode_label }}</span>
+            </div>
+            <div class="mb-3">
+              {% for exam in exam_tags %}
+                <span class="course-tag">{{ exam }}</span>
+              {% endfor %}
+            </div>
+            <a href="{{ course_url }}" class="fw-semibold text-decoration-none" style="color: var(--cl-red);">Learn More →</a>
+          </article>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="section-space" style="background: var(--cl-bg);">
+  <div class="container">
+    <div class="text-center mb-4">
+      <h2 class="section-title">The CL Advantage</h2>
+    </div>
+
+    <div class="advantage-grid mb-4">
+      <div class="advantage-card"><div class="icon">📗</div><h6 class="fw-bold mt-2">Comprehensive Study Material</h6><p class="small text-muted mb-0">Exam focused books, workbooks and concept sheets aligned with latest paper trends.</p></div>
+      <div class="advantage-card"><div class="icon">🤖</div><h6 class="fw-bold mt-2">AI Drill-Down Mocks</h6><p class="small text-muted mb-0">Performance analytics that identify micro-topic gaps and suggest correction strategies.</p></div>
+      <div class="advantage-card"><div class="icon">🏠</div><h6 class="fw-bold mt-2">AFA Hybrid Model</h6><p class="small text-muted mb-0">Attend from classroom or online with continuity across attendance, tests and revision.</p></div>
+      <div class="advantage-card"><div class="icon">🎤</div><h6 class="fw-bold mt-2">GD-PI-WAT Support</h6><p class="small text-muted mb-0">Profile-based interview preparation for MBA and law aspirants with faculty panel feedback.</p></div>
+      <div class="advantage-card"><div class="icon">📊</div><h6 class="fw-bold mt-2">Personalised Mentoring</h6><p class="small text-muted mb-0">Weekly progress mapping, strategy calls and adaptive planning for each student.</p></div>
+      <div class="advantage-card"><div class="icon">🔔</div><h6 class="fw-bold mt-2">24/7 Doubt Support</h6><p class="small text-muted mb-0">Rapid doubt resolution through faculty groups and dedicated academic coordinators.</p></div>
+    </div>
+
+    <div class="row g-3 text-center">
+      <div class="col-lg-3 col-6"><div class="cl-card py-3"><h5 class="mb-1">29+ Years</h5><p class="small text-muted mb-0">Legacy</p></div></div>
+      <div class="col-lg-3 col-6"><div class="cl-card py-3"><h5 class="mb-1">99+%ile Faculty</h5><p class="small text-muted mb-0">Expert Trainers</p></div></div>
+      <div class="col-lg-3 col-6"><div class="cl-card py-3"><h5 class="mb-1">Max 15 Per Batch</h5><p class="small text-muted mb-0">Focused Learning</p></div></div>
+      <div class="col-lg-3 col-6"><div class="cl-card py-3"><h5 class="mb-1">24/7 Support</h5><p class="small text-muted mb-0">Mentoring Access</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section-space">
+  <div class="container">
+    <div class="text-center mb-4">
+      <h2 class="section-title">Learn From the Best.</h2>
+    </div>
+
+    {% if faculty and faculty|length > 0 %}
+      {% set faculty_items = faculty %}
+      {% set use_model_faculty = true %}
+    {% else %}
+      {% set faculty_items = fallback_faculty %}
+      {% set use_model_faculty = false %}
+    {% endif %}
+
+    <div class="row g-4 faculty-grid">
+      {% for faculty_item in faculty_items %}
+        {% if use_model_faculty %}
+          {% set tags = faculty_item.exam_tags_list %}
+          {% set title_text = faculty_item.title %}
+          {% set score_text = faculty_item.exam_score %}
+          {% set bio_text = faculty_item.bio_short %}
+          {% set photo = faculty_item.photo_url %}
+          {% set name_text = faculty_item.name %}
+        {% else %}
+          {% set tags = faculty_item.exam_tags %}
+          {% set title_text = faculty_item.title %}
+          {% set score_text = faculty_item.exam_score %}
+          {% set bio_text = faculty_item.bio_short %}
+          {% set photo = faculty_item.photo_url %}
+          {% set name_text = faculty_item.name %}
+        {% endif %}
+
+        <div class="col-lg-3 col-md-6">
+          <article class="faculty-card text-center">
+            {% if photo %}
+              <img src="{{ photo }}" alt="{{ name_text }}" class="faculty-photo mb-3">
+            {% else %}
+              <div class="faculty-photo mb-3 d-inline-flex align-items-center justify-content-center" style="background: rgba(44, 62, 122, 0.08);">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="52" height="52" fill="none" stroke="var(--cl-blue)" stroke-width="1.5">
+                  <path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Z"/>
+                  <path d="M4 20a8 8 0 0 1 16 0"/>
+                </svg>
+              </div>
+            {% endif %}
+            <h6 class="fw-bold mb-1">{{ name_text }}</h6>
+            <p class="small text-muted mb-2">{{ title_text }}</p>
+            {% if score_text %}
+              <span class="badge-soft mb-2">{{ score_text }}</span>
+            {% endif %}
+            <p class="small mb-2">{{ bio_text }}</p>
+            <div>
+              {% for tag in tags %}
+                <span class="exam-tag">{{ tag }}</span>
+              {% endfor %}
+            </div>
+          </article>
+        </div>
+      {% endfor %}
+    </div>
+
+    <div class="text-center mt-4">
+      <a href="/faculty" class="btn btn-outline-dark px-4 rounded-pill">Meet All Faculty →</a>
+    </div>
+  </div>
+</section>
+
+<section class="section-space" style="background: var(--cl-navy); color: #fff;">
+  <div class="container">
+    <div class="results-banner row g-3 mb-4">
+      <div class="col-lg-3 col-6"><div class="mini-stat"><strong>520+</strong><br><small>CAT 99+ %ile</small></div></div>
+      <div class="col-lg-3 col-6"><div class="mini-stat"><strong>99.94</strong><br><small>Highest CAT %ile</small></div></div>
+      <div class="col-lg-3 col-6"><div class="mini-stat"><strong>6/10</strong><br><small>Top CLAT 2025 Ranks</small></div></div>
+      <div class="col-lg-3 col-6"><div class="mini-stat"><strong>200+</strong><br><small>CL Centers</small></div></div>
+    </div>
+
+    {% if results and results|length > 0 %}
+      {% set result_items = results[:3] %}
+    {% else %}
+      {% set result_items = fallback_results %}
+    {% endif %}
+
+    <div class="row g-4">
+      {% for result_item in result_items %}
+        {% set parts = result_item.student_name.split() %}
+        {% set initials = (parts[0][0] ~ (parts[1][0] if parts|length > 1 else ''))|upper %}
+        <div class="col-lg-4">
+          <article class="result-card">
+            <div class="d-flex align-items-center gap-3 mb-3">
+              <div class="result-avatar">{{ initials }}</div>
+              <div>
+                <h6 class="mb-0 fw-bold">{{ result_item.student_name }}</h6>
+                <small class="text-muted">{{ result_item.target_college }}</small>
+              </div>
+            </div>
+            <p class="fw-bold mb-2" style="color: var(--cl-red);">{{ result_item.rank_percentile }}</p>
+            <p class="mb-0"><em>{{ result_item.testimonial }}</em></p>
+          </article>
+        </div>
+      {% endfor %}
+    </div>
+
+    <div class="text-center mt-4">
+      <a href="/results" class="btn-cl-outline">See All Results →</a>
+    </div>
+  </div>
+</section>
+
+<section class="section-space" style="background: var(--cl-bg);">
+  <div class="container">
+    <div class="row g-4 align-items-start">
+      <div class="col-lg-5">
+        <h3 class="section-title">Book Your Free Demo Class Today</h3>
+        <p class="text-muted">Speak to our academic counsellor, attend a live class, and evaluate the right strategy before you commit.</p>
+        <p class="mb-2">✅ 100% Free — No commitment</p>
+        <p class="mb-2">✅ Choose classroom or online mode</p>
+        <p class="mb-3">✅ Speak directly with your exam specialist</p>
+        <a href="{{ demo_whatsapp_link }}" target="_blank" class="btn btn-success rounded-pill px-4">Chat on WhatsApp</a>
+      </div>
+
+      <div class="col-lg-7">
+        <div class="cl-card">
+          <form id="demoBookingForm" action="{{ url_for('main.demo_booking') }}" method="post" novalidate>
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="row g-3 demo-form-grid">
+              <div class="col-md-6">
+                <label class="form-label">First Name*</label>
+                <input type="text" name="first_name" class="form-control" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Last Name*</label>
+                <input type="text" name="last_name" class="form-control" required>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Phone*</label>
+                <input type="tel" name="phone" class="form-control" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Email*</label>
+                <input type="email" name="email" class="form-control" required>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Course Interest*</label>
+                <select name="course_interest" class="form-select" required>
+                  <option value="">Select Program</option>
+                  <option value="CAT/MBA Entrance">CAT/MBA Entrance</option>
+                  <option value="CLAT/AILET/Law">CLAT/AILET/Law</option>
+                  <option value="IPMAT/BBA">IPMAT/BBA</option>
+                  <option value="GMAT/GRE">GMAT/GRE</option>
+                  <option value="CUET">CUET</option>
+                  <option value="Class XI–XII Mathematics">Class XI–XII Mathematics</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Preferred Mode*</label>
+                <select name="preferred_mode" class="form-select" required>
+                  <option value="">Select Mode</option>
+                  <option value="classroom">Classroom – Navrangpura Centre</option>
+                  <option value="online">Online – AFA</option>
+                  <option value="decide-after-demo">Decide After Demo</option>
+                </select>
+              </div>
+
+              <div class="col-12">
+                <button type="submit" class="btn btn-cl-primary w-100">Book My Free Demo →</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="contact-strip">
+  <div class="container">
+    <div class="row text-center text-lg-start align-items-center">
+      <div class="col-lg-3 col-md-6 contact-strip-item">
+        <strong>📍 Address</strong>
+        <p class="mb-0 small">A 102, Karmyog Heights, Navrangpura, Ahmedabad – 380009</p>
+      </div>
+      <div class="col-lg-3 col-md-6 contact-strip-item">
+        <strong>📞 Phone</strong>
+        <p class="mb-0 small"><a href="tel:+919978559986">+91 9978559986</a> | <a href="tel:+916353842725">+91 6353842725</a></p>
+      </div>
+      <div class="col-lg-3 col-md-6 contact-strip-item">
+        <strong>📧 Email</strong>
+        <p class="mb-0 small"><a href="mailto:cl_ahmedabad@careerlauncher.com">cl_ahmedabad@careerlauncher.com</a></p>
+      </div>
+      <div class="col-lg-3 col-md-6 contact-strip-item">
+        <strong>🎓 Scholarship</strong>
+        <p class="mb-0 small"><a href="/scholarship" style="color: var(--cl-red);">Up to 50% Scholarship — Apply Now →</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,596 @@
+footer.site-footer {
+  background: var(--cl-navy);
+  color: rgba(255, 255, 255, 0.9);
+  padding-top: 70px;
+}
+
+.site-footer h5 {
+  color: #fff;
+  margin-bottom: 1rem;
+}
+
+.site-footer a {
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+}
+
+.site-footer a:hover {
+  color: #fff;
+}
+
+.footer-social a {
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 8px;
+}
+
+.footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 1rem 0;
+  margin-top: 2rem;
+  font-size: 14px;
+}
+
+.footer-links-inline a {
+  margin-left: 14px;
+}
+
+.contact-strip .icon-wrap {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: rgba(44, 62, 122, 0.08);
+  color: var(--cl-blue);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.advantage-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.advantage-card {
+  background: var(--cl-white);
+  border: 1px solid var(--cl-border);
+  border-radius: 14px;
+  padding: 1rem;
+  height: 100%;
+}
+
+.advantage-card .icon {
+  font-size: 1.4rem;
+}
+
+.hero-trust-bar {
+  margin-top: 2rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.hero-trust-bar .dot {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.results-banner .mini-stat {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  padding: 0.85rem;
+  text-align: center;
+  color: #fff;
+}
+
+.course-card-emoji {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.course-meta-badge {
+  background: rgba(26, 26, 46, 0.08);
+  color: var(--cl-navy);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 0.25rem 0.6rem;
+}
+
+.course-tag {
+  border: 1px solid rgba(44, 62, 122, 0.22);
+  color: var(--cl-blue);
+  border-radius: 999px;
+  font-size: 11px;
+  padding: 0.18rem 0.52rem;
+  display: inline-flex;
+  margin: 0.12rem;
+}
+
+.blog-card {
+  background: #fff;
+  border: 1px solid var(--cl-border);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.blog-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 25px rgba(26, 26, 46, 0.1);
+}
+
+.blog-card .meta {
+  font-size: 13px;
+  color: var(--cl-grey);
+}
+
+.admin-panel-shell {
+  background: #fff;
+  border: 1px solid var(--cl-border);
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.admin-stat-box {
+  border-radius: 10px;
+  padding: 1rem;
+  color: #fff;
+}
+
+.admin-stat-box.navy {
+  background: var(--cl-navy);
+}
+
+.admin-stat-box.red {
+  background: var(--cl-red);
+}
+
+.back-to-top {
+  position: fixed;
+  bottom: 96px;
+  right: 24px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: var(--cl-blue);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s ease;
+  z-index: 9998;
+}
+
+.back-to-top.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.back-to-top:hover {
+  transform: translateY(-2px);
+}
+
+.courses-filter-tabs {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  white-space: nowrap;
+}
+
+.courses-filter-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.course-card-wrapper {
+  transition: opacity 0.2s ease;
+}
+
+.cl-card .card-stripe {
+  height: 4px;
+  background: var(--cl-red);
+}
+
+.faculty-filter-tabs {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  white-space: nowrap;
+}
+
+.faculty-filter-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.faculty-card-wrapper {
+  transition: opacity 0.2s ease;
+}
+
+.faculty-photo {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--cl-red);
+}
+
+.faculty-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: var(--cl-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 36px;
+  font-weight: 700;
+  margin: 0 auto;
+}
+
+.results-filter-tabs {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  white-space: nowrap;
+}
+
+.results-filter-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.result-card-wrapper {
+  transition: opacity 0.2s ease;
+}
+
+.result-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 auto;
+}
+
+.rank-percentile-text {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--cl-red);
+}
+
+.sticky-sidebar {
+  position: sticky;
+  top: 100px;
+}
+
+.syllabus-subject-badge {
+  border-left: 4px solid var(--cl-navy);
+}
+
+.batch-table-wrapper {
+  overflow-x: auto;
+}
+
+.exam-pill {
+  display: inline-block;
+  padding: 8px 20px;
+  background: var(--cl-navy);
+  color: white;
+  border-radius: 50px;
+  font-size: 15px;
+  font-weight: 500;
+  margin: 4px;
+}
+
+.faculty-hero-photo {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid var(--cl-red);
+}
+
+.faculty-avatar-large {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: var(--cl-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 48px;
+  font-weight: 700;
+  margin: 0 auto;
+}
+
+.subject-pill {
+  display: inline-block;
+  padding: 8px 20px;
+  background: var(--cl-navy);
+  color: white;
+  border-radius: 50px;
+  font-size: 15px;
+  font-weight: 500;
+  margin: 4px;
+}
+
+.youtube-embed-wrapper {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.auth-card {
+  max-width: 480px;
+  margin: 60px auto;
+  padding: 40px;
+}
+
+.auth-card-wide {
+  max-width: 680px;
+  margin: 60px auto;
+  padding: 40px;
+}
+
+.auth-page-wrapper {
+  min-height: calc(100vh - 200px);
+  display: flex;
+  align-items: center;
+  background: var(--cl-bg);
+}
+
+.password-toggle-btn {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  border: 0;
+  background: transparent;
+  color: var(--cl-grey);
+  padding: 0;
+  line-height: 1;
+}
+
+.password-toggle-btn:hover,
+.password-toggle-btn:focus {
+  color: var(--cl-navy);
+}
+
+.article-content {
+  line-height: 1.8;
+  font-size: 17px;
+  color: var(--cl-text);
+}
+
+.article-content h2,
+.article-content h3,
+.article-content h4 {
+  color: var(--cl-navy);
+  margin-top: 1.5rem;
+  margin-bottom: 0.85rem;
+}
+
+.article-content blockquote {
+  border-left: 4px solid var(--cl-red);
+  padding-left: 20px;
+  font-style: italic;
+  color: var(--cl-grey);
+}
+
+.article-content pre,
+.article-content code {
+  background: #f1f3f5;
+  border-radius: 8px;
+}
+
+.article-content pre {
+  padding: 14px;
+  overflow-x: auto;
+}
+
+.article-content code {
+  padding: 0.15rem 0.4rem;
+}
+
+.blog-card-image-placeholder {
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 600;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.blog-sidebar-card {
+  position: relative;
+}
+
+.article-hero {
+  background: var(--cl-navy);
+}
+
+.demo-success-icon {
+  font-size: 80px;
+  color: var(--cl-success);
+  display: block;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.demo-steps {
+  padding: 24px;
+}
+
+.demo-steps ol {
+  margin-bottom: 0;
+}
+
+.demo-steps li {
+  margin-bottom: 10px;
+}
+
+.test-series-card {
+  padding: 1.75rem;
+}
+
+.test-price-free {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--cl-success);
+}
+
+.test-price-paid {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--cl-red);
+}
+
+.exam-stripe-cat {
+  background: var(--cl-blue);
+}
+
+.exam-stripe-clat {
+  background: var(--cl-red);
+}
+
+.exam-stripe-ipmat {
+  background: var(--cl-success);
+}
+
+.exam-stripe-cuet {
+  background: var(--cl-warning);
+}
+
+.exam-stripe-default {
+  background: var(--cl-navy);
+}
+
+.dashboard-sidebar {
+  min-height: 100vh;
+  background: var(--cl-navy);
+  padding: 24px 0;
+}
+
+.dashboard-sidebar .nav-link {
+  color: #fff;
+  font-size: 14px;
+  padding: 10px 20px;
+  border-radius: 8px;
+}
+
+.dashboard-sidebar .nav-link.active {
+  background: var(--cl-red);
+  color: #fff;
+}
+
+.dashboard-sidebar .nav-link:hover:not(.active) {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.dashboard-user-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--cl-red);
+  color: #fff;
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 auto;
+}
+
+.dashboard-main {
+  background: var(--cl-bg);
+  min-height: 100vh;
+  padding: 32px;
+}
+
+.dashboard-stat-card {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  border-left: 4px solid var(--cl-red);
+}
+
+.dashboard-section-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+  border: 1px solid var(--cl-border);
+}
+
+.dashboard-empty-state {
+  text-align: center;
+}
+
+.dashboard-empty-state .icon {
+  font-size: 60px;
+}
+
+.dashboard-empty-state p {
+  color: var(--cl-grey);
+}
+
+.test-section-badge {
+  display: inline-block;
+  background: var(--cl-bg);
+  color: var(--cl-navy);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 8px;
+  margin: 2px;
+}
+
+.scholarship-band-table tr.top-band {
+  background: #fff9e6;
+  border-left: 4px solid #f39c12;
+}
+
+.scholarship-result-hero {
+  position: relative;
+}
+
+.certificate-preview {
+  border: 2px solid var(--cl-navy);
+  border-radius: 12px;
+  padding: 40px;
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+  background: #fff;
+}
+
+.scholarship-progress-steps {
+  align-items: stretch;
+}
+
+.profile-summary-card {
+  border: 1px solid var(--cl-border);
+}
+
+.profile-avatar-large {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--cl-red);
+  color: #fff;
+  font-size: 28px;
+  font-weight: 700;
+}

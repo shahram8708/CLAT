@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+{% from 'components/_blog_card.html' import render_blog_card %}
+
+{% block title %}{{ meta_title }}{% endblock %}
+{% block meta_description %}{{ meta_description }}{% endblock %}
+
+{% block content %}
+{% set author_name = post.author.get_full_name() if post.author else 'CL Ahmedabad Team' %}
+
+{% if post.category == 'cat' %}
+  {% set related_programs = [
+    ('/courses/cat-mba', 'CAT / MBA Entrance'),
+    ('/courses/gmat-gre', 'GMAT / GRE Study Abroad'),
+    ('/courses/ipmat-bba', 'IPMAT / BBA Entrance'),
+    ('/courses/cuet', 'CUET Program'),
+    ('/courses/clat-ailet', 'CLAT / AILET / Law Entrance'),
+    ('/courses/class-xi-xii-maths', 'Class XI–XII Mathematics')
+  ] %}
+{% elif post.category == 'clat' %}
+  {% set related_programs = [
+    ('/courses/clat-ailet', 'CLAT / AILET / Law Entrance'),
+    ('/courses/cuet', 'CUET Program'),
+    ('/courses/ipmat-bba', 'IPMAT / BBA Entrance'),
+    ('/courses/cat-mba', 'CAT / MBA Entrance'),
+    ('/courses/class-xi-xii-maths', 'Class XI–XII Mathematics'),
+    ('/courses/gmat-gre', 'GMAT / GRE Study Abroad')
+  ] %}
+{% elif post.category == 'ipmat' %}
+  {% set related_programs = [
+    ('/courses/ipmat-bba', 'IPMAT / BBA Entrance'),
+    ('/courses/cat-mba', 'CAT / MBA Entrance'),
+    ('/courses/cuet', 'CUET Program'),
+    ('/courses/class-xi-xii-maths', 'Class XI–XII Mathematics'),
+    ('/courses/clat-ailet', 'CLAT / AILET / Law Entrance'),
+    ('/courses/gmat-gre', 'GMAT / GRE Study Abroad')
+  ] %}
+{% elif post.category == 'gmat' %}
+  {% set related_programs = [
+    ('/courses/gmat-gre', 'GMAT / GRE Study Abroad'),
+    ('/courses/cat-mba', 'CAT / MBA Entrance'),
+    ('/courses/ipmat-bba', 'IPMAT / BBA Entrance'),
+    ('/courses/cuet', 'CUET Program'),
+    ('/courses/clat-ailet', 'CLAT / AILET / Law Entrance'),
+    ('/courses/class-xi-xii-maths', 'Class XI–XII Mathematics')
+  ] %}
+{% elif post.category == 'cuet' %}
+  {% set related_programs = [
+    ('/courses/cuet', 'CUET Program'),
+    ('/courses/ipmat-bba', 'IPMAT / BBA Entrance'),
+    ('/courses/cat-mba', 'CAT / MBA Entrance'),
+    ('/courses/class-xi-xii-maths', 'Class XI–XII Mathematics'),
+    ('/courses/clat-ailet', 'CLAT / AILET / Law Entrance'),
+    ('/courses/gmat-gre', 'GMAT / GRE Study Abroad')
+  ] %}
+{% else %}
+  {% set related_programs = [
+    ('/courses/cat-mba', 'CAT / MBA Entrance'),
+    ('/courses/clat-ailet', 'CLAT / AILET / Law Entrance'),
+    ('/courses/ipmat-bba', 'IPMAT / BBA Entrance'),
+    ('/courses/gmat-gre', 'GMAT / GRE Study Abroad'),
+    ('/courses/cuet', 'CUET Program'),
+    ('/courses/class-xi-xii-maths', 'Class XI–XII Mathematics')
+  ] %}
+{% endif %}
+
+<section class="article-hero" style="padding: 80px 0 40px;">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8">
+        <nav aria-label="breadcrumb" class="mb-3">
+          <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}" class="text-white text-decoration-none">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('blog.listing') }}" class="text-white text-decoration-none">Blog</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('blog.by_category', category=post.category) }}" class="text-white text-decoration-none">{{ post.category | upper }}</a></li>
+            <li class="breadcrumb-item active text-white" aria-current="page">{{ post.title }}</li>
+          </ol>
+        </nav>
+
+        <span class="badge mb-3" style="background: var(--cl-red); color: #fff;">{{ post.category | upper }}</span>
+        <h1 style="color: #fff; font-family: 'Poppins', sans-serif; font-weight: 800; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+          {{ post.title }}
+        </h1>
+
+        <p class="mb-0" style="color: rgba(255, 255, 255, 0.85);">
+          <span>{{ author_name }}</span>
+          <span class="mx-2">•</span>
+          <span>{{ post.published_at.strftime('%d %b %Y') if post.published_at else 'Recently Published' }}</span>
+          <span class="mx-2">•</span>
+          <span>{{ post.read_time }} min read</span>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="background: #fff; padding: 40px 0 60px;">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-8">
+        {% if post.featured_image %}
+          <div class="mb-4">
+            <img src="{{ post.featured_image }}" alt="{{ post.title }} featured image" class="w-100" style="border-radius: 12px; max-height: 400px; object-fit: cover;">
+          </div>
+        {% endif %}
+
+        <article class="article-content">
+          {{ sanitised_content | safe }}
+        </article>
+
+        {% if related_posts %}
+          <section style="background: var(--cl-bg); padding: 60px 24px; border-radius: 16px; margin-top: 48px;">
+            <h3 class="mb-4" style="color: var(--cl-navy);">More Articles You Might Like</h3>
+            <div class="row">
+              {% for related in related_posts %}
+                <div class="col-md-4 mb-4 mb-md-0">
+                  {{ render_blog_card(related) }}
+                </div>
+              {% endfor %}
+            </div>
+          </section>
+        {% endif %}
+      </div>
+
+      <div class="col-lg-4">
+        <div class="sticky-sidebar">
+          <div class="cl-card blog-sidebar-card mb-4">
+            <h5 style="color: var(--cl-navy);">Start Your Preparation Today</h5>
+            <p class="text-muted mb-3">Get expert guidance, structured study plans, and personalised mentorship from CL Ahmedabad faculty.</p>
+            <a href="#" class="btn btn-cl-primary w-100 mb-2" data-bs-toggle="modal" data-bs-target="#demoModal">Book Free Demo →</a>
+            <a href="https://wa.me/919978559986?text=Hi%2C%20I%20want%20to%20book%20a%20free%20demo%20class%20at%20CL%20Ahmedabad" class="btn btn-success w-100" target="_blank" rel="noopener">WhatsApp Us</a>
+          </div>
+
+          <div class="cl-card blog-sidebar-card mb-4">
+            <h6 class="mb-3" style="color: var(--cl-navy);">Related Programs</h6>
+            <ul class="list-unstyled mb-0">
+              {% for link, label in related_programs %}
+                <li class="mb-2"><a href="{{ link }}" class="text-decoration-none" style="color: var(--cl-blue);">{{ label }}</a></li>
+              {% endfor %}
+            </ul>
+          </div>
+
+          {% if post.category in ['cat', 'clat'] %}
+            <div class="cl-card blog-sidebar-card">
+              <h6 class="mb-2" style="color: var(--cl-navy);">Free Mock Test</h6>
+              <p class="small text-muted mb-3">Test your preparation with timed mocks and instant analysis.</p>
+              <a href="/test-series/{{ post.category }}" class="btn btn-cl-outline w-100" style="border-color: var(--cl-navy); color: var(--cl-navy);">Test Your Preparation</a>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": {{ post.title | tojson }},
+  "datePublished": {{ (post.published_at.isoformat() if post.published_at else post.updated_at.isoformat()) | tojson }},
+  "dateModified": {{ post.updated_at.isoformat() | tojson }},
+  "author": {
+    "@type": "Person",
+    "name": {{ (post.author.get_full_name() if post.author else 'CL Ahmedabad') | tojson }}
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Career Launcher Ahmedabad"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": {{ request.url | tojson }}
+  }
+}
+</script>
+{% endblock %}

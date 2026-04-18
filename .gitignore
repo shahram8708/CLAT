@@ -1,0 +1,63 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+.env
+!.env.example
+
+# Flask / Application
+instance/
+!instance/.gitkeep
+*.db
+*.sqlite
+*.sqlite3
+flask_session/
+
+# IDE and OS
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Logs and temp files
+*.log
+logs/
+*.pid
+.coverage
+htmlcov/
+.pytest_cache/
+*.pytest_cache
+
+# Uploads and generated files
+app/static/uploads/
+*.pdf
+
+# Deployment
+.heroku/
+.slugignore

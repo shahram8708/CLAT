@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}404 | Page Not Found{% endblock %}
+{% block content %}
+<section class="section-space" style="min-height: 65vh; display: flex; align-items: center;">
+  <div class="container text-center">
+    <h1 style="font-size: clamp(72px, 14vw, 160px); color: var(--cl-red); font-weight: 800;">404</h1>
+    <h2 class="section-title">Page Not Found</h2>
+    <p class="text-muted mb-4">The page you are looking for may have been moved or the link may be incorrect.</p>
+    <div class="d-flex justify-content-center gap-3 flex-wrap">
+      <a href="{{ url_for('main.index') }}" class="btn btn-cl-primary">Back to Homepage</a>
+      <a href="/courses" class="btn btn-outline-dark rounded-pill">Browse Courses</a>
+      <a href="{{ url_for('main.contact') }}" class="btn btn-outline-dark rounded-pill">Contact Us</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

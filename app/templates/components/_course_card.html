@@ -1,0 +1,34 @@
+{% macro render_course_card(course) %}
+<div class="course-card-wrapper h-100" data-category="{{ course.exam_category }}">
+  <article class="cl-card h-100 d-flex flex-column" style="cursor: pointer;" onclick="window.location.href='{{ url_for('courses.detail', slug=course.slug) }}'">
+    <div class="card-stripe"></div>
+
+    <div class="text-center mb-3" style="font-size: 48px; line-height: 1;">{{ course.icon or '📘' }}</div>
+
+    <h5 class="fw-bold text-center mb-2" style="color: var(--cl-navy);">{{ course.title }}</h5>
+
+    <p class="text-muted mb-3" style="min-height: 3.2rem; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
+      {{ course.description or 'Comprehensive coaching with expert mentors and structured preparation support.' }}
+    </p>
+
+    <div class="d-flex align-items-center gap-2 flex-wrap mb-3">
+      <span class="badge rounded-pill text-dark" style="background: #e9ecef;">{{ course.duration or 'Program Duration' }}</span>
+      <span class="badge rounded-pill" style="background: var(--cl-blue); color: #fff;">{{ (course.mode or 'hybrid')|title }}</span>
+    </div>
+
+    {% if course.exams_list %}
+      <div class="mb-3">
+        {% for exam in course.exams_list %}
+          <span class="badge rounded-pill me-1 mb-1" style="background: var(--cl-navy); color: #fff; font-weight: 500;">{{ exam }}</span>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <div class="mt-auto">
+      <a href="{{ url_for('courses.detail', slug=course.slug) }}" class="fw-semibold text-decoration-none" style="color: var(--cl-red);">
+        Learn More →
+      </a>
+    </div>
+  </article>
+</div>
+{% endmacro %}

@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% from 'components/_form_errors.html' import render_errors %}
+
+{% block title %}Create Account — Career Launcher Ahmedabad{% endblock %}
+{% block meta_description %}Create your free CL Ahmedabad student account to access mock tests, course materials, and track your preparation progress.{% endblock %}
+
+{% block content %}
+<section class="auth-page-wrapper py-5">
+  <div class="container">
+    <div class="cl-card auth-card-wide">
+      <div class="text-center mb-4">
+        <h2 class="mb-2" style="color: var(--cl-navy);">Create Your Student Account</h2>
+        <p class="mb-0" style="color: var(--cl-grey);">Join thousands of CL Ahmedabad students on their path to top colleges.</p>
+      </div>
+
+      <form method="POST" action="{{ url_for('auth.register_submit') }}" novalidate>
+        {{ form.hidden_tag() }}
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label" for="{{ form.first_name.id }}">{{ form.first_name.label.text }}</label>
+            {{ form.first_name(class='form-control' + (' is-invalid' if form.first_name.errors else ''), placeholder='Enter first name') }}
+            {{ render_errors(form.first_name) }}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="{{ form.last_name.id }}">{{ form.last_name.label.text }}</label>
+            {{ form.last_name(class='form-control' + (' is-invalid' if form.last_name.errors else ''), placeholder='Enter last name') }}
+            {{ render_errors(form.last_name) }}
+          </div>
+
+          <div class="col-12">
+            <label class="form-label" for="{{ form.email.id }}">{{ form.email.label.text }}</label>
+            {{ form.email(class='form-control' + (' is-invalid' if form.email.errors else ''), placeholder='you@example.com') }}
+            {{ render_errors(form.email) }}
+          </div>
+
+          <div class="col-12">
+            <label class="form-label" for="{{ form.phone.id }}">{{ form.phone.label.text }}</label>
+            {{ form.phone(class='form-control' + (' is-invalid' if form.phone.errors else ''), placeholder='Enter phone number') }}
+            {{ render_errors(form.phone) }}
+          </div>
+
+          <div class="col-12">
+            <label class="form-label" for="{{ form.password.id }}">{{ form.password.label.text }}</label>
+            <div class="position-relative">
+              {{ form.password(class='form-control pe-5' + (' is-invalid' if form.password.errors else ''), id='registerPassword', placeholder='Create a strong password') }}
+              <button type="button" class="password-toggle-btn" id="toggleRegisterPassword" aria-label="Show or hide password">
+                <i class="fa-regular fa-eye"></i>
+              </button>
+            </div>
+            <small class="text-muted">Must be 8+ characters with at least one uppercase letter and one number.</small>
+            {{ render_errors(form.password) }}
+          </div>
+
+          <div class="col-12">
+            <label class="form-label" for="{{ form.confirm_password.id }}">{{ form.confirm_password.label.text }}</label>
+            {{ form.confirm_password(class='form-control' + (' is-invalid' if form.confirm_password.errors else ''), placeholder='Re-enter your password') }}
+            {{ render_errors(form.confirm_password) }}
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label" for="{{ form.exam_interest.id }}">{{ form.exam_interest.label.text }}</label>
+            {{ form.exam_interest(class='form-select' + (' is-invalid' if form.exam_interest.errors else '')) }}
+            {{ render_errors(form.exam_interest) }}
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label" for="{{ form.preferred_mode.id }}">{{ form.preferred_mode.label.text }}</label>
+            {{ form.preferred_mode(class='form-select' + (' is-invalid' if form.preferred_mode.errors else '')) }}
+            {{ render_errors(form.preferred_mode) }}
+          </div>
+
+          <div class="col-12 mt-2">
+            {{ form.submit(class='btn btn-cl-primary w-100 py-2', value='Create My Account →') }}
+          </div>
+        </div>
+
+        <p class="text-center mt-3 mb-2">
+          <a href="{{ url_for('auth.login') }}" class="fw-semibold text-decoration-none" style="color: var(--cl-red);">Already have an account? Login →</a>
+        </p>
+
+        <p class="small text-center mb-0" style="color: var(--cl-grey);">
+          By creating an account, you agree to our
+          <a href="/privacy-policy" style="color: var(--cl-blue);">Privacy Policy</a>
+          and
+          <a href="/terms" style="color: var(--cl-blue);">Terms of Use</a>.
+        </p>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const toggleButton = document.getElementById("toggleRegisterPassword");
+    const passwordInput = document.getElementById("registerPassword");
+
+    if (!toggleButton || !passwordInput) {
+      return;
+    }
+
+    toggleButton.addEventListener("click", function () {
+      const isPassword = passwordInput.type === "password";
+      passwordInput.type = isPassword ? "text" : "password";
+      toggleButton.innerHTML = isPassword
+        ? '<i class="fa-regular fa-eye-slash"></i>'
+        : '<i class="fa-regular fa-eye"></i>';
+    });
+  });
+</script>
+{% endblock %}

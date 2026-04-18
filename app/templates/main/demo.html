@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% from 'components/_form_errors.html' import render_errors %}
+
+{% block title %}Book a Free Demo Class — Career Launcher Ahmedabad{% endblock %}
+{% block meta_description %}Book a free demo class at CL Ahmedabad. Expert coaching for CAT, CLAT, IPMAT, and more. Our counsellor will call you within minutes.{% endblock %}
+
+{% block content %}
+<section style="background: var(--cl-navy); padding: 80px 0;">
+  <div class="container text-center">
+    <h1 style="color: #fff; font-family: 'Poppins', sans-serif; font-weight: 800;">Book Your Free Demo Class</h1>
+    <p class="mb-4" style="color: rgba(255, 255, 255, 0.85); font-size: 18px;">
+      Experience our teaching quality before you commit. Zero cost, zero obligation.
+    </p>
+    <div class="d-flex flex-wrap justify-content-center gap-3" style="color: #fff; font-weight: 600;">
+      <span>✅ 100% Free</span>
+      <span>✅ Expert Faculty</span>
+      <span>✅ Response Within Minutes</span>
+    </div>
+  </div>
+</section>
+
+<section style="background: var(--cl-bg); padding: 80px 0;">
+  <div class="container">
+    <div class="row g-4 align-items-start">
+      <div class="col-lg-5">
+        <h3 class="mb-3" style="color: var(--cl-navy);">Why Book a Demo?</h3>
+        <ul class="list-unstyled mb-4">
+          <li class="mb-2"><i class="fa-solid fa-circle-check me-2" style="color: var(--cl-success);"></i>See our teaching approach live before enrolling</li>
+          <li class="mb-2"><i class="fa-solid fa-circle-check me-2" style="color: var(--cl-success);"></i>Meet the faculty who will train you</li>
+          <li class="mb-2"><i class="fa-solid fa-circle-check me-2" style="color: var(--cl-success);"></i>Get a personalised study plan for your exam</li>
+          <li class="mb-2"><i class="fa-solid fa-circle-check me-2" style="color: var(--cl-success);"></i>Understand fee structure and scholarship options</li>
+          <li class="mb-2"><i class="fa-solid fa-circle-check me-2" style="color: var(--cl-success);"></i>Ask any question with no sales pressure</li>
+        </ul>
+
+        <div class="cl-card mb-4">
+          <h5 style="color: var(--cl-navy);">Prefer to chat first?</h5>
+          <a href="{{ whatsapp_link }}" target="_blank" rel="noopener" class="btn btn-success rounded-pill px-4 py-2 mt-2">
+            💬 WhatsApp Us Now
+          </a>
+        </div>
+
+        <div class="mb-3">
+          <p class="mb-1"><strong>Phone:</strong> <a href="tel:+919978559986" class="text-decoration-none">+91 9978559986</a></p>
+          <p class="mb-1"><strong>Phone:</strong> <a href="tel:+916353842725" class="text-decoration-none">+91 6353842725</a></p>
+          <p class="mb-0"><strong>Email:</strong> <a href="mailto:cl_ahmedabad@careerlauncher.com" class="text-decoration-none">cl_ahmedabad@careerlauncher.com</a></p>
+        </div>
+
+        <div class="cl-card">
+          <h6 class="mb-2" style="color: var(--cl-navy);">Centre Address</h6>
+          <p class="mb-0">A 102, Karmyog Heights, Navrangpura, Ahmedabad – 380009</p>
+        </div>
+      </div>
+
+      <div class="col-lg-7">
+        <div class="cl-card" style="padding: 32px;">
+          <h4 class="mb-3" style="color: var(--cl-navy);">Fill the Form — We'll Call You Within Minutes</h4>
+          <form id="demoBookingForm" method="POST" action="/demo" novalidate>
+            {{ form.hidden_tag() }}
+
+            <div class="row g-3 demo-form-grid">
+              <div class="col-md-6">
+                <label class="form-label" for="{{ form.first_name.id }}">{{ form.first_name.label.text }}</label>
+                {{ form.first_name(class='form-control' + (' is-invalid' if form.first_name.errors else ''), placeholder='First name') }}
+                {{ render_errors(form.first_name) }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="{{ form.last_name.id }}">{{ form.last_name.label.text }}</label>
+                {{ form.last_name(class='form-control' + (' is-invalid' if form.last_name.errors else ''), placeholder='Last name') }}
+                {{ render_errors(form.last_name) }}
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label" for="{{ form.phone.id }}">{{ form.phone.label.text }}</label>
+                {{ form.phone(class='form-control' + (' is-invalid' if form.phone.errors else ''), placeholder='10 digit mobile number') }}
+                {{ render_errors(form.phone) }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="{{ form.email.id }}">{{ form.email.label.text }}</label>
+                {{ form.email(class='form-control' + (' is-invalid' if form.email.errors else ''), placeholder='Email address') }}
+                {{ render_errors(form.email) }}
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label" for="{{ form.exam_interest.id }}">{{ form.exam_interest.label.text }}</label>
+                {{ form.exam_interest(class='form-select' + (' is-invalid' if form.exam_interest.errors else '')) }}
+                {{ render_errors(form.exam_interest) }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="{{ form.preferred_mode.id }}">{{ form.preferred_mode.label.text }}</label>
+                {{ form.preferred_mode(class='form-select' + (' is-invalid' if form.preferred_mode.errors else '')) }}
+                {{ render_errors(form.preferred_mode) }}
+              </div>
+
+              <div class="col-12 mt-2">
+                {{ form.submit(class='btn btn-cl-primary w-100 py-2', value='Book My Free Demo →') }}
+              </div>
+            </div>
+
+            <p class="small text-center mt-3 mb-0" style="color: var(--cl-grey);">🔒 Your information is safe with us. We never share your data.</p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

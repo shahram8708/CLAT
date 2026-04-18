@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% from 'components/_blog_card.html' import render_blog_card %}
+
+{% block title %}{{ exam }} Mock Tests & Test Series | Career Launcher Ahmedabad{% endblock %}
+{% block meta_description %}Practice {{ exam }} with CL Ahmedabad's full-length mock tests. Free trial available. AI-powered performance analysis.{% endblock %}
+
+{% block content %}
+<section style="background: var(--cl-navy); padding: 80px 0;">
+  <div class="container">
+    <nav aria-label="breadcrumb" class="mb-3">
+      <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}" class="text-white text-decoration-none">Home</a></li>
+        <li class="breadcrumb-item"><a href="/test-series" class="text-white text-decoration-none">Test Series</a></li>
+        <li class="breadcrumb-item active text-white" aria-current="page">{{ exam }}</li>
+      </ol>
+    </nav>
+
+    <h1 style="color: #fff; font-family: 'Poppins', sans-serif; font-weight: 800;">{{ exam }} Mock Tests</h1>
+    <p class="mb-0" style="color: rgba(255, 255, 255, 0.85); max-width: 860px;">
+      {% if exam == 'CAT' %}
+        Full-length CAT mocks with AI analysis. Benchmarked against 3L+ students.
+      {% elif exam == 'CLAT' %}
+        Comprehensive CLAT mocks covering all 5 sections. Free trial available.
+      {% elif exam == 'IPMAT' %}
+        IPMAT-format mocks for IIM Indore, IIM Rohtak, and other IPM programs.
+      {% elif exam == 'CUET' %}
+        CUET section-wise and full-length mocks for central university admissions.
+      {% else %}
+        Full-length mock tests with detailed analysis and percentile report.
+      {% endif %}
+    </p>
+  </div>
+</section>
+
+<section class="section-space" style="padding-top: 60px;">
+  <div class="container">
+    {% if not series_list %}
+      <div class="text-center py-5">
+        <h4 class="fw-bold mb-3" style="color: var(--cl-navy);">Mock tests for {{ exam }} are being updated. Check back soon.</h4>
+        <a href="{{ url_for('main.contact') }}" class="btn btn-cl-primary">Contact Us</a>
+      </div>
+    {% else %}
+      <div class="row g-4">
+        {% for series in series_list %}
+          <div class="col-lg-6 col-12">
+            <article class="cl-card test-series-card h-100 p-4">
+              <h4 class="fw-bold mb-2" style="color: var(--cl-navy);">{{ series.name }}</h4>
+
+              <div class="d-flex align-items-center gap-2 flex-wrap mb-3">
+                <span class="badge" style="background: var(--cl-blue); color: #fff;">{{ exam }}</span>
+                {% if series.is_free %}
+                  <span class="badge" style="background: var(--cl-success); color: #fff;">Free</span>
+                {% else %}
+                  <span class="badge" style="background: var(--cl-red); color: #fff;">Paid</span>
+                {% endif %}
+              </div>
+
+              <div class="row g-2 mb-3">
+                <div class="col-6"><div class="border rounded p-2 small"><strong>Tests Count:</strong> {{ series.total_tests or 0 }}</div></div>
+                <div class="col-6"><div class="border rounded p-2 small"><strong>Duration per Test:</strong> {{ series.duration_mins or 0 }} mins</div></div>
+                <div class="col-6"><div class="border rounded p-2 small"><strong>Total Duration:</strong> {{ (series.total_tests or 0) * (series.duration_mins or 0) }} mins</div></div>
+                <div class="col-6"><div class="border rounded p-2 small"><strong>Mode:</strong> Online</div></div>
+              </div>
+
+              {% if series.description %}
+                <p class="text-muted mb-3">{{ series.description }}</p>
+              {% endif %}
+
+              <hr>
+
+              {% if series.is_free %}
+                <div class="test-price-free mb-2">FREE</div>
+              {% else %}
+                <div class="test-price-paid mb-2">₹{{ series.price }}</div>
+              {% endif %}
+
+              <h6 class="mt-3" style="color: var(--cl-navy);">What's Included</h6>
+              <ul class="mb-3">
+                <li>Full-length timed test</li>
+                <li>Instant score + percentile</li>
+                <li>Section-wise analysis</li>
+                <li>Detailed solutions for all questions</li>
+              </ul>
+
+              <div class="d-flex flex-wrap gap-2">
+                {% if series.is_free %}
+                  <a href="/test-series/{{ exam | lower }}" class="btn btn-cl-primary">Start Free Test →</a>
+                {% else %}
+                  <a href="/test-series/{{ exam | lower }}" class="btn btn-cl-primary">Buy Now — ₹{{ series.price }}</a>
+                  <a href="/test-series/{{ exam | lower }}" class="btn btn-cl-outline btn-sm" style="border-color: var(--cl-navy); color: var(--cl-navy);">View Sample Test</a>
+                {% endif %}
+              </div>
+            </article>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+<section style="background: var(--cl-bg); padding: 60px 0;">
+  <div class="container">
+    <h3 class="mb-4 text-center" style="color: var(--cl-navy);">{{ exam }} Preparation Tips from Our Faculty</h3>
+    <div class="row g-3">
+      {% for tip in exam_tips %}
+        <div class="col-md-4">
+          <div class="cl-card h-100 text-center">
+            <div style="font-size: 30px;">{{ tip.icon }}</div>
+            <h6 class="mt-2 mb-2" style="color: var(--cl-navy);">{{ tip.title }}</h6>
+            <p class="small text-muted mb-0">{{ tip.text }}</p>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% if related_posts %}
+<section style="background: #fff; padding: 60px 0;">
+  <div class="container">
+    <h3 class="mb-4 text-center" style="color: var(--cl-navy);">Read Our {{ exam }} Preparation Guides</h3>
+    <div class="row g-4">
+      {% for post in related_posts %}
+        <div class="col-md-6">
+          {{ render_blog_card(post) }}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+{% endblock %}

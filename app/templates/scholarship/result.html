@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+
+{% block title %}Your Scholarship Result — Career Launcher Ahmedabad{% endblock %}
+
+{% block content %}
+{% if result.scholarship_pct >= 50 %}
+  {% set hero_bg = 'linear-gradient(120deg, #FFE08A, #FFF3C4)' %}
+{% elif result.scholarship_pct >= 35 %}
+  {% set hero_bg = 'linear-gradient(120deg, #E5E7EB, #F3F4F6)' %}
+{% elif result.scholarship_pct >= 25 %}
+  {% set hero_bg = 'linear-gradient(120deg, #DBEAFE, #EFF6FF)' %}
+{% elif result.scholarship_pct >= 15 %}
+  {% set hero_bg = 'linear-gradient(120deg, #DCFCE7, #F0FDF4)' %}
+{% else %}
+  {% set hero_bg = 'linear-gradient(120deg, #E5E7EB, #F8FAFC)' %}
+{% endif %}
+
+<section class="scholarship-result-hero" style="background: {{ hero_bg }}; padding: 70px 0;">
+  <div class="container text-center">
+    <h1 style="font-family: 'Poppins', sans-serif; font-weight: 800; color: var(--cl-navy);">{{ result.scholarship_pct }}% Scholarship Awarded</h1>
+    <span class="badge rounded-pill px-3 py-2 mt-2" style="background: var(--cl-navy); color: #fff; font-size: 14px;">{{ result.band_name }}</span>
+    <p class="mt-3 mb-1" style="font-size: 18px; color: var(--cl-text);">
+      You scored {{ result.score }} out of {{ result.max_score }} ({{ result.percentage }}%)
+    </p>
+    <p class="mb-0" style="color: var(--cl-grey); max-width: 760px; margin: 0 auto;">{{ result.message }}</p>
+  </div>
+</section>
+
+<section style="background: #fff; padding: 60px 0;">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-6">
+        <div class="cl-card h-100" style="padding: 24px;">
+          <h4 style="color: var(--cl-navy);">Your Scholarship Details</h4>
+          <ul class="list-group list-group-flush mt-3">
+            <li class="list-group-item d-flex justify-content-between px-0">
+              <span>Scholarship Percentage</span>
+              <strong>{{ result.scholarship_pct }}%</strong>
+            </li>
+            <li class="list-group-item d-flex justify-content-between px-0">
+              <span>Scholarship Band</span>
+              <strong>{{ result.band_name }}</strong>
+            </li>
+            <li class="list-group-item px-0">
+              <span class="fw-semibold d-block mb-1">Applicable Programs</span>
+              <span class="text-muted">CAT/MBA, CLAT/AILET, IPMAT/BBA, GMAT/GRE, CUET, Class XI to XII Mathematics</span>
+            </li>
+            <li class="list-group-item px-0">
+              <span class="fw-semibold d-block mb-1">Validity</span>
+              <span class="text-muted">Valid for 30 days from today's date.</span>
+            </li>
+            <li class="list-group-item px-0">
+              <span class="fw-semibold d-block mb-1">How to Redeem</span>
+              <span class="text-muted">Download your certificate and present it during enrollment counselling to apply the fee waiver.</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="cl-card h-100" style="padding: 24px;">
+          <h4 style="color: var(--cl-navy);">Your Savings Calculator</h4>
+          <p class="text-muted">Select a program to estimate your savings.</p>
+
+          <div class="mb-3">
+            <label for="courseFeeSelect" class="form-label">Select Program</label>
+            <select id="courseFeeSelect" class="form-select">
+              <option value="" data-fee="0">Choose a course</option>
+              <option value="CAT/MBA Entrance" data-fee="102500">CAT/MBA Entrance (₹55,000 to ₹1,50,000)</option>
+              <option value="CLAT/AILET/Law" data-fee="62500">CLAT/AILET/Law (₹45,000 to ₹80,000)</option>
+              <option value="IPMAT/BBA" data-fee="55000">IPMAT/BBA (₹40,000 to ₹70,000)</option>
+              <option value="GMAT/GRE" data-fee="90000">GMAT/GRE (₹60,000 to ₹1,20,000)</option>
+              <option value="CUET" data-fee="40000">CUET (₹30,000 to ₹50,000)</option>
+              <option value="Class XI–XII Mathematics" data-fee="30000">Class XI–XII Mathematics (₹20,000 to ₹40,000)</option>
+            </select>
+          </div>
+
+          <div class="border rounded p-3" style="background: var(--cl-bg);">
+            <p class="mb-2">Original Fee: <strong id="originalFee">₹0</strong></p>
+            <p class="mb-2">Scholarship Discount: <strong id="scholarshipDiscount">₹0</strong></p>
+            <p class="mb-0">Amount Payable: <strong id="amountPayable" style="color: var(--cl-success);">₹0</strong></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="background: var(--cl-bg); padding: 60px 0;">
+  <div class="container text-center">
+    <h3 style="color: var(--cl-navy);">Download Your Scholarship Certificate</h3>
+    <div class="certificate-preview mt-4">
+      <p class="mb-1" style="font-size: 12px; letter-spacing: 2px; color: var(--cl-grey);">CAREER LAUNCHER AHMEDABAD</p>
+      <h4 style="font-family: 'Poppins', sans-serif; color: var(--cl-navy);">Merit Scholarship Certificate</h4>
+      <p class="mb-1">Awarded To</p>
+      <p class="fw-bold mb-1" style="font-size: 24px; color: var(--cl-red);">{{ current_user.get_full_name() }}</p>
+      <p class="mb-0">{{ result.scholarship_pct }}% Scholarship Benefit</p>
+    </div>
+    <a href="/scholarship/certificate" class="btn btn-cl-primary btn-lg mt-4">📄 Download Certificate PDF</a>
+    <p class="small text-muted mt-2 mb-0">Certificate is valid for 30 days from today. Present it when enrolling to avail your scholarship.</p>
+  </div>
+</section>
+
+<section style="background: #fff; padding: 60px 0;">
+  <div class="container">
+    <h2 class="section-title text-center mb-4">What To Do Next</h2>
+    <div class="row g-3 mb-4">
+      <div class="col-lg-4">
+        <div class="cl-card h-100 text-center">
+          <div style="font-size: 34px;">📄</div>
+          <h6 class="fw-bold mt-2">Download Certificate</h6>
+          <p class="text-muted mb-0">Save your scholarship certificate for counseling and enrollment.</p>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="cl-card h-100 text-center">
+          <div style="font-size: 34px;">📞</div>
+          <h6 class="fw-bold mt-2">Book Counselling Call</h6>
+          <p class="text-muted mb-0">Discuss the best batch and course plan with our academic advisor.</p>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="cl-card h-100 text-center">
+          <div style="font-size: 34px;">🎯</div>
+          <h6 class="fw-bold mt-2">Enroll with Scholarship</h6>
+          <p class="text-muted mb-0">Complete enrollment and start your preparation with applied fee waiver.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="d-flex flex-wrap justify-content-center gap-2">
+      <a href="/demo" class="btn btn-cl-primary">Book Free Counselling →</a>
+      <a href="/courses" class="btn btn-cl-outline">Explore Programs →</a>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const scholarshipPct = {{ result.scholarship_pct }};
+    const select = document.getElementById("courseFeeSelect");
+    const originalFee = document.getElementById("originalFee");
+    const scholarshipDiscount = document.getElementById("scholarshipDiscount");
+    const amountPayable = document.getElementById("amountPayable");
+
+    const formatINR = function (value) {
+      return "₹" + Math.round(value).toLocaleString("en-IN");
+    };
+
+    const recalculate = function () {
+      const selectedOption = select.options[select.selectedIndex];
+      const fee = Number(selectedOption.getAttribute("data-fee") || 0);
+      const discount = (fee * scholarshipPct) / 100;
+      const payable = fee - discount;
+
+      originalFee.textContent = formatINR(fee);
+      scholarshipDiscount.textContent = formatINR(discount);
+      amountPayable.textContent = formatINR(payable);
+    };
+
+    select.addEventListener("change", recalculate);
+    recalculate();
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% from 'components/_course_card.html' import render_course_card %}
+
+{% block title %}All Programs — Career Launcher Ahmedabad{% endblock %}
+{% block meta_description %}Explore all coaching programs at CL Ahmedabad — CAT/MBA, CLAT/AILET, IPMAT/BBA, GMAT/GRE, CUET, and Class XI–XII Maths. Book a free demo today.{% endblock %}
+
+{% block content %}
+<section style="background: var(--cl-navy); padding: 80px 0;">
+  <div class="container">
+    <nav aria-label="breadcrumb" class="mb-3">
+      <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}" class="text-white text-decoration-none">Home</a></li>
+        <li class="breadcrumb-item active text-white" aria-current="page">Programs</li>
+      </ol>
+    </nav>
+
+    <h1 class="hero-title mb-3" style="font-family: 'Poppins', sans-serif; font-weight: 800; color: #fff;">All Coaching Programs</h1>
+    <p class="hero-subtitle mb-4" style="max-width: 860px; color: rgba(255, 255, 255, 0.85);">
+      Expert led coaching for India's most competitive entrance exams. Choose your program and start your journey to your dream college.
+    </p>
+
+    <div class="d-flex flex-wrap gap-3" style="color: rgba(255, 255, 255, 0.75); font-weight: 500;">
+      <span>6 Programs</span>
+      <span>|</span>
+      <span>30+ Years</span>
+      <span>|</span>
+      <span>7,500+ Students Mentored</span>
+    </div>
+  </div>
+</section>
+
+<section class="py-4" style="background: #fff;">
+  <div class="container">
+    <ul class="nav nav-pills gap-2 flex-nowrap courses-filter-tabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" type="button" data-filter="all">All Programs</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" type="button" data-filter="CAT">CAT MBA</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" type="button" data-filter="CLAT">CLAT Law</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" type="button" data-filter="IPMAT">IPMAT BBA</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" type="button" data-filter="GMAT">GMAT GRE</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" type="button" data-filter="CUET">CUET</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" type="button" data-filter="Boards">Boards Maths</button>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section class="section-space pt-4">
+  <div class="container">
+    {% if courses %}
+      <div class="row">
+        {% for course in courses %}
+          <div class="col-lg-4 col-md-6 col-12 mb-4">
+            {{ render_course_card(course) }}
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="text-center py-5">
+        <h4 class="fw-bold" style="color: var(--cl-navy);">No programs found. Please check back soon.</h4>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+<section style="background: var(--cl-bg); padding: 60px 0;">
+  <div class="container text-center">
+    <h3 class="fw-bold mb-3" style="color: var(--cl-navy);">Not sure which program is right for you?</h3>
+    <p class="text-muted mx-auto mb-4" style="max-width: 780px;">
+      Our counsellors will help you pick the perfect course based on your goals, timeline, and background. Completely free.
+    </p>
+    <div class="d-flex flex-wrap justify-content-center gap-3">
+      <a href="/demo" class="btn btn-cl-primary">Book Free Counselling →</a>
+      <a href="https://wa.me/919978559986?text=Hi%2C%20I%20need%20help%20choosing%20the%20right%20program%20at%20CL%20Ahmedabad" target="_blank" class="btn btn-success rounded-pill px-4">
+        <i class="fab fa-whatsapp me-1"></i>WhatsApp Us
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "Career Launcher Ahmedabad Programs",
+  "itemListElement": [
+    {% for course in courses %}
+      {
+        "@type": "ListItem",
+        "position": {{ loop.index }},
+        "name": {{ course.title | tojson }},
+        "url": {{ (request.url_root.rstrip('/') ~ url_for('courses.detail', slug=course.slug)) | tojson }}
+      }{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ]
+}
+</script>
+{% endblock %}

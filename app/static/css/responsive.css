@@ -1,0 +1,214 @@
+@media (max-width: 575.98px) {
+  body {
+    font-size: 14px;
+  }
+
+  .section-space {
+    padding: 48px 0;
+  }
+
+  .hero-section {
+    min-height: 85vh;
+    padding-top: 96px;
+  }
+
+  .hero-title {
+    font-size: clamp(28px, 6vw, 40px);
+    max-width: 100%;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  #stats-section .row > [class*="col-"] {
+    width: 50%;
+  }
+
+  .course-grid .col,
+  .faculty-grid .col,
+  .demo-form-grid .col {
+    width: 100%;
+  }
+
+  .footer-grid > [class*="col-"] {
+    width: 100%;
+  }
+
+  .btn,
+  .form-control,
+  .form-select,
+  .navbar-toggler {
+    min-height: 44px;
+  }
+
+  .whatsapp-float {
+    bottom: 18px;
+    right: 16px;
+  }
+}
+
+@media (min-width: 576px) and (max-width: 991.98px) {
+  #stats-section .row > [class*="col-"] {
+    width: 50%;
+  }
+
+  .course-grid > [class*="col-"] {
+    width: 50%;
+  }
+
+  .faculty-grid > [class*="col-"] {
+    width: 50%;
+  }
+
+  .footer-grid > [class*="col-"] {
+    width: 50%;
+  }
+
+  .hero-section {
+    min-height: 90vh;
+  }
+}
+
+@media (min-width: 992px) {
+  .course-detail-panel {
+    position: sticky;
+    top: 100px;
+  }
+}
+
+@media (max-width: 576px) {
+  .sticky-sidebar {
+    position: static !important;
+  }
+
+  .faculty-hero-photo,
+  .faculty-avatar-large {
+    width: 100px;
+    height: 100px;
+  }
+
+  .exam-pill,
+  .subject-pill {
+    font-size: 13px;
+    padding: 6px 14px;
+  }
+
+  #syllabusAccordion .accordion-button,
+  #syllabusAccordion .list-group-item {
+    font-size: 14px;
+  }
+
+  .batch-table-wrapper table {
+    font-size: 13px;
+  }
+
+  .results-hero-stats > [class*="col-"] {
+    width: 50%;
+  }
+
+  .faculty-filter-tabs .nav-link {
+    font-size: 13px;
+    padding: 6px 12px;
+  }
+
+  .results-filter-tabs .nav-link {
+    font-size: 13px;
+    padding: 6px 12px;
+  }
+}
+
+@media (min-width: 576px) and (max-width: 991px) {
+  .sticky-sidebar {
+    position: static;
+  }
+
+  .faculty-listing-grid > [class*="col-"] {
+    width: 50%;
+  }
+
+  .results-hero-stats > [class*="col-"] {
+    width: 50%;
+  }
+}
+
+@media (max-width: 576px) {
+  .auth-card,
+  .auth-card-wide {
+    margin: 24px 16px;
+    padding: 24px;
+  }
+
+  .demo-modal-grid > [class*="col-"] {
+    width: 100%;
+    flex: 0 0 100%;
+  }
+
+  .blog-sidebar-card,
+  .sticky-sidebar {
+    position: static !important;
+  }
+
+  .test-price-free,
+  .test-price-paid {
+    font-size: 22px;
+  }
+
+  .demo-success-icon {
+    font-size: 60px;
+  }
+}
+
+@media (min-width: 576px) and (max-width: 991px) {
+  .blog-sidebar-card,
+  .sticky-sidebar {
+    position: static;
+  }
+
+  .auth-card,
+  .auth-card-wide {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 576px) {
+  .dashboard-sidebar {
+    display: none !important;
+  }
+
+  .dashboard-main {
+    padding: 16px;
+  }
+
+  .dashboard-stat-card {
+    width: 100%;
+    margin-bottom: 12px;
+  }
+
+  .scholarship-submit-bar {
+    min-height: 72px;
+  }
+
+  .scholarship-question-card p {
+    font-size: 15px;
+  }
+
+  .certificate-preview {
+    padding: 20px;
+    font-size: 14px;
+  }
+}
+
+@media (min-width: 576px) and (max-width: 991px) {
+  .dashboard-sidebar {
+    display: none !important;
+  }
+
+  .dashboard-stat-card {
+    width: 100%;
+  }
+
+  .dashboard-stat-grid > [class*="col-"] {
+    width: 50%;
+  }
+}

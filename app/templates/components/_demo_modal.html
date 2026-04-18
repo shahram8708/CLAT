@@ -1,0 +1,74 @@
+<div class="modal fade" id="demoModal" tabindex="-1" aria-labelledby="demoModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="demoModalLabel">Book Your Free Demo Class</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <form id="demoModalForm" method="POST" action="/demo" novalidate>
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+          <div id="demoModalFormFields">
+            <div class="row g-3 demo-modal-grid">
+              <div class="col-md-6">
+                <label class="form-label" for="modalFirstName">First Name</label>
+                <input type="text" class="form-control" id="modalFirstName" name="first_name" required>
+                <div class="invalid-feedback"></div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="modalLastName">Last Name</label>
+                <input type="text" class="form-control" id="modalLastName" name="last_name" required>
+                <div class="invalid-feedback"></div>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label" for="modalPhone">Phone Number</label>
+                <input type="tel" class="form-control" id="modalPhone" name="phone" required>
+                <div class="invalid-feedback"></div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="modalEmail">Email Address</label>
+                <input type="email" class="form-control" id="modalEmail" name="email" required>
+                <div class="invalid-feedback"></div>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label" for="modalExamInterest">Course Interest</label>
+                <select class="form-select" id="modalExamInterest" name="exam_interest" required>
+                  <option value="">— Select a Course —</option>
+                  <option value="CAT/MBA Entrance">CAT/MBA Entrance</option>
+                  <option value="CLAT/AILET/Law">CLAT/AILET/Law</option>
+                  <option value="IPMAT/BBA">IPMAT/BBA</option>
+                  <option value="GMAT/GRE">GMAT/GRE</option>
+                  <option value="CUET">CUET</option>
+                  <option value="Class XI–XII Mathematics">Class XI–XII Mathematics</option>
+                </select>
+                <div class="invalid-feedback"></div>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label" for="modalPreferredMode">Preferred Mode</label>
+                <select class="form-select" id="modalPreferredMode" name="preferred_mode" required>
+                  <option value="">— Select preferred mode —</option>
+                  <option value="Classroom – Navrangpura Centre">Classroom – Navrangpura Centre</option>
+                  <option value="Online – AFA (Attend From Anywhere)">Online – AFA (Attend From Anywhere)</option>
+                  <option value="Decide After Demo">Decide After Demo</option>
+                </select>
+                <div class="invalid-feedback"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer border-0 px-0 pb-0 mt-3" id="demoModalFooter">
+            <button type="submit" class="btn btn-cl-primary w-100" id="demoModalSubmitBtn">Book My Free Demo →</button>
+            <button type="button" class="btn btn-link text-muted text-decoration-none w-100 mt-2" data-bs-dismiss="modal">Cancel</button>
+          </div>
+        </form>
+
+        <div id="demoModalFeedback" class="d-none mt-3"></div>
+      </div>
+    </div>
+  </div>
+</div>

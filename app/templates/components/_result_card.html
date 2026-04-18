@@ -1,0 +1,45 @@
+{% macro render_result_card(result) %}
+{% set parts = (result.student_name or '').split() %}
+{% set initials = ((parts[0][0] if parts|length > 0 else 'S') ~ (parts[1][0] if parts|length > 1 else ''))|upper %}
+{% set exam_name = (result.exam or '')|upper %}
+{% if exam_name == 'CAT' %}
+  {% set avatar_bg = 'var(--cl-blue)' %}
+{% elif exam_name == 'CLAT' %}
+  {% set avatar_bg = 'var(--cl-red)' %}
+{% elif exam_name == 'IPMAT' %}
+  {% set avatar_bg = 'var(--cl-success)' %}
+{% else %}
+  {% set avatar_bg = 'var(--cl-navy)' %}
+{% endif %}
+
+<div class="result-card-wrapper h-100" data-exam="{{ result.exam }}">
+  <article class="cl-card h-100">
+    <div class="text-center mb-3">
+      {% if result.photo_url %}
+        <img src="{{ result.photo_url }}" alt="{{ result.student_name }}" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover;">
+      {% else %}
+        <div class="result-avatar" style="background: {{ avatar_bg }};">{{ initials }}</div>
+      {% endif %}
+    </div>
+
+    <h6 class="fw-bold text-center mb-2">{{ result.student_name }}</h6>
+    <p class="rank-percentile-text text-center mb-1">{{ result.rank_percentile }}</p>
+
+    {% if result.target_college %}
+      <p class="small text-center mb-3" style="color: var(--cl-navy);">🎓 {{ result.target_college }}</p>
+    {% endif %}
+
+    <div class="text-center mb-3">
+      <span class="badge" style="background: rgba(44, 62, 122, 0.12); color: var(--cl-blue);">
+        {{ result.exam }} {{ result.year }}
+      </span>
+    </div>
+
+    {% if result.testimonial %}
+      <blockquote class="mb-0" style="font-style: italic; color: var(--cl-grey); font-size: 14px; border-left: 3px solid var(--cl-red); padding-left: 0.75rem;">
+        {{ result.testimonial }}
+      </blockquote>
+    {% endif %}
+  </article>
+</div>
+{% endmacro %}

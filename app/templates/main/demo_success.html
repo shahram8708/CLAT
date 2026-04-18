@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Demo Booking Confirmed — Career Launcher Ahmedabad{% endblock %}
+{% block meta_description %}Your free demo booking is confirmed with Career Launcher Ahmedabad. Our counsellor will call you shortly with batch details.{% endblock %}
+
+{% block content %}
+<section style="background: #fff; padding: 80px 0;">
+  <div class="container">
+    <div class="mx-auto text-center" style="max-width: 760px;">
+      <i class="fa-solid fa-circle-check demo-success-icon" aria-hidden="true"></i>
+      <h2 class="mb-3" style="color: var(--cl-navy);">Your Demo is Confirmed!</h2>
+      <p class="mb-4" style="font-size: 18px;">
+        Hi {{ lead.first_name }}, thank you for booking a free demo class at Career Launcher Ahmedabad.
+      </p>
+
+      <div class="cl-card text-start demo-steps mb-4">
+        <h5 class="mb-3" style="color: var(--cl-navy);">What happens next?</h5>
+        <ol class="mb-0 ps-3">
+          <li class="mb-2">Our counsellor will call you on {{ lead.phone }} within the next few hours.</li>
+          <li class="mb-2">We'll discuss your preparation goals and recommend the best batch for you.</li>
+          <li class="mb-0">You'll receive demo class details via SMS and WhatsApp.</li>
+        </ol>
+      </div>
+
+      <a href="{{ whatsapp_link }}" target="_blank" rel="noopener" class="btn btn-success rounded-pill px-4 py-2 mb-3">
+        💬 WhatsApp Us for Instant Confirmation
+      </a>
+
+      <div class="d-flex flex-wrap justify-content-center gap-3 mb-4">
+        <a href="/courses" class="btn btn-cl-primary">Explore Our Programs →</a>
+        <a href="/results" class="btn btn-cl-outline" style="border-color: var(--cl-navy); color: var(--cl-navy);">View Our Results →</a>
+      </div>
+
+      <div class="cl-card text-start">
+        <div class="row g-3">
+          <div class="col-md-4">
+            <strong>Phone</strong>
+            <p class="mb-0"><a href="tel:+919978559986" class="text-decoration-none">+91 9978559986</a></p>
+            <p class="mb-0"><a href="tel:+916353842725" class="text-decoration-none">+91 6353842725</a></p>
+          </div>
+          <div class="col-md-4">
+            <strong>Email</strong>
+            <p class="mb-0"><a href="mailto:cl_ahmedabad@careerlauncher.com" class="text-decoration-none">cl_ahmedabad@careerlauncher.com</a></p>
+          </div>
+          <div class="col-md-4">
+            <strong>Address</strong>
+            <p class="mb-0">A 102, Karmyog Heights, Navrangpura, Ahmedabad – 380009</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

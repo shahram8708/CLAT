@@ -1,0 +1,334 @@
+{% extends 'base.html' %}
+{% from 'components/_faculty_card.html' import render_faculty_card %}
+{% from 'components/_result_card.html' import render_result_card %}
+
+{% macro sidebar_card(course) %}
+<div class="cl-card p-4">
+  <h5 class="fw-bold mb-3" style="color: var(--cl-navy);">{{ course.title }}</h5>
+
+  <p class="mb-2"><i class="fa-regular fa-clock me-2" style="color: var(--cl-red);"></i>{{ course.duration or 'Flexible Duration' }}</p>
+
+  {% set mode_lower = (course.mode or 'hybrid')|lower %}
+  <p class="mb-2">
+    {% if mode_lower == 'online' %}
+      <i class="fa-solid fa-laptop me-2" style="color: var(--cl-red);"></i>
+    {% elif mode_lower == 'classroom' %}
+      <i class="fa-solid fa-chalkboard-user me-2" style="color: var(--cl-red);"></i>
+    {% else %}
+      <i class="fa-solid fa-arrows-rotate me-2" style="color: var(--cl-red);"></i>
+    {% endif %}
+    {{ mode_lower|title }}
+  </p>
+
+  <p class="mb-2 fw-bold" style="color: var(--cl-red); font-size: 1.05rem;">
+    ₹{{ course.fee_min | format_inr }} – ₹{{ course.fee_max | format_inr }}
+  </p>
+  <p class="small mb-3" style="color: var(--cl-success);">Up to 50% off</p>
+
+  <a href="/demo" class="btn btn-cl-primary w-100 mb-2">Book Free Demo →</a>
+  <a href="https://wa.me/919978559986?text=Hi%2C%20I%20want%20the%20exact%20fee%20details%20for%20this%20program" target="_blank" class="btn btn-success w-100 rounded-pill">WhatsApp Us</a>
+
+  <hr>
+  <p class="mb-0">📞 <a href="tel:+919978559986" class="text-decoration-none">Call: +91 9978559986</a></p>
+</div>
+{% endmacro %}
+
+{% block title %}{{ meta_title or (course.title ~ ' Coaching in Ahmedabad | Career Launcher') }}{% endblock %}
+{% block meta_description %}{{ meta_description }}{% endblock %}
+
+{% block content %}
+<section style="background: var(--cl-navy); padding: 80px 0 60px;">
+  <div class="container">
+    <nav aria-label="breadcrumb" class="mb-3">
+      <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}" class="text-white text-decoration-none">Home</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('courses.listing') }}" class="text-white text-decoration-none">Programs</a></li>
+        <li class="breadcrumb-item active text-white" aria-current="page">{{ course.title }}</li>
+      </ol>
+    </nav>
+
+    <div class="d-flex align-items-start gap-3 mb-3">
+      <div style="font-size: 64px; line-height: 1;">{{ course.icon or '📘' }}</div>
+      <div>
+        <h1 class="hero-title mb-2" style="color: #fff; font-family: 'Poppins', sans-serif; font-weight: 800;">{{ course.title }}</h1>
+        <p class="mb-3" style="font-size: 18px; color: rgba(255, 255, 255, 0.85); max-width: 900px;">{{ course.description }}</p>
+
+        {% set mode_lower = (course.mode or 'hybrid')|lower %}
+        <div class="d-flex flex-wrap gap-2 mb-3">
+          <span class="badge rounded-pill border border-light text-white px-3 py-2">
+            <i class="fa-regular fa-clock me-1"></i>{{ course.duration or 'Flexible Duration' }}
+          </span>
+          <span class="badge rounded-pill border border-light text-white px-3 py-2">
+            {% if mode_lower == 'online' %}
+              <i class="fa-solid fa-laptop me-1"></i>
+            {% elif mode_lower == 'classroom' %}
+              <i class="fa-solid fa-chalkboard-user me-1"></i>
+            {% else %}
+              <i class="fa-solid fa-arrows-rotate me-1"></i>
+            {% endif %}
+            {{ mode_lower|title }}
+          </span>
+        </div>
+
+        <a href="/demo" class="btn btn-cl-primary">Book Free Demo →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="container py-5">
+  <div class="row g-4">
+    <div class="col-lg-9">
+      <section class="mb-4 p-4 p-md-5 rounded-4" style="background: #fff;">
+        <h2 class="section-title mb-4">What's Included in This Program</h2>
+
+        {% if course.exam_category in ['CAT', 'GMAT'] %}
+          {% set feature_four_title = '🎤 GD PI WAT Preparation' %}
+          {% set feature_four_desc = 'Full Group Discussion, Personal Interview, and WAT coaching for MBA programs.' %}
+        {% elif course.exam_category == 'CLAT' %}
+          {% set feature_four_title = '⚖️ Legal Reasoning Masterclasses' %}
+          {% set feature_four_desc = 'Case based legal reasoning sessions with passage analysis and argument building drills.' %}
+        {% elif course.exam_category == 'IPMAT' %}
+          {% set feature_four_title = '🗣️ Interview Readiness Support' %}
+          {% set feature_four_desc = 'Structured communication and interview prep for IIM IPM and top BBA admissions.' %}
+        {% elif course.exam_category == 'CUET' %}
+          {% set feature_four_title = '🧾 Domain Subject Strategy' %}
+          {% set feature_four_desc = 'Domain selection guidance and focused prep plans for top central university targets.' %}
+        {% else %}
+          {% set feature_four_title = '🧮 Board Plus Competitive Bridge' %}
+          {% set feature_four_desc = 'School board concepts integrated with entrance level aptitude and applied problem solving.' %}
+        {% endif %}
+
+        <div class="row g-3">
+          <div class="col-lg-4 col-md-6">
+            <div class="cl-card h-100">
+              <h6 class="fw-bold">📗 Comprehensive Study Material</h6>
+              <p class="small text-muted mb-0">Complete books plus Daily Practice Papers included in your fee.</p>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-6">
+            <div class="cl-card h-100">
+              <h6 class="fw-bold">🤖 AI Mock Tests with Analysis</h6>
+              <p class="small text-muted mb-0">Performance benchmarked against 3L plus peer students nationally.</p>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-6">
+            <div class="cl-card h-100">
+              <h6 class="fw-bold">🏠 AFA Hybrid Mode</h6>
+              <p class="small text-muted mb-0">Attend from classroom or online and switch anytime without extra cost.</p>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-6">
+            <div class="cl-card h-100">
+              <h6 class="fw-bold">{{ feature_four_title }}</h6>
+              <p class="small text-muted mb-0">{{ feature_four_desc }}</p>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-6">
+            <div class="cl-card h-100">
+              <h6 class="fw-bold">📊 1 on 1 Doubt Sessions</h6>
+              <p class="small text-muted mb-0">Scheduled doubt clearing sessions with subject faculty, not TAs.</p>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-6">
+            <div class="cl-card h-100">
+              <h6 class="fw-bold">🔔 24/7 WhatsApp Support</h6>
+              <p class="small text-muted mb-0">Faculty monitored WhatsApp group for quick doubt resolution.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mb-4 p-4 p-md-5 rounded-4" style="background: var(--cl-bg);">
+        <h3 class="section-title mb-3">Exams Covered in This Program</h3>
+        {% if course.exams_list %}
+          <div>
+            {% for exam in course.exams_list %}
+              <span class="exam-pill">{{ exam }}</span>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="mb-0 text-muted">Contact us for the full exam coverage list.</p>
+        {% endif %}
+      </section>
+
+      <section class="mb-4 p-4 p-md-5 rounded-4" style="background: #fff;">
+        <h2 class="section-title mb-4">Complete Syllabus</h2>
+        {% if course.syllabus_list %}
+          <div class="accordion" id="syllabusAccordion">
+            {% for item in course.syllabus_list %}
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="subject-{{ loop.index }}">
+                  <button class="accordion-button {% if not loop.first %}collapsed{% endif %} syllabus-subject-badge" type="button" data-bs-toggle="collapse" data-bs-target="#subject-collapse-{{ loop.index }}" aria-expanded="{{ 'true' if loop.first else 'false' }}" aria-controls="subject-collapse-{{ loop.index }}">
+                    {{ item.subject }}
+                  </button>
+                </h2>
+                <div id="subject-collapse-{{ loop.index }}" class="accordion-collapse collapse {% if loop.first %}show{% endif %}" aria-labelledby="subject-{{ loop.index }}" data-bs-parent="#syllabusAccordion">
+                  <div class="accordion-body p-0">
+                    <ul class="list-group list-group-flush">
+                      {% for topic in item.topics %}
+                        <li class="list-group-item">{{ topic }}</li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="mb-0 text-muted">Full syllabus details available upon enrollment. Contact us for a detailed syllabus PDF.</p>
+        {% endif %}
+      </section>
+
+      <section class="mb-4 p-4 p-md-5 rounded-4" style="background: var(--cl-bg);">
+        <h2 class="section-title mb-4">Your Faculty for {{ course.title }}</h2>
+        {% if assigned_faculty %}
+          <div class="row">
+            {% for faculty in assigned_faculty %}
+              <div class="col-lg-4 col-md-6 mb-4">
+                {{ render_faculty_card(faculty) }}
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="mb-0 text-muted">Faculty details for this program are being updated. Contact us to learn more about our teaching team.</p>
+        {% endif %}
+      </section>
+
+      <section class="mb-4 p-4 p-md-5 rounded-4" style="background: #fff;">
+        <h2 class="section-title mb-4">Upcoming Batches</h2>
+        <div class="batch-table-wrapper">
+          <table class="table table-bordered align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>Batch Name</th>
+                <th>Schedule</th>
+                <th>Start Date</th>
+                <th>Mode</th>
+                <th>Seats Available</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for batch in batches %}
+                <tr>
+                  <td>{{ batch.name }}</td>
+                  <td>{{ batch.timing }}</td>
+                  <td>{{ batch.start_date }}</td>
+                  <td>{{ batch.mode }}</td>
+                  <td>{{ batch.seats }}</td>
+                  <td><a href="/demo" class="btn btn-cl-primary btn-sm">Book Seat →</a></td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <p class="mb-0 small mt-3">⚠️ Batches fill up fast. Maximum {{ course.batch_size or 25 }} students per batch. Secure your seat early.</p>
+      </section>
+
+      <section class="mb-4 p-4 p-md-5 rounded-4" style="background: var(--cl-bg);">
+        <h2 class="section-title mb-4">Program Fees</h2>
+        <div class="row g-3">
+          <div class="col-lg-6">
+            <div class="cl-card h-100">
+              <h5 class="fw-bold mb-3">Fee Range</h5>
+              <p class="mb-2" style="font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 2rem; color: var(--cl-red);">
+                ₹{{ course.fee_min | format_inr }} – ₹{{ course.fee_max | format_inr }}
+              </p>
+              <p class="small text-muted mb-0">Inclusive of study material, mock tests, and GD PI preparation.</p>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="cl-card h-100">
+              <h5 class="fw-bold mb-3">Scholarship Support</h5>
+              <p class="mb-3">Up to 50% scholarship available through our Merit Scholarship Test. Scores above 90% qualify for 50% fee waiver.</p>
+              <a href="/scholarship" class="text-decoration-none fw-semibold" style="color: var(--cl-red);">Check Scholarship →</a>
+            </div>
+          </div>
+        </div>
+
+        <p class="small mt-3 mb-3">Fee payable in 2 to 3 instalments. Contact us for details.</p>
+        <a href="https://wa.me/919978559986?text=Hi%2C%20I%20want%20the%20exact%20fee%20details%20for%20this%20program" target="_blank" class="btn btn-success rounded-pill px-4">WhatsApp for Exact Fee →</a>
+      </section>
+
+      <section class="mb-4 p-4 p-md-5 rounded-4" style="background: #fff;">
+        <h2 class="section-title mb-4">What Our Students Say</h2>
+        {% if testimonials %}
+          <div class="row">
+            {% for result in testimonials %}
+              <div class="col-lg-4 col-md-6 mb-4">
+                {{ render_result_card(result) }}
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="text-muted">Student testimonials for this program will be updated soon.</p>
+        {% endif %}
+
+        <a href="{{ url_for('results.index') }}" class="fw-semibold text-decoration-none" style="color: var(--cl-red);">See All Results →</a>
+      </section>
+
+      <section class="mb-4 p-4 p-md-5 rounded-4" style="background: var(--cl-bg);">
+        <h2 class="section-title mb-4">Frequently Asked Questions</h2>
+        <div class="accordion" id="faqAccordion">
+          {% for faq in faqs %}
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="faq-heading-{{ loop.index }}">
+                <button class="accordion-button {% if not loop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#faq-collapse-{{ loop.index }}" aria-expanded="{{ 'true' if loop.first else 'false' }}" aria-controls="faq-collapse-{{ loop.index }}">
+                  {{ faq.question }}
+                </button>
+              </h2>
+              <div id="faq-collapse-{{ loop.index }}" class="accordion-collapse collapse {% if loop.first %}show{% endif %}" aria-labelledby="faq-heading-{{ loop.index }}" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">{{ faq.answer }}</div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </section>
+
+      <section class="mb-4 p-4 p-md-5 rounded-4 text-center" style="background: var(--cl-navy); color: #fff;">
+        <h2 class="mb-3">Ready to Start Your {{ course.title }} Journey?</h2>
+        <p class="mb-4" style="color: rgba(255, 255, 255, 0.82);">Join hundreds of Ahmedabad students who chose CL for their exam preparation.</p>
+        <div class="d-flex flex-wrap justify-content-center gap-3">
+          <a href="/demo" class="btn btn-cl-primary">Book Free Demo →</a>
+          <a href="tel:+919978559986" class="btn btn-cl-outline">Call Us Now</a>
+        </div>
+      </section>
+
+      <div class="d-lg-none mt-3">
+        {{ sidebar_card(course) }}
+      </div>
+    </div>
+
+    <div class="col-lg-3 d-none d-lg-block">
+      <div class="sticky-sidebar">
+        {{ sidebar_card(course) }}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Course",
+  "name": {{ course.title | tojson }},
+  "description": {{ (course.description or '') | tojson }},
+  "provider": {
+    "@type": "EducationalOrganization",
+    "name": "Career Launcher Ahmedabad",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "A 102, Karmyog Heights, Navrangpura",
+      "addressLocality": "Ahmedabad",
+      "addressRegion": "Gujarat",
+      "postalCode": "380009",
+      "addressCountry": "IN"
+    }
+  },
+  "url": {{ request.url | tojson }}
+}
+</script>
+{% endblock %}
