@@ -2,6 +2,7 @@ import importlib
 import os
 from datetime import datetime
 from pathlib import Path
+from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 from flask import Flask, render_template
 from dotenv import load_dotenv
@@ -12,6 +13,39 @@ load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent / ".env", overrid
 
 from app.config import config_map
 from app.extensions import bcrypt, csrf, db, limiter, login_manager, mail, migrate, talisman
+
+
+def _normalize_google_maps_embed_url(raw_url, fallback=""):
+    candidate = (raw_url or "").strip()
+    fallback_value = (fallback or "").strip()
+    if not candidate:
+        return fallback_value
+
+    lower_candidate = candidate.lower()
+    if "google.com/maps/embed" in lower_candidate:
+        return candidate
+
+    parsed = urlparse(candidate)
+    host = (parsed.netloc or "").lower()
+    path = parsed.path or ""
+
+    if host in {"maps.google.com", "www.maps.google.com"}:
+        query_params = parse_qs(parsed.query, keep_blank_values=False)
+        map_query = (query_params.get("q") or [""])[0].strip()
+        if map_query:
+            embed_query = urlencode({"q": map_query, "output": "embed"})
+            return urlunparse(("https", "www.google.com", "/maps", "", embed_query, ""))
+        return fallback_value or candidate
+
+    if host in {"google.com", "www.google.com"} and path.startswith("/maps"):
+        query_params = parse_qs(parsed.query, keep_blank_values=True)
+        output_mode = (query_params.get("output") or [""])[0].lower()
+        if output_mode != "embed":
+            query_params["output"] = ["embed"]
+        embed_query = urlencode(query_params, doseq=True)
+        return urlunparse(("https", "www.google.com", "/maps", "", embed_query, ""))
+
+    return candidate
 
 
 def create_app(config_name="development"):
@@ -149,7 +183,10 @@ def create_app(config_name="development"):
 
             def get_setting(key, default=""):
                 try:
-                    return SiteSetting.get(key, default)
+                    value = SiteSetting.get(key, default)
+                    if key == "google_maps_embed_url":
+                        return _normalize_google_maps_embed_url(value, fallback=default)
+                    return value
                 except Exception:
                     db.session.rollback()
                     return default

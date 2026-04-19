@@ -803,7 +803,12 @@ def seed_site_settings(admin_user):
         "youtube_url": ("https://www.youtube.com/@careerlauncher", "url", "YouTube URL", "social"),
         "facebook_url": ("https://www.facebook.com/CareerLauncher", "url", "Facebook URL", "social"),
         "linkedin_url": ("https://www.linkedin.com/company/career-launcher", "url", "LinkedIn URL", "social"),
-        "google_maps_embed_url": ("https://maps.google.com/?q=Career+Launcher+Ahmedabad", "url", "Google Maps Embed URL", "social"),
+        "google_maps_embed_url": (
+            "https://www.google.com/maps?q=Career+Launcher+Ahmedabad&output=embed",
+            "url",
+            "Google Maps Embed URL",
+            "social",
+        ),
         "homepage_meta_title": ("Career Launcher Ahmedabad | CAT, CLAT, IPMAT, CUET Coaching", "text", "Homepage Meta Title", "seo"),
         "homepage_meta_description": (
             "Join Career Launcher Ahmedabad for expert coaching in CAT, CLAT, IPMAT, GMAT, CUET and Class XI-XII Mathematics.",
