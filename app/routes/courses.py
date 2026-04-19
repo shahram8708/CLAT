@@ -1,8 +1,10 @@
 from flask import Blueprint, abort, render_template
 
+from app.models.batch_schedule import BatchSchedule
 from app.models.course import Course
 from app.models.faculty import Faculty
 from app.models.result import Result
+from app.models.testimonial import Testimonial
 
 
 courses_bp = Blueprint("courses", __name__)
@@ -157,27 +159,91 @@ def detail(slug):
         if course.exam_category in (faculty.exam_tags_list or [])
     ]
 
-    testimonials = (
-        Result.query.filter(
-            Result.is_active.is_(True),
-            Result.exam == course.exam_category,
-            Result.testimonial.isnot(None),
-            Result.testimonial != "",
+    course_title = (course.title or "").strip().lower()
+    course_exam = (course.exam_category or "").strip().upper()
+
+    location_testimonials = (
+        Testimonial.query.filter(
+            Testimonial.is_active.is_(True),
+            Testimonial.display_location.in_(["courses", "all"]),
         )
-        .order_by(Result.display_order.asc())
-        .limit(3)
+        .order_by(Testimonial.display_order.asc(), Testimonial.id.asc())
         .all()
     )
 
-    faqs = _common_faqs() + _specific_faqs(course.exam_category)
-    batches = _build_batch_schedule(course)
+    filtered_testimonials = []
+    for item in location_testimonials:
+        location_key = (item.display_location or "").strip().lower()
+        if location_key == "all":
+            filtered_testimonials.append(item)
+            continue
+
+        item_course = (item.course or "").strip().lower()
+        item_exam = (item.exam or "").strip().upper()
+
+        matches_course = False
+
+        if not item_course and not item_exam:
+            matches_course = True
+
+        if item_course:
+            matches_course = (
+                item_course == course_title
+                or course_title in item_course
+                or item_course in course_title
+            )
+
+        if item_exam and course_exam and item_exam == course_exam:
+            matches_course = True
+
+        if item_course and course_exam and course_exam in item_course.upper():
+            matches_course = True
+
+        if matches_course:
+            filtered_testimonials.append(item)
+
+    if filtered_testimonials:
+        testimonials = filtered_testimonials[:3]
+    else:
+        testimonials = (
+            Result.query.filter(
+                Result.is_active.is_(True),
+                Result.exam == course.exam_category,
+                Result.testimonial.isnot(None),
+                Result.testimonial != "",
+            )
+            .order_by(Result.display_order.asc())
+            .limit(3)
+            .all()
+        )
+
+    faqs = course.faqs_list or (_common_faqs() + _specific_faqs(course.exam_category))
+
+    batch_records = (
+        BatchSchedule.query.filter_by(course_id=course.id, is_active=True)
+        .order_by(BatchSchedule.start_date.asc(), BatchSchedule.id.asc())
+        .all()
+    )
+    if batch_records:
+        batches = [
+            {
+                "name": batch.batch_name,
+                "timing": batch.timing,
+                "start_date": batch.start_date.strftime("%d %b %Y"),
+                "mode": (batch.mode or "hybrid").title(),
+                "seats": batch.seats_available,
+            }
+            for batch in batch_records
+        ]
+    else:
+        batches = _build_batch_schedule(course)
 
     fee_min = f"{course.fee_min:,}" if course.fee_min else ""
     fee_max = f"{course.fee_max:,}" if course.fee_max else ""
     fee_range = f"INR {fee_min} to INR {fee_max}" if fee_min and fee_max else "competitive fee options"
 
-    meta_title = f"{course.title} Coaching in Ahmedabad | Career Launcher Ahmedabad"
-    meta_description = (
+    meta_title = course.meta_title or f"{course.title} Coaching in Ahmedabad | Career Launcher Ahmedabad"
+    meta_description = course.meta_description or (
         f"Join {course.title} coaching at Career Launcher Ahmedabad with expert faculty, "
         f"structured batches, and {fee_range}. Book a free demo class today."
     )

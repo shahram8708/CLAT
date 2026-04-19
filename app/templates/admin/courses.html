@@ -3,12 +3,10 @@
 {% block admin_page_title %}Courses{% endblock %}
 
 {% block admin_content %}
-<nav aria-label="breadcrumb" class="mb-3">
-  <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="/admin">Admin Dashboard</a></li>
-    <li class="breadcrumb-item active">Courses</li>
-  </ol>
-</nav>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+  <span class="badge badge-soft">{{ courses|length }} courses</span>
+  <a href="/admin/courses/new" class="btn btn-cl-primary">Add New Course →</a>
+</div>
 
 <div class="bg-white border rounded-3 p-3">
   <div class="table-responsive">
@@ -22,6 +20,7 @@
           <th>Mode</th>
           <th>Fee Range (₹)</th>
           <th>Batch Size</th>
+          <th>Batches</th>
           <th>Active</th>
           <th>Order</th>
           <th>Actions</th>
@@ -41,6 +40,7 @@
             <td>{{ course.mode | title if course.mode else '-' }}</td>
             <td>₹{{ course.fee_min | format_inr }} – ₹{{ course.fee_max | format_inr }}</td>
             <td>{{ course.batch_size if course.batch_size is not none else '-' }}</td>
+            <td>{{ batch_counts.get(course.id, 0) }}</td>
             <td>
               {% if course.is_active %}
                 <span class="text-success"><i class="fa-solid fa-circle-check"></i></span>
@@ -49,15 +49,37 @@
               {% endif %}
             </td>
             <td>{{ course.display_order if course.display_order is not none else 0 }}</td>
-            <td><a href="/admin/courses/{{ course.id }}/edit" class="btn btn-outline-primary btn-sm">Edit →</a></td>
+            <td>
+              <div class="d-flex flex-wrap gap-2">
+                <a href="/admin/courses/{{ course.id }}/edit" class="btn btn-outline-primary btn-sm">Edit</a>
+                <a href="/admin/courses/{{ course.id }}/syllabus" class="btn btn-outline-secondary btn-sm">Syllabus</a>
+                <a href="/admin/courses/{{ course.id }}/faqs" class="btn btn-outline-secondary btn-sm">FAQs</a>
+                <form method="POST" action="/admin/courses/{{ course.id }}/delete" class="m-0 delete-course-form">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button class="btn btn-outline-danger btn-sm" type="submit">Deactivate</button>
+                </form>
+              </div>
+            </td>
           </tr>
         {% else %}
           <tr>
-            <td colspan="10" class="text-center text-muted py-4">No courses available.</td>
+            <td colspan="11" class="text-center text-muted py-4">No courses available.</td>
           </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
 </div>
+{% endblock %}
+
+{% block admin_js %}
+<script>
+  document.querySelectorAll(".delete-course-form").forEach(function (form) {
+    form.addEventListener("submit", function (event) {
+      if (!confirm("Deactivate this course? Existing active enrollments will be checked before applying this action.")) {
+        event.preventDefault();
+      }
+    });
+  });
+</script>
 {% endblock %}

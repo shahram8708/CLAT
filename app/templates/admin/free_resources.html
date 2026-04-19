@@ -1,0 +1,140 @@
+{% extends 'admin/base.html' %}
+
+{% block admin_page_title %}Free Resources{% endblock %}
+
+{% block admin_content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+  <div class="d-flex flex-wrap gap-2">
+    {% for category, count in category_counts.items() %}
+      <span class="badge text-bg-light border">{{ category|upper }}: {{ count }}</span>
+    {% endfor %}
+  </div>
+  <a href="/admin/free-resources/new" class="btn btn-cl-primary">Add New Resource →</a>
+</div>
+
+<div class="bg-white border rounded-3 p-3">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle admin-table mb-0">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Title</th>
+          <th>Category</th>
+          <th>Type</th>
+          <th>Destination</th>
+          <th>Gated</th>
+          <th>Downloads</th>
+          <th>Active</th>
+          <th>Order</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% set ns = namespace(last_category='') %}
+        {% for resource in resources %}
+          {% if ns.last_category != resource.category %}
+            <tr>
+              <td colspan="10" class="table-light fw-semibold text-uppercase small">{{ resource.category }}</td>
+            </tr>
+            {% set ns.last_category = resource.category %}
+          {% endif %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ resource.title }}</td>
+            <td><span class="badge text-bg-light border">{{ resource.category|upper }}</span></td>
+            <td><span class="badge text-bg-light border">{{ resource.resource_type|upper }}</span></td>
+            <td>
+              {% if resource.external_url %}
+                <a href="{{ resource.external_url }}" target="_blank" rel="noopener noreferrer" title="{{ resource.external_url }}">
+                  {{ resource.external_url[:40] }}{% if resource.external_url|length > 40 %}...{% endif %}
+                </a>
+              {% elif resource.local_file_path %}
+                <a href="{{ resource.display_url }}" target="_blank" rel="noopener noreferrer" title="{{ resource.local_file_path }}">
+                  {{ resource.local_file_path.split('/')[-1] }}
+                </a>
+              {% elif resource.url %}
+                <span title="{{ resource.url }}">{{ resource.url[:40] }}{% if resource.url|length > 40 %}...{% endif %}</span>
+              {% else %}
+                <span class="text-muted">-</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if resource.is_gated %}
+                <span class="small">Email Required</span>
+              {% else %}
+                <span class="small">Free</span>
+              {% endif %}
+            </td>
+            <td><i class="fa-solid fa-download me-1"></i>{{ resource.download_count or 0 }}</td>
+            <td>
+              <div class="form-check form-switch">
+                <input class="form-check-input resource-active-toggle" type="checkbox" data-id="{{ resource.id }}" {% if resource.is_active %}checked{% endif %}>
+              </div>
+            </td>
+            <td>{{ resource.display_order or 0 }}</td>
+            <td>
+              <div class="d-flex gap-2">
+                <a href="/admin/free-resources/{{ resource.id }}/edit" class="btn btn-outline-primary btn-sm">Edit</a>
+                <form method="POST" action="/admin/free-resources/{{ resource.id }}/delete" class="m-0 delete-resource-form">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button class="btn btn-outline-danger btn-sm" type="submit">Delete</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="10" class="text-center text-muted py-4">No resources found.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block admin_js %}
+<script>
+(function () {
+  const csrfToken = "{{ csrf_token() }}";
+
+  document.querySelectorAll(".delete-resource-form").forEach(function (form) {
+    form.addEventListener("submit", function (event) {
+      if (!confirm("Delete this resource?")) {
+        event.preventDefault();
+      }
+    });
+  });
+
+  document.querySelectorAll(".resource-active-toggle").forEach(function (toggle) {
+    toggle.addEventListener("change", function () {
+      const resourceId = toggle.getAttribute("data-id");
+      const previous = !toggle.checked;
+      toggle.disabled = true;
+
+      fetch(`/admin/free-resources/${resourceId}/toggle-active`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrfToken
+        },
+        body: JSON.stringify({})
+      })
+        .then(function (response) {
+          if (!response.ok) {
+            throw new Error("Failed");
+          }
+          return response.json();
+        })
+        .catch(function () {
+          toggle.checked = previous;
+          alert("Unable to update resource status.");
+        })
+        .finally(function () {
+          toggle.disabled = false;
+        });
+    });
+  });
+})();
+</script>
+{% endblock %}

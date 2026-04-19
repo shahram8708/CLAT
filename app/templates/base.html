@@ -17,12 +17,14 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
 
+  {% block extra_head %}{% endblock %}
+
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "EducationalOrganization",
     "name": "Career Launcher Ahmedabad",
-    "url": "https://careerlauncherahmedabad.com",
+    "url": "https://clahmedabad.onrender.com",
     "telephone": "+91-9978559986",
     "address": {
       "@type": "PostalAddress",
@@ -33,12 +35,57 @@
       "addressCountry": "IN"
     },
     "openingHours": ["Mo-Sa 10:00-19:00", "Su 09:00-18:00"],
-    "sameAs": ["https://www.careerlauncher.com/ahmedabad"]
+    "sameAs": ["https://clahmedabad.onrender.com/ahmedabad"]
   }
   </script>
 </head>
 <body>
   {% include 'components/_navbar.html' %}
+
+  {% if active_announcements %}
+    {% set banner_items = [] %}
+    {% for ann in active_announcements %}
+      {% set show_for_page = false %}
+      {% if ann.display_location in ['all_pages', 'banner'] %}
+        {% set show_for_page = true %}
+      {% elif ann.display_location == 'homepage' and request.endpoint == 'main.index' %}
+        {% set show_for_page = true %}
+      {% elif ann.display_location == 'courses' and request.endpoint and request.endpoint.startswith('courses.') %}
+        {% set show_for_page = true %}
+      {% endif %}
+
+      {% if show_for_page %}
+        {% set _ = banner_items.append(ann) %}
+      {% endif %}
+    {% endfor %}
+
+    {% for ann in banner_items %}
+      {% set alert_class = 'alert-info' %}
+      {% if ann.announcement_type == 'success' %}
+        {% set alert_class = 'alert-success' %}
+      {% elif ann.announcement_type == 'warning' %}
+        {% set alert_class = 'alert-warning' %}
+      {% elif ann.announcement_type == 'urgent' %}
+        {% set alert_class = 'alert-danger' %}
+      {% endif %}
+
+      <div class="alert {{ alert_class }} alert-dismissible fade show rounded-0 mb-0 border-0" role="alert">
+        <div class="container d-flex flex-wrap align-items-center justify-content-between gap-2">
+          <div>
+            <strong>{{ ann.title }}</strong>
+            <span class="ms-1">{{ ann.message }}</span>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            {% if ann.cta_text and ann.cta_url %}
+              <a href="{{ ann.cta_url }}" class="btn btn-sm btn-outline-dark">{{ ann.cta_text }}</a>
+            {% endif %}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  {% endif %}
+
   {% include 'components/_flash_messages.html' %}
 
   <main>
@@ -52,6 +99,7 @@
   <script src="{{ url_for('static', filename='js/counter.js') }}"></script>
   <script src="{{ url_for('static', filename='js/filters.js') }}" defer></script>
   <script src="{{ url_for('static', filename='js/modal.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/loading-states.js') }}" defer></script>
   {% block extra_js %}{% endblock %}
 
   {% include 'components/_demo_modal.html' %}

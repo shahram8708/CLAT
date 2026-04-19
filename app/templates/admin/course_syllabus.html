@@ -1,0 +1,152 @@
+{% extends 'admin/base.html' %}
+
+{% block admin_page_title %}Syllabus Editor: {{ course.title }}{% endblock %}
+
+{% block admin_content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+  <div>
+    <a href="/admin/courses" class="btn btn-outline-secondary btn-sm">← Back to Courses</a>
+  </div>
+  <div class="d-flex gap-2">
+    <button type="button" id="addSubjectBtn" class="btn btn-outline-primary btn-sm">Add Subject</button>
+    <button type="button" id="saveSyllabusBtn" class="btn btn-cl-primary btn-sm">Save Syllabus</button>
+  </div>
+</div>
+
+<div class="bg-white border rounded-3 p-3 mb-3">
+  <p class="text-muted mb-0">Create subject-wise syllabus blocks. Each subject can have multiple topic lines.</p>
+</div>
+
+<div id="statusMessage" class="alert d-none" role="alert"></div>
+<div id="subjectsContainer" class="d-flex flex-column gap-3"></div>
+{% endblock %}
+
+{% block admin_js %}
+<script>
+(function () {
+  const csrfToken = "{{ csrf_token() }}";
+  const initialData = {{ syllabus_data|tojson }};
+
+  const subjectsContainer = document.getElementById("subjectsContainer");
+  const addSubjectBtn = document.getElementById("addSubjectBtn");
+  const saveBtn = document.getElementById("saveSyllabusBtn");
+  const statusMessage = document.getElementById("statusMessage");
+
+  function showStatus(type, message) {
+    statusMessage.className = "alert alert-" + type;
+    statusMessage.textContent = message;
+    statusMessage.classList.remove("d-none");
+  }
+
+  function createTopicRow(value) {
+    const row = document.createElement("div");
+    row.className = "input-group mb-2";
+    row.innerHTML = '<input type="text" class="form-control topic-input" placeholder="Topic" value="">' +
+      '<button type="button" class="btn btn-outline-danger remove-topic">Remove</button>';
+
+    row.querySelector(".topic-input").value = value || "";
+    row.querySelector(".remove-topic").addEventListener("click", function () {
+      row.remove();
+    });
+
+    return row;
+  }
+
+  function createSubjectCard(item) {
+    const card = document.createElement("div");
+    card.className = "bg-white border rounded-3 p-3";
+
+    card.innerHTML =
+      '<div class="d-flex justify-content-between align-items-center gap-2 mb-3">' +
+      '  <input type="text" class="form-control subject-input" placeholder="Subject title" style="max-width: 520px;">' +
+      '  <button type="button" class="btn btn-outline-danger remove-subject">Remove Subject</button>' +
+      '</div>' +
+      '<div class="topics-wrap"></div>' +
+      '<button type="button" class="btn btn-outline-secondary btn-sm add-topic mt-2">+ Add Topic</button>';
+
+    const subjectInput = card.querySelector(".subject-input");
+    const topicsWrap = card.querySelector(".topics-wrap");
+    const addTopicBtn = card.querySelector(".add-topic");
+
+    subjectInput.value = (item && item.subject) || "";
+
+    const topics = (item && Array.isArray(item.topics) && item.topics.length) ? item.topics : [""];
+    topics.forEach(function (topic) {
+      topicsWrap.appendChild(createTopicRow(topic));
+    });
+
+    addTopicBtn.addEventListener("click", function () {
+      topicsWrap.appendChild(createTopicRow(""));
+    });
+
+    card.querySelector(".remove-subject").addEventListener("click", function () {
+      card.remove();
+    });
+
+    return card;
+  }
+
+  function collectPayload() {
+    const payload = [];
+
+    subjectsContainer.querySelectorAll(".bg-white.border.rounded-3").forEach(function (card) {
+      const subject = (card.querySelector(".subject-input").value || "").trim();
+      const topics = Array.from(card.querySelectorAll(".topic-input"))
+        .map(function (input) { return (input.value || "").trim(); })
+        .filter(Boolean);
+
+      if (subject) {
+        payload.push({ subject: subject, topics: topics });
+      }
+    });
+
+    return payload;
+  }
+
+  function saveSyllabus() {
+    const payload = collectPayload();
+
+    saveBtn.disabled = true;
+    fetch("/admin/courses/{{ course.id }}/syllabus", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken
+      },
+      body: JSON.stringify(payload)
+    })
+      .then(function (response) {
+        return response.json().then(function (data) {
+          return { ok: response.ok, data: data };
+        });
+      })
+      .then(function (result) {
+        if (!result.ok || result.data.status !== "ok") {
+          throw new Error(result.data.message || "Failed to save syllabus.");
+        }
+        showStatus("success", result.data.message || "Syllabus saved successfully.");
+      })
+      .catch(function (error) {
+        showStatus("danger", error.message || "Unable to save syllabus.");
+      })
+      .finally(function () {
+        saveBtn.disabled = false;
+      });
+  }
+
+  addSubjectBtn.addEventListener("click", function () {
+    subjectsContainer.appendChild(createSubjectCard({ subject: "", topics: [""] }));
+  });
+
+  saveBtn.addEventListener("click", saveSyllabus);
+
+  if (Array.isArray(initialData) && initialData.length > 0) {
+    initialData.forEach(function (item) {
+      subjectsContainer.appendChild(createSubjectCard(item));
+    });
+  } else {
+    subjectsContainer.appendChild(createSubjectCard({ subject: "", topics: [""] }));
+  }
+})();
+</script>
+{% endblock %}

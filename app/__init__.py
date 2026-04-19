@@ -1,5 +1,6 @@
 import importlib
 import os
+from datetime import datetime
 from pathlib import Path
 
 from flask import Flask, render_template
@@ -36,10 +37,15 @@ def create_app(config_name="development"):
         "connect-src": [
             "'self'",
             "cdn.jsdelivr.net",
+            "cdn.quilljs.com",
             "checkout.razorpay.com",
+            "api.razorpay.com",
+            "lumberjack.razorpay.com",
         ],
         "frame-src": [
             "'self'",
+            "checkout.razorpay.com",
+            "api.razorpay.com",
             "www.google.com",
             "www.youtube.com",
             "youtube.com",
@@ -50,6 +56,7 @@ def create_app(config_name="development"):
             "cdn.jsdelivr.net",
             "cdn.quilljs.com",
             "checkout.razorpay.com",
+            "cdn.razorpay.com",
             "fonts.googleapis.com",
             "'unsafe-inline'",
         ],
@@ -62,7 +69,13 @@ def create_app(config_name="development"):
             "cdnjs.cloudflare.com",
         ],
         "font-src": ["fonts.gstatic.com", "cdn.jsdelivr.net", "cdnjs.cloudflare.com"],
-        "img-src": ["'self'", "data:", "*.googleapis.com"],
+        "img-src": [
+            "'self'",
+            "data:",
+            "*.googleapis.com",
+            "https://instamark.net",
+            "https://*.instamark.net",
+        ],
     }
     force_https = app.config.get("ENV") != "development"
     talisman.init_app(app, content_security_policy=csp, force_https=force_https)
@@ -129,6 +142,46 @@ def create_app(config_name="development"):
     # app.register_blueprint(admin_bp, url_prefix="/admin")
     # app.register_blueprint(course_bp, url_prefix="/courses")
 
+    @app.context_processor
+    def inject_site_settings():
+        try:
+            from app.models.site_setting import SiteSetting
+
+            def get_setting(key, default=""):
+                try:
+                    return SiteSetting.get(key, default)
+                except Exception:
+                    db.session.rollback()
+                    return default
+
+            return dict(get_setting=get_setting)
+        except Exception:
+
+            def get_setting(key, default=""):
+                return default
+
+            return dict(get_setting=get_setting)
+
+    @app.context_processor
+    def inject_announcements():
+        try:
+            from app.models.announcement import Announcement
+
+            now = datetime.utcnow()
+            active = (
+                Announcement.query.filter(
+                    Announcement.is_active.is_(True),
+                    db.or_(Announcement.start_date.is_(None), Announcement.start_date <= now),
+                    db.or_(Announcement.end_date.is_(None), Announcement.end_date >= now),
+                )
+                .order_by(Announcement.created_at.desc(), Announcement.id.desc())
+                .all()
+            )
+            return dict(active_announcements=active)
+        except Exception:
+            db.session.rollback()
+            return dict(active_announcements=[])
+
     @app.errorhandler(404)
     def not_found_error(error):
         return render_template("errors/404.html"), 404
@@ -142,9 +195,19 @@ def create_app(config_name="development"):
     def forbidden_error(error):
         return render_template("errors/403.html"), 403
 
-    app.wsgi_app = WhiteNoise(app.wsgi_app, root="app/static/", prefix="static")
+    # Avoid wrapping Flask static serving in development, which can cause
+    # range/content-length mismatches with browser cache behavior.
+    if app.config.get("ENV") == "production":
+        app.wsgi_app = WhiteNoise(app.wsgi_app, root=app.static_folder, prefix="static/")
 
     importlib.import_module("app.models")
-    from app.models import ScholarshipQuestion  # noqa: F401
+    from app.models import (  # noqa: F401
+        Announcement,
+        BatchSchedule,
+        FreeResource,
+        ScholarshipQuestion,
+        SiteSetting,
+        Testimonial,
+    )
 
     return app

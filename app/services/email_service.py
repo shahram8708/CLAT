@@ -12,7 +12,7 @@ def _clean_phone_number(phone):
 def _base_site_url():
     from flask import current_app
 
-    return (current_app.config.get("SITE_URL") or "https://careerlauncherahmedabad.com").rstrip("/")
+    return (current_app.config.get("SITE_URL") or "https://clahmedabad.onrender.com").rstrip("/")
 
 
 def send_lead_notification(lead):

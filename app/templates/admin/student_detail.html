@@ -46,9 +46,9 @@
 
     <div class="col-lg-3">
       <div class="d-grid gap-2">
-        <form method="POST" action="/admin/students/{{ user.id }}/toggle-active">
+        <form method="POST" action="/admin/students/{{ user.id }}/toggle-active" id="toggleActiveForm-{{ user.id }}">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-          <button type="submit" class="btn btn-outline-secondary">Toggle Active Status</button>
+          <button type="submit" class="btn btn-outline-secondary" id="toggleActiveBtn-{{ user.id }}" data-loading-text="Updating status...">Toggle Active Status</button>
         </form>
         <a href="/admin/students" class="btn btn-primary">Back to Students →</a>
       </div>
@@ -137,6 +137,89 @@
   {% endif %}
 </div>
 
+<div class="bg-white border rounded-3 p-4 mb-4" id="examSessionSection">
+  <h5 class="mb-3">Scholarship Exam Session Details</h5>
+  {% set exam_session = user.exam_sessions | selectattr('exam_type', 'equalto', 'scholarship') | selectattr('is_submitted', 'equalto', True) | list | last %}
+  {% if exam_session %}
+    {% set is_auto_submitted = exam_session.violation_count >= 3 %}
+    <div class="row">
+      <div class="col-md-6">
+        <table class="table table-sm mb-0">
+          <tr>
+            <td class="text-muted">Started At</td>
+            <td>{{ exam_session.started_at.strftime('%d %b %Y, %I:%M %p') }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted">Submitted At</td>
+            <td>
+              {% if exam_session.submitted_at %}
+                {{ exam_session.submitted_at.strftime('%d %b %Y, %I:%M %p') }}
+              {% else %}
+                <span class="text-warning">Not submitted</span>
+              {% endif %}
+            </td>
+          </tr>
+          <tr>
+            <td class="text-muted">Time Taken</td>
+            <td>
+              {% if exam_session.submitted_at %}
+                {% set duration = (exam_session.submitted_at - exam_session.started_at).total_seconds() | int %}
+                {{ duration // 60 }} min {{ duration % 60 }} sec
+              {% else %}
+                —
+              {% endif %}
+            </td>
+          </tr>
+          <tr>
+            <td class="text-muted">Submission Type</td>
+            <td>
+              {% if is_auto_submitted %}
+                <span class="badge bg-danger">Auto-submitted</span>
+              {% else %}
+                <span class="badge bg-success">Manual submission</span>
+              {% endif %}
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class="col-md-6">
+        <table class="table table-sm mb-0">
+          <tr>
+            <td class="text-muted">Violations</td>
+            <td>
+              {% if exam_session.violation_count > 0 %}
+                <span class="badge bg-warning text-dark">{{ exam_session.violation_count }} violation(s)</span>
+              {% else %}
+                <span class="text-success">✅ No violations</span>
+              {% endif %}
+            </td>
+          </tr>
+          <tr>
+            <td class="text-muted">Violation Types</td>
+            <td><span class="text-muted small">Count stored only. Individual types are not persisted.</span></td>
+          </tr>
+          <tr>
+            <td class="text-muted">IP Address</td>
+            <td><code>{{ exam_session.ip_address or '—' }}</code></td>
+          </tr>
+          <tr>
+            <td class="text-muted">Browser</td>
+            <td>
+              {% if exam_session.user_agent %}
+                <small class="text-muted" title="{{ exam_session.user_agent }}">{{ exam_session.user_agent[:60] }}{% if exam_session.user_agent|length > 60 %}...{% endif %}</small>
+              {% else %}
+                <span class="text-muted">—</span>
+              {% endif %}
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  {% else %}
+    <p class="text-muted mb-0">No exam session data found for this student.</p>
+  {% endif %}
+</div>
+
 <div class="bg-white border rounded-3 p-4">
   <h5 class="mb-3">Payment History</h5>
   {% if payments %}
@@ -155,7 +238,15 @@
           {% for payment, test_series_name in payments %}
             <tr>
               <td>{{ payment.razorpay_order_id or '-' }}</td>
-              <td>{{ test_series_name or '-' }}</td>
+              <td>
+                {% if test_series_name %}
+                  {{ test_series_name }}
+                {% elif payment.test_series_id is none and payment.status == 'success' %}
+                  Scholarship Enrollment
+                {% else %}
+                  -
+                {% endif %}
+              </td>
               <td>₹{{ payment.amount_inr | format_inr }}</td>
               <td>
                 {% if payment.status == 'success' %}

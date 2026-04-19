@@ -145,20 +145,23 @@ a {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid var(--cl-white);
-  color: var(--cl-white);
-  background: black;
+  border: 2px solid #000;
+  color: #fff !important;
+  background: #000;
   border-radius: 999px;
   padding: 0.75rem 1.4rem;
   font-weight: 600;
   text-decoration: none;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease, color 0.25s ease;
 }
 
 .btn-cl-outline:hover,
 .btn-cl-outline:focus {
-  background: var(--cl-white);
-  color: var(--cl-navy);
+  background: #fff;
+  color: #000 !important;
+  border-color: #000;
   transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.18);
 }
 
 #mainNavbar {
@@ -345,7 +348,6 @@ a {
   padding: 1.35rem;
   box-shadow: 0 6px 14px rgba(26, 26, 46, 0.06);
   transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-  height: 100%;
 }
 
 .cl-card:hover {
@@ -442,12 +444,28 @@ a {
   height: 54px;
   border-radius: 50%;
   background: rgba(192, 57, 43, 0.12);
-  color: var(--cl-red);
+  color: white;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
   font-family: "Poppins", sans-serif;
+}
+
+.result-avatar-cat {
+  background: var(--cl-blue);
+}
+
+.result-avatar-clat {
+  background: var(--cl-red);
+}
+
+.result-avatar-ipmat {
+  background: var(--cl-success);
+}
+
+.result-avatar-other {
+  background: var(--cl-navy);
 }
 
 .form-control,

@@ -4,25 +4,6 @@
 {% block meta_description %}Download free CAT, CLAT and IPMAT resources from Career Launcher Ahmedabad including previous year papers, mock tests and prep tools.{% endblock %}
 
 {% block content %}
-{% set resources = [
-  {'title': 'CLAT PYQ 2024', 'description': 'Previous year CLAT paper with answer key mapping and analysis pointers.', 'exam': 'CLAT', 'icon': '📘', 'gated': true, 'download_url': '#'},
-  {'title': 'CLAT PYQ 2023', 'description': 'Full paper for timed practice and sectional strategy review.', 'exam': 'CLAT', 'icon': '📘', 'gated': true, 'download_url': '#'},
-  {'title': 'CLAT PYQ 2022', 'description': 'Practice set with legal reasoning pattern familiarization.', 'exam': 'CLAT', 'icon': '📘', 'gated': true, 'download_url': '#'},
-  {'title': 'CLAT PYQ 2021', 'description': 'High quality exam level passage and analytical question set.', 'exam': 'CLAT', 'icon': '📘', 'gated': true, 'download_url': '#'},
-  {'title': 'CLAT PYQ 2020', 'description': 'Baseline paper for concept revision and speed calibration.', 'exam': 'CLAT', 'icon': '📘', 'gated': true, 'download_url': '#'},
-  {'title': 'CAT PYQ 2024', 'description': 'Latest CAT style pattern with QA, VARC and DILR references.', 'exam': 'CAT', 'icon': '📊', 'gated': true, 'download_url': '#'},
-  {'title': 'CAT PYQ 2023', 'description': 'Timed CAT practice file with difficulty indexing.', 'exam': 'CAT', 'icon': '📊', 'gated': true, 'download_url': '#'},
-  {'title': 'CAT PYQ 2022', 'description': 'Foundational mock style paper for 6 month prep planning.', 'exam': 'CAT', 'icon': '📊', 'gated': true, 'download_url': '#'},
-  {'title': 'IPMAT PYQ 2024', 'description': 'Quant and verbal balancing worksheet from latest exam trend.', 'exam': 'IPMAT', 'icon': '🧠', 'gated': true, 'download_url': '#'},
-  {'title': 'IPMAT PYQ 2023', 'description': 'Realistic difficulty set with topic wise cues.', 'exam': 'IPMAT', 'icon': '🧠', 'gated': true, 'download_url': '#'},
-  {'title': 'IPMAT PYQ 2022', 'description': 'Warm up paper for arithmetic and logical reasoning preparation.', 'exam': 'IPMAT', 'icon': '🧠', 'gated': true, 'download_url': '#'},
-  {'title': 'CLAT Sample Papers with Solutions', 'description': 'Curated sample papers with stepwise solution frameworks.', 'exam': 'CLAT', 'icon': '📝', 'gated': true, 'download_url': '#'},
-  {'title': 'CAT Percentile Predictor', 'description': 'Use official style estimators to benchmark expected percentile.', 'exam': 'CAT', 'icon': '📈', 'gated': false, 'download_url': 'https://www.careerlauncher.com'},
-  {'title': 'Daily Current Affairs', 'description': 'Stay updated with national and international current affairs.', 'exam': 'General', 'icon': '🗞️', 'gated': false, 'download_url': 'https://www.careerlauncher.com'},
-  {'title': 'Free CLAT Mock Test', 'description': 'Attempt a free CLAT mock to assess your preparation level.', 'exam': 'CLAT', 'icon': '⚖️', 'gated': false, 'download_url': '/test-series/clat'},
-  {'title': 'Free CAT Mock Test', 'description': 'Attempt a free CAT mock and evaluate your section wise strengths.', 'exam': 'CAT', 'icon': '🎯', 'gated': false, 'download_url': '/test-series/cat'}
-] %}
-
 <section class="hero-section" style="min-height: 44vh;">
   <div class="container hero-content text-center">
     <h1 class="hero-title">Free Resources — Start Preparing Today</h1>
@@ -58,14 +39,19 @@
               <button
                 type="button"
                 class="btn btn-cl-primary resource-download-btn"
-                data-bs-toggle="modal"
-                data-bs-target="#resourceEmailGate"
+                data-modal-target="#resourceEmailGate"
+                data-loading-text="Loading..."
                 data-resource-title="{{ resource.title }}"
-                data-download-url="{{ resource.download_url }}">
-                Download Free
+                data-resource-id="{{ resource.id }}"
+                data-resource-open-mode="{{ resource.open_mode }}">
+                {{ resource.cta_label }}
               </button>
             {% else %}
-              <a href="{{ resource.download_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-cl-primary">Download Free</a>
+              {% if resource.open_mode == 'navigate' %}
+                <a href="{{ resource.download_url }}" class="btn btn-cl-primary" target="_blank" rel="noopener noreferrer" data-loading-text="Opening...">{{ resource.cta_label }}</a>
+              {% else %}
+                <a href="{{ resource.download_url }}" class="btn btn-cl-primary" data-loading-text="Loading...">{{ resource.cta_label }}</a>
+              {% endif %}
             {% endif %}
           </article>
         </div>
@@ -89,10 +75,9 @@
       </div>
       <div class="modal-body">
         <p class="small text-muted" id="resourceTitleText">Enter your email to unlock the download link.</p>
-        <form id="resourceEmailForm" action="{{ url_for('main.capture_resource_email') }}" method="post">
+        <form id="emailCaptureForm" action="{{ url_for('main.capture_resource_email') }}" method="post">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-          <input type="hidden" name="resource_title" id="resourceTitleInput">
-          <input type="hidden" name="download_url" id="resourceDownloadInput">
+          <input type="hidden" name="resource_id" id="resourceIdInput">
           <div class="mb-3">
             <label for="resourceEmail" class="form-label">Email Address</label>
             <input type="email" class="form-control" id="resourceEmail" name="email" required>
@@ -100,37 +85,62 @@
           <button type="submit" class="btn btn-cl-primary w-100">Unlock Download</button>
         </form>
         <div id="resourceGateMessage" class="small mt-3"></div>
+        <div id="resourceUnlockedBox" class="alert alert-success mt-3 mb-0 d-none">
+          Download link ready.
+          <a id="resourceUnlockedLink" href="#" target="_blank" rel="noopener noreferrer">Click here if download does not start</a>
+        </div>
       </div>
     </div>
   </div>
 </div>
+
+<iframe id="resourceDownloadFrame" class="d-none" title="resource-download-frame"></iframe>
 {% endblock %}
 
 {% block extra_js %}
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-  const titleInput = document.getElementById("resourceTitleInput");
-  const downloadInput = document.getElementById("resourceDownloadInput");
+  const resourceIdInput = document.getElementById("resourceIdInput");
   const titleText = document.getElementById("resourceTitleText");
   const messageBox = document.getElementById("resourceGateMessage");
-  const form = document.getElementById("resourceEmailForm");
+  const unlockedBox = document.getElementById("resourceUnlockedBox");
+  const unlockedLink = document.getElementById("resourceUnlockedLink");
+  const downloadFrame = document.getElementById("resourceDownloadFrame");
+  const form = document.getElementById("emailCaptureForm");
   const modalEl = document.getElementById("resourceEmailGate");
+  const submitButton = form.querySelector("button[type='submit']");
+
+  function resetGateFeedback() {
+    messageBox.textContent = "";
+    messageBox.className = "small mt-3";
+    unlockedBox.classList.add("d-none");
+    unlockedLink.removeAttribute("href");
+  }
 
   document.querySelectorAll(".resource-download-btn").forEach(function (button) {
     button.addEventListener("click", function () {
+      const resourceId = button.getAttribute("data-resource-id") || "";
       const resourceTitle = button.getAttribute("data-resource-title") || "Free Resource";
-      const downloadUrl = button.getAttribute("data-download-url") || "#";
-      titleInput.value = resourceTitle;
-      downloadInput.value = downloadUrl;
+      resourceIdInput.value = resourceId;
       titleText.textContent = "Enter your email to unlock: " + resourceTitle;
-      messageBox.textContent = "";
-      messageBox.className = "small mt-3";
+      resetGateFeedback();
     });
   });
 
   form.addEventListener("submit", async function (event) {
     event.preventDefault();
-    messageBox.textContent = "";
+    resetGateFeedback();
+
+    let originalButtonHTML = submitButton ? (submitButton.dataset.originalHtml || submitButton.innerHTML) : "";
+    if (submitButton && !submitButton.classList.contains("btn-loading")) {
+      if (window.CLLoadingStates && typeof window.CLLoadingStates.setButtonLoading === "function") {
+        originalButtonHTML = window.CLLoadingStates.setButtonLoading(submitButton, "Getting your resources...");
+      } else {
+        originalButtonHTML = submitButton.innerHTML;
+        submitButton.disabled = true;
+        submitButton.textContent = "Getting your resources...";
+      }
+    }
 
     const formData = new FormData(form);
 
@@ -143,28 +153,54 @@ document.addEventListener("DOMContentLoaded", function () {
         body: formData
       });
 
-      const data = await response.json();
-      if (response.ok && data.status === "ok") {
-        messageBox.className = "small mt-3 text-success";
-        messageBox.textContent = "Access granted. Your resource is ready.";
+      let data = {};
+      try {
+        data = await response.json();
+      } catch (jsonError) {
+        data = {};
+      }
 
-        if (data.download_url && data.download_url !== "#") {
-          window.open(data.download_url, "_blank", "noopener");
+      if (response.ok && data.status === "ok" && data.download_url) {
+        messageBox.className = "small mt-3 text-success";
+        messageBox.textContent = "Access granted.";
+        unlockedLink.href = data.download_url;
+        unlockedBox.classList.remove("d-none");
+
+        if (data.open_mode === "navigate") {
+          window.location.href = data.download_url;
+        } else {
+          downloadFrame.src = data.download_url;
         }
 
         const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
         setTimeout(function () {
           modal.hide();
-        }, 900);
+        }, 1100);
         return;
       }
 
       messageBox.className = "small mt-3 text-danger";
-      messageBox.textContent = (data.errors && data.errors.email) ? data.errors.email : "Unable to unlock resource. Please try again.";
+      messageBox.textContent = (data.errors && (data.errors.email || data.errors.resource))
+        ? (data.errors.email || data.errors.resource)
+        : "Unable to unlock resource. Please try again.";
     } catch (error) {
       messageBox.className = "small mt-3 text-danger";
       messageBox.textContent = "Network error. Please try again.";
+    } finally {
+      if (submitButton) {
+        if (window.CLLoadingStates && typeof window.CLLoadingStates.restoreButton === "function") {
+          window.CLLoadingStates.restoreButton(submitButton, originalButtonHTML);
+        } else {
+          submitButton.disabled = false;
+          submitButton.innerHTML = originalButtonHTML;
+        }
+      }
     }
+  });
+
+  modalEl.addEventListener("hidden.bs.modal", function () {
+    form.reset();
+    resetGateFeedback();
   });
 });
 </script>

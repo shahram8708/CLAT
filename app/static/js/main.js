@@ -94,6 +94,37 @@ document.addEventListener("DOMContentLoaded", function () {
 
   demoForm.addEventListener("submit", async function (event) {
     event.preventDefault();
+
+    const submitBtn = demoForm.querySelector("button[type='submit'], [type='submit'], button.btn-submit-trigger");
+    let originalHTML = "";
+
+    if (submitBtn) {
+      if (submitBtn.disabled || submitBtn.classList.contains("btn-loading")) {
+        return;
+      }
+
+      if (window.CLLoadingStates && typeof window.CLLoadingStates.setButtonLoading === "function") {
+        originalHTML = window.CLLoadingStates.setButtonLoading(submitBtn, "Booking your demo...");
+      } else {
+        originalHTML = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Booking your demo...";
+      }
+    }
+
+    const restoreSubmitButton = function () {
+      if (!submitBtn) {
+        return;
+      }
+
+      if (window.CLLoadingStates && typeof window.CLLoadingStates.restoreButton === "function") {
+        window.CLLoadingStates.restoreButton(submitBtn, originalHTML);
+      } else {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalHTML;
+      }
+    };
+
     clearDemoErrors();
 
     const formData = new FormData(demoForm);
@@ -123,9 +154,16 @@ document.addEventListener("DOMContentLoaded", function () {
           const firstError = Array.isArray(fieldErrors) ? fieldErrors[0] : fieldErrors;
           showFieldError(key, firstError);
         });
+
+        restoreSubmitButton();
+        return;
       }
+
+      showFieldError("first_name", "We could not submit your request right now. Please try again.");
+      restoreSubmitButton();
     } catch (error) {
       showFieldError("first_name", "We could not submit your request right now. Please try again.");
+      restoreSubmitButton();
     }
   });
 });

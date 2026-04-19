@@ -30,6 +30,14 @@ class Course(db.Model):
     fee_max = db.Column(db.Integer, nullable=True)
     icon = db.Column(db.String(10), nullable=True)
     syllabus_json = db.Column(db.Text, nullable=True)
+    faqs_json = db.Column(db.Text, nullable=True)
+    meta_title = db.Column(db.String(160), nullable=True)
+    meta_description = db.Column(db.String(320), nullable=True)
+    highlights = db.Column(db.Text, nullable=True)
+    prerequisite = db.Column(db.Text, nullable=True)
+    certificate_offered = db.Column(db.Boolean, nullable=False, default=False)
+    emi_available = db.Column(db.Boolean, nullable=False, default=True)
+    whatsapp_group_link = db.Column(db.String(255), nullable=True)
     is_active = db.Column(db.Boolean, nullable=False, default=True)
     display_order = db.Column(db.Integer, nullable=True, default=0)
 
@@ -50,3 +58,11 @@ class Course(db.Model):
     @property
     def syllabus_list(self):
         return self._parse_json_list(self.syllabus_json)
+
+    @property
+    def highlights_list(self):
+        return self._parse_json_list(self.highlights)
+
+    @property
+    def faqs_list(self):
+        return self._parse_json_list(self.faqs_json)

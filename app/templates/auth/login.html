@@ -13,7 +13,7 @@
         <p class="mb-0" style="color: var(--cl-grey);">Student Login</p>
       </div>
 
-      <form method="POST" action="{{ url_for('auth.login_submit', next=request.args.get('next')) }}" novalidate>
+      <form id="loginForm" method="POST" action="{{ url_for('auth.login_submit', next=request.args.get('next')) }}" novalidate>
         {{ form.hidden_tag() }}
 
         <div class="mb-3">

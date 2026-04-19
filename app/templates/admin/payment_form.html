@@ -1,0 +1,48 @@
+{% extends 'admin/base.html' %}
+
+{% block admin_page_title %}Record Manual Payment{% endblock %}
+
+{% block admin_content %}
+<div class="bg-white border rounded-3" style="padding: 32px; max-width: 920px;">
+  <form method="POST" action="/admin/payments/new" novalidate>
+    {{ form.hidden_tag() }}
+
+    <div class="row g-3">
+      <div class="col-md-8">
+        <label class="form-label" for="{{ form.user_id.id }}">{{ form.user_id.label.text }}</label>
+        {{ form.user_id(class='form-select' + (' is-invalid' if form.user_id.errors else ''), id=form.user_id.id) }}
+        {% for error in form.user_id.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+      <div class="col-md-4">
+        <label class="form-label" for="{{ form.amount_inr.id }}">{{ form.amount_inr.label.text }}</label>
+        {{ form.amount_inr(class='form-control' + (' is-invalid' if form.amount_inr.errors else ''), id=form.amount_inr.id) }}
+        {% for error in form.amount_inr.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label" for="{{ form.test_series_id.id }}">{{ form.test_series_id.label.text }}</label>
+        {{ form.test_series_id(class='form-select' + (' is-invalid' if form.test_series_id.errors else ''), id=form.test_series_id.id) }}
+      </div>
+      <div class="col-md-6">
+        <label class="form-label" for="{{ form.payment_method.id }}">{{ form.payment_method.label.text }}</label>
+        {{ form.payment_method(class='form-select' + (' is-invalid' if form.payment_method.errors else ''), id=form.payment_method.id) }}
+        {% for error in form.payment_method.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label" for="{{ form.reference_number.id }}">{{ form.reference_number.label.text }}</label>
+        {{ form.reference_number(class='form-control' + (' is-invalid' if form.reference_number.errors else ''), id=form.reference_number.id) }}
+      </div>
+      <div class="col-12">
+        <label class="form-label" for="{{ form.notes.id }}">{{ form.notes.label.text }}</label>
+        {{ form.notes(class='form-control' + (' is-invalid' if form.notes.errors else ''), id=form.notes.id, rows='4') }}
+      </div>
+
+      <div class="col-12 d-flex gap-2 pt-2">
+        {{ form.submit(class='btn btn-cl-primary') }}
+        <a href="/admin/payments" class="btn btn-outline-secondary">Cancel</a>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}

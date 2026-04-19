@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block title %}Test Result | {{ attempt.test.name if attempt.test else 'Mock Test' }} | Career Launcher Ahmedabad{% endblock %}
+
+{% block content %}
+<section style="background: var(--cl-navy); padding: 64px 0;">
+  <div class="container text-center">
+    <h1 style="color: #fff; font-family: 'Poppins', sans-serif; font-weight: 800;">Test Submitted Successfully</h1>
+    <p class="mb-0" style="color: rgba(255, 255, 255, 0.85);">Your performance report is ready. Review your score and attempt details below.</p>
+  </div>
+</section>
+
+<section class="section-space" style="padding-top: 44px;">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-8">
+        <div class="cl-card p-4 h-100">
+          <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+            <div>
+              <h4 class="mb-1" style="color: var(--cl-navy);">{{ attempt.test.name if attempt.test else 'Mock Test' }}</h4>
+              <p class="text-muted mb-0">
+                {{ attempt.test.exam if attempt.test else 'General Aptitude' }}
+                {% if attempt.completed_at %}
+                  | {{ attempt.completed_at.strftime('%d %b %Y, %I:%M %p') }}
+                {% endif %}
+              </p>
+            </div>
+            <a href="{{ url_for('dashboard.tests') }}" class="btn btn-sm btn-cl-outline">View All Attempts</a>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-4">
+              <div class="border rounded-3 p-3 h-100" style="background: #FAFAFD;">
+                <div class="small text-muted">Score</div>
+                <div class="h4 mb-0" style="color: var(--cl-navy);">{{ attempt.score if attempt.score is not none else 0 }}/{{ attempt.max_score or 0 }}</div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="border rounded-3 p-3 h-100" style="background: #FAFAFD;">
+                <div class="small text-muted">Percentage</div>
+                <div class="h4 mb-0" style="color: var(--cl-navy);">{{ score_pct }}%</div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="border rounded-3 p-3 h-100" style="background: #FAFAFD;">
+                <div class="small text-muted">Time Taken</div>
+                <div class="h4 mb-0" style="color: var(--cl-navy);">{{ attempt.time_taken_mins or 0 }} min</div>
+              </div>
+            </div>
+          </div>
+
+          <h6 style="color: var(--cl-navy);">Section Breakdown</h6>
+          {% if section_breakdown %}
+            <div class="row g-2">
+              {% for section, score in section_breakdown.items() %}
+                <div class="col-md-6">
+                  <div class="border rounded-3 p-3 d-flex justify-content-between align-items-center">
+                    <span class="fw-semibold">{{ section }}</span>
+                    <span class="badge" style="background: var(--cl-bg); color: var(--cl-navy);">{{ score }}</span>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <p class="text-muted mb-0">Section report is not available for this attempt.</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="cl-card p-4 mb-3">
+          <h6 style="color: var(--cl-navy);">Percentile</h6>
+          {% if percentile_value is not none and attempt_rank is not none %}
+            <div style="font-size: 32px; font-weight: 700; color: var(--cl-red);">{{ percentile_value }}%</div>
+            <p class="text-muted mb-2 small">Calculated among {{ participant_count }} students who completed this test.</p>
+            <div class="border rounded-3 px-3 py-2" style="background: #FAFAFD;">
+              <div class="small text-muted">Your Rank</div>
+              <div class="h5 mb-0" style="color: var(--cl-navy);">{{ attempt_rank }} / {{ participant_count }}</div>
+            </div>
+          {% else %}
+            <p class="text-muted mb-0">Percentile and rank will be shown once more than one student completes this test.</p>
+          {% endif %}
+        </div>
+
+        <div class="cl-card p-4">
+          <h6 style="color: var(--cl-navy);">Next Action</h6>
+          <div class="d-grid gap-2">
+            {% if attempt.test %}
+              <a href="{{ url_for('tests.start_test', test_series_id=attempt.test.id) }}" class="btn btn-cl-primary">Retake This Test</a>
+            {% endif %}
+            <a href="{{ url_for('dashboard.tests') }}" class="btn btn-cl-outline">Open Test History</a>
+            <a href="{{ url_for('tests.listing') }}" class="btn btn-light border">Browse More Test Series</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

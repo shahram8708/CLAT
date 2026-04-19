@@ -1,0 +1,407 @@
+{% extends 'admin/base.html' %}
+
+{% block admin_page_title %}{% if is_new %}Add New Faculty{% else %}Edit: {{ form.name.data }}{% endif %}{% endblock %}
+
+{% block admin_head %}
+<link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+<style>
+  .tag-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #f3f4f8;
+    border: 1px solid #d9deea;
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 12px;
+    margin: 0 6px 6px 0;
+  }
+  .achievement-row { display: flex; gap: 8px; margin-bottom: 8px; }
+</style>
+{% endblock %}
+
+{% block admin_content %}
+<div class="row g-3">
+  <div class="col-lg-8">
+    <div class="bg-white border rounded-3" style="padding: 32px;">
+      <h4 class="mb-4">Faculty Information</h4>
+
+      <form method="POST" enctype="multipart/form-data" action="{% if is_new %}/admin/faculty/new{% else %}/admin/faculty/{{ faculty.id }}/edit{% endif %}" id="facultyForm" novalidate>
+        {{ form.hidden_tag() }}
+
+        <h6 class="text-uppercase text-muted mb-3">Basic Info</h6>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label" for="{{ form.name.id }}">{{ form.name.label.text }}</label>
+            {{ form.name(class='form-control' + (' is-invalid' if form.name.errors else ''), id=form.name.id) }}
+            {% for error in form.name.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="{{ form.slug.id }}">{{ form.slug.label.text }}</label>
+            {{ form.slug(class='form-control' + (' is-invalid' if form.slug.errors else ''), id=form.slug.id) }}
+            {% for error in form.slug.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="{{ form.title.id }}">{{ form.title.label.text }}</label>
+            {{ form.title(class='form-control' + (' is-invalid' if form.title.errors else ''), id=form.title.id) }}
+            {% for error in form.title.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="{{ form.qualification.id }}">{{ form.qualification.label.text }}</label>
+            {{ form.qualification(class='form-control' + (' is-invalid' if form.qualification.errors else ''), id=form.qualification.id) }}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="{{ form.exam_score.id }}">{{ form.exam_score.label.text }}</label>
+            {{ form.exam_score(class='form-control' + (' is-invalid' if form.exam_score.errors else ''), id=form.exam_score.id) }}
+          </div>
+          <div class="col-md-3">
+            <label class="form-label" for="{{ form.experience_yrs.id }}">{{ form.experience_yrs.label.text }}</label>
+            {{ form.experience_yrs(class='form-control' + (' is-invalid' if form.experience_yrs.errors else ''), id=form.experience_yrs.id) }}
+          </div>
+          <div class="col-md-3">
+            <label class="form-label" for="{{ form.total_students_trained.id }}">{{ form.total_students_trained.label.text }}</label>
+            {{ form.total_students_trained(class='form-control' + (' is-invalid' if form.total_students_trained.errors else ''), id=form.total_students_trained.id) }}
+          </div>
+          <div class="col-md-3">
+            <label class="form-label" for="{{ form.joining_year.id }}">{{ form.joining_year.label.text }}</label>
+            {{ form.joining_year(class='form-control' + (' is-invalid' if form.joining_year.errors else ''), id=form.joining_year.id) }}
+            {% for error in form.joining_year.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+          </div>
+          <div class="col-md-3">
+            <label class="form-label" for="{{ form.display_order.id }}">{{ form.display_order.label.text }}</label>
+            {{ form.display_order(class='form-control' + (' is-invalid' if form.display_order.errors else ''), id=form.display_order.id) }}
+          </div>
+        </div>
+
+        <hr class="my-4">
+
+        <h6 class="text-uppercase text-muted mb-3">Contact and Social</h6>
+        <div class="row g-3">
+          <div class="col-md-4">
+            <label class="form-label" for="{{ form.youtube_url.id }}">{{ form.youtube_url.label.text }}</label>
+            {{ form.youtube_url(class='form-control' + (' is-invalid' if form.youtube_url.errors else ''), id=form.youtube_url.id) }}
+            {% for error in form.youtube_url.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label" for="{{ form.instagram_url.id }}">{{ form.instagram_url.label.text }}</label>
+            {{ form.instagram_url(class='form-control' + (' is-invalid' if form.instagram_url.errors else ''), id=form.instagram_url.id) }}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label" for="{{ form.linkedin_url.id }}">{{ form.linkedin_url.label.text }}</label>
+            {{ form.linkedin_url(class='form-control' + (' is-invalid' if form.linkedin_url.errors else ''), id=form.linkedin_url.id) }}
+          </div>
+        </div>
+
+        <hr class="my-4">
+
+        <h6 class="text-uppercase text-muted mb-3">Professional Details</h6>
+        <div class="mb-3">
+          <label class="form-label" for="subjectsTagInput">Subjects (comma-separated)</label>
+          {{ form.subjects_input(class='form-control d-none', id=form.subjects_input.id) }}
+          <input id="subjectsTagInput" type="text" class="form-control" placeholder="Type subject and press Enter">
+          <div id="subjectsTagList" class="mt-2"></div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="examTagInput">Exams Covered (comma-separated, e.g.: CAT, CLAT, IPMAT)</label>
+          {{ form.exam_tags_input(class='form-control d-none', id=form.exam_tags_input.id) }}
+          <input id="examTagInput" type="text" class="form-control" placeholder="Type exam and press Enter">
+          <div id="examTagList" class="mt-2"></div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="achievementInput">Key Achievements (one per line)</label>
+          {{ form.achievements_input(class='form-control d-none', id=form.achievements_input.id) }}
+          <div id="achievementsList"></div>
+          <button class="btn btn-outline-secondary btn-sm" id="addAchievementBtn" type="button">Add Achievement</button>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="{{ form.photo_upload.id }}">{{ form.photo_upload.label.text }}</label>
+          {{ form.photo_upload(class='form-control' + (' is-invalid' if form.photo_upload.errors else ''), id=form.photo_upload.id, accept='image/png,image/jpeg,image/jpg') }}
+          {% for error in form.photo_upload.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+
+          <div class="mt-2 d-flex align-items-center gap-2">
+            {% if faculty and faculty.photo_display_url %}
+              <img id="photoPreview" src="{{ faculty.photo_display_url }}" alt="{{ faculty.name }} current photo" style="width: 72px; height: 72px; border-radius: 50%; object-fit: cover;">
+            {% else %}
+              <img id="photoPreview" src="" alt="Faculty photo preview" style="display:none; width: 72px; height: 72px; border-radius: 50%; object-fit: cover;">
+            {% endif %}
+            <span class="small text-muted">Image auto resized to 400x400</span>
+          </div>
+        </div>
+
+        <hr class="my-4">
+
+        <h6 class="text-uppercase text-muted mb-3">Bio</h6>
+        <div class="mb-3">
+          <label class="form-label" for="{{ form.bio_short.id }}">{{ form.bio_short.label.text }}</label>
+          {{ form.bio_short(class='form-control' + (' is-invalid' if form.bio_short.errors else ''), id=form.bio_short.id, rows='3') }}
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="{{ form.bio_long.id }}">{{ form.bio_long.label.text }}</label>
+          {{ form.bio_long(class='form-control' + (' is-invalid' if form.bio_long.errors else ''), id=form.bio_long.id, rows='9', placeholder='Write detailed faculty bio, teaching approach, domain depth, and student outcomes...') }}
+          {% for error in form.bio_long.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+          <div id="bioLongEditorWrap" class="d-none mt-2">
+            <div id="bioLongEditor" style="height: 260px;"></div>
+          </div>
+          <div class="form-text">If rich editor is unavailable, this textarea works as reliable fallback and saves normally.</div>
+        </div>
+
+        <div class="row g-3 align-items-center">
+          <div class="col-md-6">
+            <div class="form-check">
+              {{ form.is_active(class='form-check-input', id=form.is_active.id) }}
+              <label class="form-check-label" for="{{ form.is_active.id }}">{{ form.is_active.label.text }}</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 d-flex gap-2">
+          {{ form.submit(class='btn btn-cl-primary') }}
+          <a href="/admin/faculty" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="bg-white border rounded-3 p-3" style="position: sticky; top: 20px;">
+      <h6 class="mb-3">Live Preview</h6>
+      <article class="cl-card text-center">
+        <img id="previewPhoto" src="{% if faculty and faculty.photo_display_url %}{{ faculty.photo_display_url }}{% endif %}" alt="Faculty card preview image" style="width: 84px; height: 84px; border-radius: 50%; object-fit: cover; {% if not (faculty and faculty.photo_display_url) %}display:none;{% endif %}">
+        <div id="previewAvatar" class="d-inline-flex align-items-center justify-content-center mt-2" style="width:84px;height:84px;border-radius:50%;background:#eef1f7;font-size:28px;font-weight:700;{% if faculty and faculty.photo_display_url %}display:none;{% endif %}">F</div>
+        <h6 id="previewName" class="fw-bold mt-3 mb-1">{{ form.name.data or 'Faculty Name' }}</h6>
+        <p id="previewTitle" class="small text-muted mb-2">{{ form.title.data or 'Faculty Title' }}</p>
+        <span id="previewScore" class="badge text-bg-light border">{{ form.exam_score.data or 'Exam Score' }}</span>
+        <div id="previewExamTags" class="mt-3"></div>
+      </article>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block admin_js %}
+<script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+<script>
+(function () {
+  const form = document.getElementById("facultyForm");
+  const nameField = document.getElementById("{{ form.name.id }}");
+  const slugField = document.getElementById("{{ form.slug.id }}");
+  const titleField = document.getElementById("{{ form.title.id }}");
+  const scoreField = document.getElementById("{{ form.exam_score.id }}");
+  const photoField = document.getElementById("{{ form.photo_upload.id }}");
+  const photoPreview = document.getElementById("photoPreview");
+  const previewPhoto = document.getElementById("previewPhoto");
+  const previewAvatar = document.getElementById("previewAvatar");
+  const previewName = document.getElementById("previewName");
+  const previewTitle = document.getElementById("previewTitle");
+  const previewScore = document.getElementById("previewScore");
+  const previewExamTags = document.getElementById("previewExamTags");
+
+  let slugManuallyEdited = false;
+  slugField.addEventListener("input", function () {
+    slugManuallyEdited = true;
+  });
+
+  nameField.addEventListener("input", function () {
+    if (!slugManuallyEdited) {
+      slugField.value = (nameField.value || "")
+        .toLowerCase()
+        .replace(/\s+/g, "-")
+        .replace(/[^a-z0-9-]/g, "")
+        .replace(/-+/g, "-")
+        .replace(/^-|-$/g, "");
+    }
+    updatePreview();
+  });
+
+  function setPreviewPhoto(src) {
+    if (src) {
+      previewPhoto.src = src;
+      previewPhoto.style.display = "inline-block";
+      previewAvatar.style.display = "none";
+      photoPreview.src = src;
+      photoPreview.style.display = "inline-block";
+    } else {
+      previewPhoto.style.display = "none";
+      previewAvatar.style.display = "inline-flex";
+    }
+  }
+
+  if (photoField) {
+    photoField.addEventListener("change", function () {
+      const file = photoField.files && photoField.files[0];
+      if (!file) {
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = function (event) {
+        setPreviewPhoto(event.target.result);
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function buildTagPills(values, target) {
+    target.innerHTML = "";
+    values.slice(0, 2).forEach(function (value) {
+      const span = document.createElement("span");
+      span.className = "badge text-bg-light border me-1";
+      span.textContent = value;
+      target.appendChild(span);
+    });
+  }
+
+  function createTagEditor(inputId, listId, hiddenFieldId) {
+    const textInput = document.getElementById(inputId);
+    const list = document.getElementById(listId);
+    const hiddenField = document.getElementById(hiddenFieldId);
+
+    const tags = (hiddenField.value || "")
+      .split(",")
+      .map(function (item) { return item.trim(); })
+      .filter(Boolean);
+
+    function sync() {
+      hiddenField.value = tags.join(", ");
+      list.innerHTML = "";
+      tags.forEach(function (tag, index) {
+        const pill = document.createElement("span");
+        pill.className = "tag-pill";
+        pill.innerHTML = `<span>${tag}</span><button type="button" class="btn btn-sm p-0 border-0" aria-label="remove">×</button>`;
+        pill.querySelector("button").addEventListener("click", function () {
+          tags.splice(index, 1);
+          sync();
+          updatePreview();
+        });
+        list.appendChild(pill);
+      });
+      updatePreview();
+    }
+
+    function pushTag(raw) {
+      const value = (raw || "").trim();
+      if (!value || tags.includes(value)) {
+        return;
+      }
+      tags.push(value);
+      sync();
+    }
+
+    textInput.addEventListener("keydown", function (event) {
+      if (event.key === "Enter" || event.key === ",") {
+        event.preventDefault();
+        pushTag(textInput.value.replace(/,+$/, ""));
+        textInput.value = "";
+      }
+    });
+
+    textInput.addEventListener("blur", function () {
+      if (textInput.value.trim()) {
+        pushTag(textInput.value);
+        textInput.value = "";
+      }
+    });
+
+    sync();
+
+    return {
+      getTags: function () { return tags.slice(); }
+    };
+  }
+
+  let subjectsEditor = null;
+  let examEditor = null;
+
+  subjectsEditor = createTagEditor("subjectsTagInput", "subjectsTagList", "{{ form.subjects_input.id }}");
+  examEditor = createTagEditor("examTagInput", "examTagList", "{{ form.exam_tags_input.id }}");
+
+  const achievementsField = document.getElementById("{{ form.achievements_input.id }}");
+  const achievementsList = document.getElementById("achievementsList");
+  const addAchievementBtn = document.getElementById("addAchievementBtn");
+
+  function addAchievementRow(value) {
+    const row = document.createElement("div");
+    row.className = "achievement-row";
+    row.innerHTML = `<input type="text" class="form-control" value="${value || ""}"><button type="button" class="btn btn-outline-danger btn-sm">Remove</button>`;
+    row.querySelector("button").addEventListener("click", function () {
+      row.remove();
+      syncAchievements();
+    });
+    row.querySelector("input").addEventListener("input", syncAchievements);
+    achievementsList.appendChild(row);
+  }
+
+  function syncAchievements() {
+    const values = Array.from(achievementsList.querySelectorAll("input"))
+      .map(function (input) { return input.value.trim(); })
+      .filter(Boolean);
+    achievementsField.value = values.join("\n");
+  }
+
+  (achievementsField.value || "").split("\n").map(function (line) { return line.trim(); }).filter(Boolean).forEach(addAchievementRow);
+  if (!achievementsList.children.length) {
+    addAchievementRow("");
+  }
+
+  addAchievementBtn.addEventListener("click", function () {
+    addAchievementRow("");
+    syncAchievements();
+  });
+
+  const bioLongField = document.getElementById("{{ form.bio_long.id }}");
+  const bioLongEditorWrap = document.getElementById("bioLongEditorWrap");
+  let quill = null;
+
+  if (window.Quill && bioLongField && bioLongEditorWrap) {
+    const initialBioLong = bioLongField.value || "";
+
+    bioLongEditorWrap.classList.remove("d-none");
+    bioLongField.classList.add("d-none");
+
+    quill = new Quill("#bioLongEditor", {
+      theme: "snow",
+      modules: {
+        toolbar: [
+          [{ header: [2, 3, false] }],
+          ["bold", "italic", "underline"],
+          [{ list: "ordered" }, { list: "bullet" }],
+          ["link"],
+          ["clean"]
+        ]
+      }
+    });
+
+    quill.root.innerHTML = initialBioLong;
+  }
+
+  function updatePreview() {
+    previewName.textContent = nameField.value || "Faculty Name";
+    previewTitle.textContent = titleField.value || "Faculty Title";
+    previewScore.textContent = scoreField.value || "Exam Score";
+
+    const initials = (nameField.value || "F").split(" ").map(function (item) {
+      return item.trim()[0] || "";
+    }).join("").slice(0, 2).toUpperCase() || "F";
+    previewAvatar.textContent = initials;
+
+    const examTags = examEditor && typeof examEditor.getTags === "function" ? examEditor.getTags() : [];
+    buildTagPills(examTags, previewExamTags);
+  }
+
+  titleField.addEventListener("input", updatePreview);
+  scoreField.addEventListener("input", updatePreview);
+
+  form.addEventListener("submit", function () {
+    if (quill && bioLongField) {
+      bioLongField.value = quill.root.innerHTML;
+    }
+    syncAchievements();
+  });
+
+  updatePreview();
+})();
+</script>
+{% endblock %}

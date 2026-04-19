@@ -1,0 +1,194 @@
+{% extends 'admin/base.html' %}
+
+{% block admin_page_title %}Faculty Management{% endblock %}
+
+{% block admin_content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+  <span class="badge badge-soft">{{ faculty_list|length }} faculty members</span>
+  <a href="/admin/faculty/new" class="btn btn-cl-primary">Add New Faculty →</a>
+</div>
+
+<div class="bg-white border rounded-3 p-3">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle admin-table mb-0" id="facultyTable">
+      <thead>
+        <tr>
+          <th style="width: 36px;"></th>
+          <th>#</th>
+          <th>Photo</th>
+          <th>Name</th>
+          <th>Title</th>
+          <th>Exams</th>
+          <th>Experience</th>
+          <th>Batches</th>
+          <th>Active</th>
+          <th>Order</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for member in faculty_list %}
+          <tr draggable="true" data-id="{{ member.id }}" data-order="{{ member.display_order or 0 }}">
+            <td class="text-muted drag-handle" style="cursor: grab;"><i class="fa-solid fa-grip-vertical"></i></td>
+            <td>{{ loop.index }}</td>
+            <td>
+              {% if member.photo_display_url %}
+                <img src="{{ member.photo_display_url }}" alt="{{ member.name }} photo" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+              {% else %}
+                <div class="d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px; border-radius: 50%; background: #f2f4f7; font-size: 12px; font-weight: 700; color: #1A1A2E;">
+                  {{ ((member.name.split()[0][0] if member.name else 'F') ~ (member.name.split()[1][0] if member.name and member.name.split()|length > 1 else ''))|upper }}
+                </div>
+              {% endif %}
+            </td>
+            <td>{{ member.name }}</td>
+            <td>{{ member.title or '-' }}</td>
+            <td>
+              {% set tags = member.exam_tags_list %}
+              {% for tag in tags[:3] %}
+                <span class="badge text-bg-light border">{{ tag }}</span>
+              {% endfor %}
+              {% if tags|length > 3 %}
+                <span class="small text-muted">+{{ tags|length - 3 }} more</span>
+              {% endif %}
+            </td>
+            <td>{{ member.experience_yrs ~ ' yrs' if member.experience_yrs is not none else '-' }}</td>
+            <td>{{ member.batches|length }}</td>
+            <td>
+              <div class="form-check form-switch">
+                <input class="form-check-input faculty-active-toggle" type="checkbox" data-id="{{ member.id }}" {% if member.is_active %}checked{% endif %}>
+              </div>
+            </td>
+            <td>{{ member.display_order or 0 }}</td>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <a href="/admin/faculty/{{ member.id }}/edit" class="btn btn-outline-primary btn-sm">Edit →</a>
+                <form method="POST" action="/admin/faculty/{{ member.id }}/delete" class="m-0 delete-faculty-form">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button class="btn btn-outline-danger btn-sm" type="submit">Delete</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="11" class="text-center text-muted py-4">No faculty members found.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block admin_js %}
+<script>
+(function () {
+  const csrfToken = "{{ csrf_token() }}";
+
+  document.querySelectorAll(".delete-faculty-form").forEach(function (form) {
+    form.addEventListener("submit", function (event) {
+      if (!confirm("Are you sure you want to deactivate this faculty record?")) {
+        event.preventDefault();
+      }
+    });
+  });
+
+  document.querySelectorAll(".faculty-active-toggle").forEach(function (toggle) {
+    toggle.addEventListener("change", function () {
+      const facultyId = toggle.getAttribute("data-id");
+      const previous = !toggle.checked;
+      toggle.disabled = true;
+
+      fetch(`/admin/faculty/${facultyId}/toggle-active`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrfToken
+        },
+        body: JSON.stringify({})
+      })
+        .then(function (response) {
+          if (!response.ok) {
+            throw new Error("Failed");
+          }
+          return response.json();
+        })
+        .catch(function () {
+          toggle.checked = previous;
+          alert("Unable to update faculty status.");
+        })
+        .finally(function () {
+          toggle.disabled = false;
+        });
+    });
+  });
+
+  const tableBody = document.querySelector("#facultyTable tbody");
+  if (!tableBody) {
+    return;
+  }
+
+  let dragRow = null;
+
+  function updateOrderPayload() {
+    const rows = Array.from(tableBody.querySelectorAll("tr[data-id]"));
+    return rows.map(function (row, index) {
+      return {
+        id: Number(row.getAttribute("data-id")),
+        order: index + 1
+      };
+    });
+  }
+
+  function persistOrder() {
+    const payload = updateOrderPayload();
+
+    fetch("/admin/faculty/reorder", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken
+      },
+      body: JSON.stringify(payload)
+    }).then(function (response) {
+      if (!response.ok) {
+        throw new Error("Failed");
+      }
+    }).catch(function () {
+      alert("Unable to save new faculty order.");
+      window.location.reload();
+    });
+  }
+
+  tableBody.querySelectorAll("tr[data-id]").forEach(function (row) {
+    row.addEventListener("dragstart", function () {
+      dragRow = row;
+      row.classList.add("table-active");
+    });
+
+    row.addEventListener("dragend", function () {
+      row.classList.remove("table-active");
+      dragRow = null;
+      persistOrder();
+    });
+
+    row.addEventListener("dragover", function (event) {
+      event.preventDefault();
+      const target = row;
+      if (!dragRow || dragRow === target) {
+        return;
+      }
+
+      const targetRect = target.getBoundingClientRect();
+      const shouldInsertAfter = event.clientY > targetRect.top + targetRect.height / 2;
+
+      if (shouldInsertAfter) {
+        target.after(dragRow);
+      } else {
+        target.before(dragRow);
+      }
+    });
+  });
+})();
+</script>
+{% endblock %}

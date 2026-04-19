@@ -4,6 +4,26 @@
 {% block title %}{{ meta_title }}{% endblock %}
 {% block meta_description %}{{ meta_description }}{% endblock %}
 
+{% block extra_head %}
+  <link rel="canonical" href="{{ request.base_url }}">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="{{ meta_title }}">
+  <meta property="og:description" content="{{ meta_description }}">
+  <meta property="og:url" content="{{ request.base_url }}">
+  {% if post.featured_image %}
+    <meta property="og:image" content="{{ post.featured_image }}">
+  {% endif %}
+
+  <meta name="twitter:card" content="{{ 'summary_large_image' if post.featured_image else 'summary' }}">
+  <meta name="twitter:title" content="{{ meta_title }}">
+  <meta name="twitter:description" content="{{ meta_description }}">
+  {% if post.featured_image %}
+    <meta name="twitter:image" content="{{ post.featured_image }}">
+  {% endif %}
+{% endblock %}
+
 {% block content %}
 {% set author_name = post.author.get_full_name() if post.author else 'CL Ahmedabad Team' %}
 {% set test_series_categories = ['cat', 'clat', 'ipmat', 'cuet', 'gmat'] %}

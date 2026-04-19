@@ -7,7 +7,7 @@ from app.models.test_series import TestSeries
 
 
 def generate_sitemap(app):
-    base_url = (app.config.get("SITE_URL") or "https://careerlauncherahmedabad.com").rstrip("/")
+    base_url = (app.config.get("SITE_URL") or "https://clahmedabad.onrender.com").rstrip("/")
     today = datetime.utcnow().strftime("%Y-%m-%d")
 
     static_pages = [

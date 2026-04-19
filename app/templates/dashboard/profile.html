@@ -26,7 +26,7 @@
         <p class="mb-1"><strong>Member since:</strong> {{ current_user.created_at.strftime('%B %Y') if current_user.created_at else 'N/A' }}</p>
         {% if current_user.scholarship_pct %}
           <div class="mt-2">
-            <a href="/scholarship/certificate" class="btn btn-sm btn-warning w-100">
+            <a href="/scholarship/certificate" class="btn btn-sm btn-warning w-100" data-loading-text="Generating your certificate..." data-loading-delay="400" data-restore-delay="6000">
               <i class="fas fa-download me-1"></i>Download Scholarship Certificate
             </a>
           </div>
@@ -49,7 +49,7 @@
     <div class="cl-card" style="padding: 32px;">
       <h5 class="mb-3" style="color: var(--cl-navy);">Update Your Profile</h5>
 
-      <form method="POST" action="{{ url_for('dashboard.profile_update') }}" novalidate>
+      <form id="profileUpdateForm" method="POST" action="{{ url_for('dashboard.profile_update') }}" novalidate>
         {{ form.hidden_tag() }}
 
         <div class="row g-3">

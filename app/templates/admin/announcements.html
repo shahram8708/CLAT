@@ -1,0 +1,126 @@
+{% extends 'admin/base.html' %}
+
+{% block admin_page_title %}Announcements{% endblock %}
+
+{% block admin_content %}
+{% set info_count = announcements | selectattr('announcement_type', 'equalto', 'info') | list | length %}
+{% set success_count = announcements | selectattr('announcement_type', 'equalto', 'success') | list | length %}
+{% set warning_count = announcements | selectattr('announcement_type', 'equalto', 'warning') | list | length %}
+{% set urgent_count = announcements | selectattr('announcement_type', 'equalto', 'urgent') | list | length %}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+  <div class="d-flex gap-2 flex-wrap">
+    <span class="badge text-bg-light border">Info: {{ info_count }}</span>
+    <span class="badge text-bg-light border">Success: {{ success_count }}</span>
+    <span class="badge text-bg-light border">Warning: {{ warning_count }}</span>
+    <span class="badge text-bg-light border">Urgent: {{ urgent_count }}</span>
+  </div>
+  <a href="/admin/announcements/new" class="btn btn-cl-primary">Add Announcement →</a>
+</div>
+
+<div class="bg-white border rounded-3 p-3">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle admin-table mb-0">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Title and Message</th>
+          <th>Type</th>
+          <th>Location</th>
+          <th>Schedule</th>
+          <th>Active</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for announcement in announcements %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>
+              <div class="fw-semibold">{{ announcement.title }}</div>
+              <div class="small text-muted">{{ announcement.message[:100] }}{% if announcement.message|length > 100 %}...{% endif %}</div>
+              {% if announcement.cta_text and announcement.cta_url %}
+                <a href="{{ announcement.cta_url }}" target="_blank" rel="noopener noreferrer" class="small">CTA: {{ announcement.cta_text }}</a>
+              {% endif %}
+            </td>
+            <td>
+              <span class="badge text-bg-light border">{{ announcement.announcement_type|upper }}</span>
+            </td>
+            <td>{{ announcement.display_location|replace('_', ' ')|title }}</td>
+            <td>
+              <div class="small">
+                <div>Start: {{ announcement.start_date.strftime('%d %b %Y, %I:%M %p') if announcement.start_date else 'Immediate' }}</div>
+                <div>End: {{ announcement.end_date.strftime('%d %b %Y, %I:%M %p') if announcement.end_date else 'No End Date' }}</div>
+              </div>
+            </td>
+            <td>
+              <div class="form-check form-switch">
+                <input class="form-check-input announcement-active-toggle" type="checkbox" data-id="{{ announcement.id }}" {% if announcement.is_active %}checked{% endif %}>
+              </div>
+            </td>
+            <td>
+              <div class="d-flex gap-2">
+                <a href="/admin/announcements/{{ announcement.id }}/edit" class="btn btn-outline-primary btn-sm">Edit</a>
+                <form method="POST" action="/admin/announcements/{{ announcement.id }}/delete" class="m-0 delete-announcement-form">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button class="btn btn-outline-danger btn-sm" type="submit">Delete</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="7" class="text-center text-muted py-4">No announcements found.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block admin_js %}
+<script>
+  (function () {
+    const csrfToken = "{{ csrf_token() }}";
+
+    document.querySelectorAll(".delete-announcement-form").forEach(function (form) {
+      form.addEventListener("submit", function (event) {
+        if (!confirm("Delete this announcement?")) {
+          event.preventDefault();
+        }
+      });
+    });
+
+    document.querySelectorAll(".announcement-active-toggle").forEach(function (toggle) {
+      toggle.addEventListener("change", function () {
+        const announcementId = toggle.getAttribute("data-id");
+        const previous = !toggle.checked;
+        toggle.disabled = true;
+
+        fetch(`/admin/announcements/${announcementId}/toggle-active`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrfToken
+          },
+          body: JSON.stringify({})
+        })
+          .then(function (response) {
+            if (!response.ok) {
+              throw new Error("Failed");
+            }
+            return response.json();
+          })
+          .catch(function () {
+            toggle.checked = previous;
+            alert("Unable to update announcement status.");
+          })
+          .finally(function () {
+            toggle.disabled = false;
+          });
+      });
+    });
+  })();
+</script>
+{% endblock %}

@@ -1,0 +1,122 @@
+{% extends 'admin/base.html' %}
+
+{% block admin_page_title %}Testimonials{% endblock %}
+
+{% block admin_content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+  <div class="d-flex gap-2 flex-wrap">
+    <span class="badge text-bg-light border">Total: {{ testimonials|length }}</span>
+    <span class="badge text-bg-light border">Homepage: {{ grouped_counts.get('homepage', 0) }}</span>
+    <span class="badge text-bg-light border">Courses: {{ grouped_counts.get('courses', 0) }}</span>
+    <span class="badge text-bg-light border">Results: {{ grouped_counts.get('results', 0) }}</span>
+    <span class="badge text-bg-light border">All Pages: {{ grouped_counts.get('all', 0) }}</span>
+  </div>
+  <a href="/admin/testimonials/new" class="btn btn-cl-primary">Add Testimonial →</a>
+</div>
+
+<div class="bg-white border rounded-3 p-3">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle admin-table mb-0">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Student</th>
+          <th>Details</th>
+          <th>Rating</th>
+          <th>Display</th>
+          <th>Order</th>
+          <th>Active</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for testimonial in testimonials %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>
+              <div class="fw-semibold">{{ testimonial.student_name }}</div>
+              <div class="small text-muted">{{ testimonial.designation or 'Student' }}</div>
+            </td>
+            <td>
+              <div class="small"><strong>Course:</strong> {{ testimonial.course or '-' }}</div>
+              <div class="small"><strong>Exam:</strong> {{ testimonial.exam or '-' }}</div>
+            </td>
+            <td>
+              {% for _ in range(testimonial.rating or 0) %}★{% endfor %}
+              {% for _ in range(5 - (testimonial.rating or 0)) %}<span class="text-muted">☆</span>{% endfor %}
+            </td>
+            <td>
+              <span class="badge text-bg-light border">{{ testimonial.display_location|replace('_', ' ')|title }}</span>
+            </td>
+            <td>{{ testimonial.display_order or 0 }}</td>
+            <td>
+              <div class="form-check form-switch">
+                <input class="form-check-input testimonial-active-toggle" type="checkbox" data-id="{{ testimonial.id }}" {% if testimonial.is_active %}checked{% endif %}>
+              </div>
+            </td>
+            <td>
+              <div class="d-flex gap-2">
+                <a href="/admin/testimonials/{{ testimonial.id }}/edit" class="btn btn-outline-primary btn-sm">Edit</a>
+                <form method="POST" action="/admin/testimonials/{{ testimonial.id }}/delete" class="m-0 delete-testimonial-form">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button class="btn btn-outline-danger btn-sm" type="submit">Delete</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="8" class="text-center text-muted py-4">No testimonials found.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block admin_js %}
+<script>
+  (function () {
+    const csrfToken = "{{ csrf_token() }}";
+
+    document.querySelectorAll(".delete-testimonial-form").forEach(function (form) {
+      form.addEventListener("submit", function (event) {
+        if (!confirm("Delete this testimonial?")) {
+          event.preventDefault();
+        }
+      });
+    });
+
+    document.querySelectorAll(".testimonial-active-toggle").forEach(function (toggle) {
+      toggle.addEventListener("change", function () {
+        const testimonialId = toggle.getAttribute("data-id");
+        const previous = !toggle.checked;
+        toggle.disabled = true;
+
+        fetch(`/admin/testimonials/${testimonialId}/toggle-active`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrfToken
+          },
+          body: JSON.stringify({})
+        })
+          .then(function (response) {
+            if (!response.ok) {
+              throw new Error("Failed");
+            }
+            return response.json();
+          })
+          .catch(function () {
+            toggle.checked = previous;
+            alert("Unable to update testimonial status.");
+          })
+          .finally(function () {
+            toggle.disabled = false;
+          });
+      });
+    });
+  })();
+</script>
+{% endblock %}

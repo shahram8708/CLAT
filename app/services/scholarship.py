@@ -1,4 +1,7 @@
+import base64
 from datetime import datetime
+from html import escape
+from pathlib import Path
 
 from flask import current_app
 from weasyprint import HTML
@@ -52,8 +55,22 @@ def calculate_scholarship_band(score, max_score):
 def generate_certificate_pdf(user, scholarship_pct, band_name):
     try:
         issue_date = datetime.utcnow().strftime("%d %B %Y")
-        program_name = (getattr(user, "enrolled_exam", None) or "selected").strip() if getattr(user, "enrolled_exam", None) else "selected"
-        student_name = user.get_full_name()
+        program_name_raw = getattr(user, "enrolled_exam", None) or "selected"
+        program_name = escape(program_name_raw.strip() or "selected")
+        student_name = escape(user.get_full_name())
+
+        signature_data_uri = ""
+        signature_path = Path(current_app.root_path) / "static" / "img" / "signature.png"
+        try:
+          signature_data_uri = "data:image/png;base64," + base64.b64encode(signature_path.read_bytes()).decode("ascii")
+        except OSError:
+          current_app.logger.warning("Director signature image not found at path: %s", signature_path)
+
+        signature_markup = (
+          f'<img class="signature-image" src="{signature_data_uri}" alt="Director Signature">'
+          if signature_data_uri
+          else '<div class="signature-fallback">Director</div>'
+        )
 
         html_content = f"""
         <!DOCTYPE html>
@@ -162,8 +179,24 @@ def generate_certificate_pdf(user, scholarship_pct, band_name):
               text-align: center;
               padding-left: 28px;
             }}
+            .signature-image {{
+              display: block;
+              width: 220px;
+              max-width: 220px;
+              height: auto;
+              margin: 0 auto 6px;
+              object-fit: contain;
+            }}
+            .signature-fallback {{
+              min-height: 52px;
+              margin: 0 auto 6px;
+              color: #2C3E7A;
+              font-size: 18px;
+              font-style: italic;
+              line-height: 52px;
+            }}
             .signature-line {{
-              margin: 34px auto 6px;
+              margin: 0 auto 6px;
               width: 220px;
               border-top: 1px solid #1C1C2E;
             }}
@@ -203,7 +236,8 @@ def generate_certificate_pdf(user, scholarship_pct, band_name):
                 cl_ahmedabad@careerlauncher.com
               </div>
               <div class=\"footer-right signature-wrap\">
-                <div class=\"signature-line\"></div>
+                  {signature_markup}
+                  <div class="signature-line"></div>
                 <div class=\"signature-label\">Director's Signature</div>
               </div>
             </div>

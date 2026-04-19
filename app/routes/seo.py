@@ -40,7 +40,7 @@ def robots_txt():
             "Disallow: /dashboard/",
             "Disallow: /login",
             "Disallow: /register",
-            "Sitemap: https://careerlauncherahmedabad.com/sitemap.xml",
+            "Sitemap: https://clahmedabad.onrender.com/sitemap.xml",
         ]
     )
     return Response(content, mimetype="text/plain")

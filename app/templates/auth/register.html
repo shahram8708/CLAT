@@ -13,7 +13,7 @@
         <p class="mb-0" style="color: var(--cl-grey);">Join thousands of CL Ahmedabad students on their path to top colleges.</p>
       </div>
 
-      <form method="POST" action="{{ url_for('auth.register_submit') }}" novalidate>
+      <form id="registerForm" method="POST" action="{{ url_for('auth.register_submit') }}" novalidate>
         {{ form.hidden_tag() }}
 
         <div class="row g-3">

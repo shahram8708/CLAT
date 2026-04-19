@@ -8,6 +8,7 @@ from app.extensions import db, limiter
 from app.forms import LoginForm, RegistrationForm
 from app.models.user import User
 from app.services.email_service import send_registration_welcome
+from app.services.enrollment_service import ensure_student_enrollments
 
 try:
     from werkzeug.urls import url_parse
@@ -118,6 +119,12 @@ def register_submit():
 
     db.session.add(user)
     db.session.commit()
+
+    try:
+        ensure_student_enrollments(user)
+    except Exception as exc:
+        db.session.rollback()
+        current_app.logger.error("Registration enrollment bootstrap failed for user %s: %s", user.id, exc)
 
     login_user(user)
 

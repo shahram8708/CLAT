@@ -17,6 +17,13 @@ CATEGORY_LABELS = {
     "general": "General",
 }
 
+SEO_SLUG_OVERRIDES = {
+    "cat-preparation-mistakes-2025": {
+        "meta_title": "CAT Preparation Mistakes in 2025: 11 Errors That Hurt Your Percentile",
+        "meta_description": "Avoid the biggest CAT 2025 preparation mistakes across VARC, DILR, QA, mocks, and revision. Use this practical checklist to improve accuracy and percentile.",
+    }
+}
+
 ALLOWED_TAGS = [
     "p",
     "h2",
@@ -129,8 +136,14 @@ def article(category, slug):
         .all()
     )
 
-    meta_title = post.meta_title or f"{post.title} | Career Launcher Ahmedabad"
-    meta_description = post.meta_description or post.excerpt or "Expert preparation guidance from Career Launcher Ahmedabad."
+    seo_override = SEO_SLUG_OVERRIDES.get(post.slug, {})
+    meta_title = post.meta_title or seo_override.get("meta_title") or f"{post.title} | Career Launcher Ahmedabad"
+    meta_description = (
+        post.meta_description
+        or seo_override.get("meta_description")
+        or post.excerpt
+        or "Expert preparation guidance from Career Launcher Ahmedabad."
+    )
 
     return render_template(
         "blog/article.html",

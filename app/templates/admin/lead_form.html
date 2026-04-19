@@ -1,0 +1,65 @@
+{% extends 'admin/base.html' %}
+
+{% block admin_page_title %}{% if is_new %}Add Lead{% else %}Edit Lead #{{ lead.id }}{% endif %}{% endblock %}
+
+{% block admin_content %}
+<div class="bg-white border rounded-3" style="padding: 32px;">
+  <form method="POST" action="{% if is_new %}/admin/leads/new{% else %}/admin/leads/{{ lead.id }}/edit{% endif %}" novalidate>
+    {{ form.hidden_tag() }}
+
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label" for="{{ form.first_name.id }}">{{ form.first_name.label.text }}</label>
+        {{ form.first_name(class='form-control' + (' is-invalid' if form.first_name.errors else ''), id=form.first_name.id) }}
+        {% for error in form.first_name.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+      <div class="col-md-6">
+        <label class="form-label" for="{{ form.last_name.id }}">{{ form.last_name.label.text }}</label>
+        {{ form.last_name(class='form-control' + (' is-invalid' if form.last_name.errors else ''), id=form.last_name.id) }}
+        {% for error in form.last_name.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label" for="{{ form.phone.id }}">{{ form.phone.label.text }}</label>
+        {{ form.phone(class='form-control' + (' is-invalid' if form.phone.errors else ''), id=form.phone.id) }}
+        {% for error in form.phone.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+      <div class="col-md-6">
+        <label class="form-label" for="{{ form.email.id }}">{{ form.email.label.text }}</label>
+        {{ form.email(class='form-control' + (' is-invalid' if form.email.errors else ''), id=form.email.id) }}
+        {% for error in form.email.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label" for="{{ form.exam_interest.id }}">{{ form.exam_interest.label.text }}</label>
+        {{ form.exam_interest(class='form-select' + (' is-invalid' if form.exam_interest.errors else ''), id=form.exam_interest.id) }}
+      </div>
+      <div class="col-md-4">
+        <label class="form-label" for="{{ form.preferred_mode.id }}">{{ form.preferred_mode.label.text }}</label>
+        {{ form.preferred_mode(class='form-select' + (' is-invalid' if form.preferred_mode.errors else ''), id=form.preferred_mode.id) }}
+      </div>
+      <div class="col-md-4">
+        <label class="form-label" for="{{ form.source_page.id }}">{{ form.source_page.label.text }}</label>
+        {{ form.source_page(class='form-select' + (' is-invalid' if form.source_page.errors else ''), id=form.source_page.id) }}
+        {% for error in form.source_page.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label" for="{{ form.status.id }}">{{ form.status.label.text }}</label>
+        {{ form.status(class='form-select' + (' is-invalid' if form.status.errors else ''), id=form.status.id) }}
+        {% for error in form.status.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+      <div class="col-12">
+        <label class="form-label" for="{{ form.notes.id }}">{{ form.notes.label.text }}</label>
+        {{ form.notes(class='form-control' + (' is-invalid' if form.notes.errors else ''), id=form.notes.id, rows='4') }}
+        {% for error in form.notes.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+
+      <div class="col-12 d-flex gap-2 pt-2">
+        {{ form.submit(class='btn btn-cl-primary') }}
+        <a href="/admin/leads" class="btn btn-outline-secondary">Cancel</a>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}

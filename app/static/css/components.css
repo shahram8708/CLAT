@@ -259,7 +259,6 @@ footer.site-footer {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
   font-size: 28px;
   font-weight: 700;
   margin: 0 auto;
@@ -718,4 +717,173 @@ footer.site-footer {
   color: var(--cl-red);
   font-size: 12px;
   font-weight: 600;
+}
+
+/* ============================================================
+   BUTTON LOADING STATES
+   ============================================================ */
+
+.btn-loading {
+  pointer-events: none !important;
+  opacity: 0.8;
+  cursor: not-allowed !important;
+}
+
+.btn .spinner-border {
+  vertical-align: -0.125em;
+}
+
+#submissionOverlay {
+  font-family: 'Poppins', sans-serif;
+}
+
+#submissionOverlay h4 {
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+.lead-status-select:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.result-active-toggle:disabled,
+.student-active-toggle:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+#certificateDownloadBtn.btn-loading {
+  background-color: var(--cl-blue) !important;
+}
+
+#exportCsvBtn.btn-loading {
+  color: var(--cl-grey);
+}
+
+.btn-filter-loading {
+  position: relative;
+}
+
+.btn-filter-loading::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--cl-red);
+  animation: filterProgress 1.5s ease-in-out infinite;
+}
+
+@keyframes filterProgress {
+  0% {
+    width: 0;
+    left: 0;
+  }
+
+  50% {
+    width: 100%;
+    left: 0;
+  }
+
+  100% {
+    width: 0;
+    left: 100%;
+  }
+}
+
+#contactForm .btn[type="submit"].btn-loading,
+#demoBookingForm .btn[type="submit"].btn-loading {
+  background-color: #9b2f24;
+}
+
+#loginForm .btn[type="submit"],
+#registerForm .btn[type="submit"] {
+  min-width: 200px;
+  transition: background-color 0.2s ease;
+}
+
+/* ============================================================
+   EXAM SECURITY ANTI CHEATING STYLES
+   ============================================================ */
+
+#questionsContainer,
+#questionsContainer * {
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  user-select: none !important;
+  -webkit-touch-callout: none !important;
+}
+
+#questionsContainer input[type="radio"],
+#questionsContainer label {
+  -webkit-user-select: auto !important;
+  user-select: auto !important;
+  cursor: pointer;
+}
+
+#questionsContainer img,
+#questionsContainer p,
+#questionsContainer h5,
+#questionsContainer h6 {
+  -webkit-user-drag: none !important;
+  user-drag: none !important;
+  pointer-events: none;
+}
+
+#questionsContainer input[type="radio"],
+#questionsContainer label {
+  pointer-events: auto !important;
+}
+
+#examWarningModal .modal-header {
+  background: #C0392B;
+  color: white;
+}
+
+#fullscreenBanner {
+  font-size: 14px;
+  border-radius: 0 !important;
+}
+
+#examWatermark {
+  z-index: 0;
+}
+
+@media print {
+  body * {
+    display: none !important;
+  }
+
+  body::before {
+    content: "Printing the CL Ahmedabad scholarship test is not permitted. This action has been recorded.";
+    display: block !important;
+    font-size: 24px;
+    text-align: center;
+    margin-top: 40vh;
+    color: #C0392B;
+  }
+}
+
+#examStartModal .modal-header {
+  border-radius: calc(0.375rem - 1px) calc(0.375rem - 1px) 0 0;
+}
+
+#examTimer {
+  transition: color 0.5s ease;
+  font-variant-numeric: tabular-nums;
+}
+
+:-webkit-full-screen #fullscreenBanner {
+  display: none !important;
+}
+
+:-moz-full-screen #fullscreenBanner {
+  display: none !important;
+}
+
+:fullscreen #fullscreenBanner {
+  display: none !important;
 }

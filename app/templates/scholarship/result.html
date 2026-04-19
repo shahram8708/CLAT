@@ -2,6 +2,10 @@
 
 {% block title %}Your Scholarship Result — Career Launcher Ahmedabad{% endblock %}
 
+{% block extra_head %}
+<meta name="csrf-token" content="{{ csrf_token() }}">
+{% endblock %}
+
 {% block content %}
 {% if result.scholarship_pct >= 50 %}
   {% set hero_bg = 'linear-gradient(120deg, #FFE08A, #FFF3C4)' %}
@@ -25,6 +29,16 @@
     <p class="mb-0" style="color: var(--cl-grey); max-width: 760px; margin: 0 auto;">{{ result.message }}</p>
   </div>
 </section>
+
+{% if request.args.get('payment') == 'success' %}
+<section style="background: #fff; padding: 18px 0 0;">
+  <div class="container">
+    <div class="alert alert-success mb-0">
+      Payment received successfully. Your enrollment has been marked as paid.
+    </div>
+  </div>
+</section>
+{% endif %}
 
 <section style="background: #fff; padding: 60px 0;">
   <div class="container">
@@ -67,26 +81,56 @@
       <div class="col-lg-6">
         <div class="cl-card h-100" style="padding: 24px;">
           <h4 style="color: var(--cl-navy);">Your Savings Calculator</h4>
-          <p class="text-muted">Select a program to estimate your savings.</p>
+          <p class="text-muted">Select your course and complete payment online or at the center.</p>
 
-          <div class="mb-3">
-            <label for="courseFeeSelect" class="form-label">Select Program</label>
-            <select id="courseFeeSelect" class="form-select">
-              <option value="" data-fee="0">Choose a course</option>
-              <option value="CAT/MBA Entrance" data-fee="102500">CAT/MBA Entrance (₹55,000 to ₹1,50,000)</option>
-              <option value="CLAT/AILET/Law" data-fee="62500">CLAT/AILET/Law (₹45,000 to ₹80,000)</option>
-              <option value="IPMAT/BBA" data-fee="55000">IPMAT/BBA (₹40,000 to ₹70,000)</option>
-              <option value="GMAT/GRE" data-fee="90000">GMAT/GRE (₹60,000 to ₹1,20,000)</option>
-              <option value="CUET" data-fee="40000">CUET (₹30,000 to ₹50,000)</option>
-              <option value="Class XI–XII Mathematics" data-fee="30000">Class XI–XII Mathematics (₹20,000 to ₹40,000)</option>
-            </select>
-          </div>
+          {% if course_offers %}
+            <div class="mb-3">
+              <label for="courseFeeSelect" class="form-label">Select Program</label>
+              <select id="courseFeeSelect" class="form-select">
+                <option value="" data-original-fee="0" data-discount="0" data-payable="0" data-fee-paid="0" {% if not selected_course_id %}selected{% endif %}>Choose a course</option>
+                {% for offer in course_offers %}
+                  <option
+                    value="{{ offer.id }}"
+                    data-course-title="{{ offer.title }}"
+                    data-original-fee="{{ offer.original_fee }}"
+                    data-discount="{{ offer.discount }}"
+                    data-payable="{{ offer.payable }}"
+                    data-fee-paid="{{ offer.fee_paid }}"
+                    {% if selected_course_id and selected_course_id == offer.id %}selected{% endif %}
+                  >
+                    {{ offer.title }} (₹{{ offer.fee_min | format_inr }} to ₹{{ offer.fee_max | format_inr }})
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
 
-          <div class="border rounded p-3" style="background: var(--cl-bg);">
-            <p class="mb-2">Original Fee: <strong id="originalFee">₹0</strong></p>
-            <p class="mb-2">Scholarship Discount: <strong id="scholarshipDiscount">₹0</strong></p>
-            <p class="mb-0">Amount Payable: <strong id="amountPayable" style="color: var(--cl-success);">₹0</strong></p>
-          </div>
+            <div class="border rounded p-3" style="background: var(--cl-bg);">
+              <p class="mb-2">Original Fee: <strong id="originalFee">₹0</strong></p>
+              <p class="mb-2">Scholarship Discount: <strong id="scholarshipDiscount">₹0</strong></p>
+              <p class="mb-2">Amount Payable: <strong id="amountPayable" style="color: var(--cl-success);">₹0</strong></p>
+              <p class="mb-0">Fee Paid: <strong id="feePaidDisplay">₹0</strong></p>
+            </div>
+
+            <div class="d-grid gap-2 mt-3">
+              <button
+                type="button"
+                id="payScholarshipOnlineBtn"
+                class="btn btn-cl-primary"
+                data-loading-text="Opening payment gateway..."
+              >
+                Pay Online via Razorpay
+              </button>
+              <a href="{{ offline_support_link }}" target="_blank" rel="noopener noreferrer" class="btn btn-cl-outline">
+                Pay Offline at Center
+              </a>
+            </div>
+
+            <div id="scholarshipPaymentMsg" class="small mt-3 text-muted"></div>
+          {% else %}
+            <div class="alert alert-warning mb-0">
+              Course fee configuration is unavailable right now. Please contact admissions to complete enrollment.
+            </div>
+          {% endif %}
         </div>
       </div>
     </div>
@@ -103,7 +147,7 @@
       <p class="fw-bold mb-1" style="font-size: 24px; color: var(--cl-red);">{{ current_user.get_full_name() }}</p>
       <p class="mb-0">{{ result.scholarship_pct }}% Scholarship Benefit</p>
     </div>
-    <a href="/scholarship/certificate" class="btn btn-cl-primary btn-lg mt-4">📄 Download Certificate PDF</a>
+    <a href="/scholarship/certificate" id="certificateDownloadBtn" class="btn btn-cl-primary btn-lg mt-4" data-loading-text="Generating your certificate..." data-loading-delay="400" data-restore-delay="6000">📄 Download Certificate PDF</a>
     <p class="text-muted small mt-3 mb-0">
       Certificate downloaded?
       <a href="/demo">Book a counselling call</a> to enroll with your scholarship applied.
@@ -154,31 +198,235 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-    const scholarshipPct = {{ result.scholarship_pct }};
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || "";
     const select = document.getElementById("courseFeeSelect");
     const originalFee = document.getElementById("originalFee");
     const scholarshipDiscount = document.getElementById("scholarshipDiscount");
     const amountPayable = document.getElementById("amountPayable");
+    const feePaidDisplay = document.getElementById("feePaidDisplay");
+    const payOnlineBtn = document.getElementById("payScholarshipOnlineBtn");
+    const paymentMsg = document.getElementById("scholarshipPaymentMsg");
+
+    if (!select) {
+      return;
+    }
 
     const formatINR = function (value) {
       return "₹" + Math.round(value).toLocaleString("en-IN");
     };
 
-    const recalculate = function () {
+    const setMessage = function (message, tone) {
+      if (!paymentMsg) {
+        return;
+      }
+
+      paymentMsg.textContent = message || "";
+      paymentMsg.className = "small mt-3";
+
+      if (!tone) {
+        paymentMsg.classList.add("text-muted");
+      } else if (tone === "success") {
+        paymentMsg.classList.add("text-success");
+      } else if (tone === "warning") {
+        paymentMsg.classList.add("text-warning");
+      } else if (tone === "danger") {
+        paymentMsg.classList.add("text-danger");
+      } else {
+        paymentMsg.classList.add("text-muted");
+      }
+    };
+
+    const getSelectedCourse = function () {
       const selectedOption = select.options[select.selectedIndex];
-      const fee = Number(selectedOption.getAttribute("data-fee") || 0);
-      const discount = (fee * scholarshipPct) / 100;
-      const payable = fee - discount;
+      if (!selectedOption || !selectedOption.value) {
+        return null;
+      }
+
+      return {
+        id: Number(selectedOption.value),
+        title: selectedOption.dataset.courseTitle || "",
+        originalFee: Number(selectedOption.dataset.originalFee || 0),
+        discount: Number(selectedOption.dataset.discount || 0),
+        payable: Number(selectedOption.dataset.payable || 0),
+        feePaid: Number(selectedOption.dataset.feePaid || 0)
+      };
+    };
+
+    const setButtonLoading = function (isLoading, loadingText) {
+      if (!payOnlineBtn) {
+        return;
+      }
+
+      if (isLoading) {
+        payOnlineBtn.disabled = true;
+        payOnlineBtn.dataset.originalHtml = payOnlineBtn.innerHTML;
+        payOnlineBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>' + (loadingText || "Processing...");
+        return;
+      }
+
+      payOnlineBtn.disabled = false;
+      if (payOnlineBtn.dataset.originalHtml) {
+        payOnlineBtn.innerHTML = payOnlineBtn.dataset.originalHtml;
+      }
+    };
+
+    const recalculate = function () {
+      const selected = getSelectedCourse();
+      const fee = selected ? selected.originalFee : 0;
+      const discount = selected ? selected.discount : 0;
+      const payable = selected ? selected.payable : 0;
+      const feePaid = selected ? selected.feePaid : 0;
 
       originalFee.textContent = formatINR(fee);
       scholarshipDiscount.textContent = formatINR(discount);
       amountPayable.textContent = formatINR(payable);
+
+      if (feePaidDisplay) {
+        feePaidDisplay.textContent = formatINR(feePaid);
+      }
+
+      if (payOnlineBtn) {
+        payOnlineBtn.disabled = false;
+        payOnlineBtn.classList.remove("btn-success");
+        payOnlineBtn.classList.add("btn-cl-primary");
+        payOnlineBtn.innerHTML = "Pay Online via Razorpay";
+      }
+
+      if (selected && feePaid >= payable && payable > 0) {
+        if (payOnlineBtn) {
+          payOnlineBtn.disabled = true;
+          payOnlineBtn.classList.remove("btn-cl-primary");
+          payOnlineBtn.classList.add("btn-success");
+          payOnlineBtn.innerHTML = "Payment Completed";
+        }
+        setMessage("Payment already received for this course.", "success");
+      } else if (selected && payable > 0) {
+        setMessage("You can pay online now or choose offline payment at the center.", "");
+      } else {
+        if (payOnlineBtn) {
+          payOnlineBtn.disabled = true;
+        }
+        setMessage("Select a course to continue.", "");
+      }
     };
 
     select.addEventListener("change", recalculate);
     recalculate();
+
+    if (payOnlineBtn) {
+      payOnlineBtn.addEventListener("click", async function () {
+        const selected = getSelectedCourse();
+        if (!selected) {
+          setMessage("Please select a course before making payment.", "warning");
+          return;
+        }
+
+        if (selected.payable <= 0) {
+          setMessage("Selected course is not available for online payment.", "danger");
+          return;
+        }
+
+        if (selected.feePaid >= selected.payable) {
+          setMessage("Payment already marked for this course.", "success");
+          return;
+        }
+
+        setButtonLoading(true, payOnlineBtn.dataset.loadingText || "Opening payment gateway...");
+        setMessage("", "");
+
+        try {
+          const createResponse = await fetch("/payment/create-scholarship-order", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": csrfToken
+            },
+            body: JSON.stringify({ course_id: selected.id })
+          });
+
+          const createData = await createResponse.json();
+
+          if (createData.status === "already_purchased") {
+            setButtonLoading(false);
+            setMessage(createData.message || "Payment already received for this course.", "success");
+            setTimeout(function () {
+              window.location.href = createData.redirect || "/scholarship/result";
+            }, 1200);
+            return;
+          }
+
+          if (!createResponse.ok || createData.status !== "success") {
+            throw new Error(createData.message || "Unable to create payment order right now.");
+          }
+
+          if (!createData.key_id) {
+            throw new Error("Online payment is temporarily unavailable. Please choose offline payment.");
+          }
+
+          const options = {
+            key: createData.key_id,
+            amount: createData.amount,
+            currency: createData.currency,
+            name: "Career Launcher Ahmedabad",
+            description: createData.course_title || selected.title,
+            order_id: createData.order_id,
+            prefill: {
+              name: createData.user_name,
+              email: createData.user_email,
+              contact: createData.user_phone
+            },
+            theme: { color: "#C0392B" },
+            handler: async function (responsePayload) {
+              setButtonLoading(true, "Verifying payment...");
+
+              try {
+                const verifyResponse = await fetch("/payment/verify-scholarship", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrfToken
+                  },
+                  body: JSON.stringify({
+                    razorpay_order_id: responsePayload.razorpay_order_id,
+                    razorpay_payment_id: responsePayload.razorpay_payment_id,
+                    razorpay_signature: responsePayload.razorpay_signature
+                  })
+                });
+
+                const verifyData = await verifyResponse.json();
+
+                if (!verifyResponse.ok || verifyData.status !== "success") {
+                  throw new Error(verifyData.message || "Payment verification failed.");
+                }
+
+                setMessage(verifyData.message || "Payment successful. Enrollment marked as paid.", "success");
+                setTimeout(function () {
+                  window.location.href = verifyData.redirect || "/scholarship/result";
+                }, 1200);
+              } catch (error) {
+                setButtonLoading(false);
+                setMessage(error.message || "Payment verification failed. Please contact support.", "danger");
+              }
+            },
+            modal: {
+              ondismiss: function () {
+                setButtonLoading(false);
+                setMessage("Payment was cancelled. You can try again anytime.", "warning");
+              }
+            }
+          };
+
+          const checkout = new Razorpay(options);
+          checkout.open();
+        } catch (error) {
+          setButtonLoading(false);
+          setMessage(error.message || "Unable to process payment. Please try again.", "danger");
+        }
+      });
+    }
   });
 </script>
 {% endblock %}

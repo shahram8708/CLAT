@@ -19,6 +19,12 @@ class Faculty(db.Model):
     bio_long = db.Column(db.Text, nullable=True)
     photo_url = db.Column(db.String(255), nullable=True)
     youtube_url = db.Column(db.String(255), nullable=True)
+    instagram_url = db.Column(db.String(255), nullable=True)
+    linkedin_url = db.Column(db.String(255), nullable=True)
+    achievements = db.Column(db.Text, nullable=True)
+    video_intro_url = db.Column(db.String(255), nullable=True)
+    total_students_trained = db.Column(db.Integer, nullable=True)
+    joining_year = db.Column(db.Integer, nullable=True)
     is_active = db.Column(db.Boolean, nullable=False, default=True)
     display_order = db.Column(db.Integer, nullable=True, default=0)
 
@@ -39,3 +45,29 @@ class Faculty(db.Model):
     @property
     def exam_tags_list(self):
         return self._parse_json_list(self.exam_tags)
+
+    @property
+    def achievements_list(self):
+        return self._parse_json_list(self.achievements)
+
+    @property
+    def photo_display_url(self):
+        raw_value = (self.photo_url or "").strip()
+        if not raw_value:
+            return None
+
+        if raw_value.startswith(("http://", "https://", "data:")):
+            return raw_value
+
+        cleaned = raw_value.lstrip("/")
+        if cleaned.startswith("static/"):
+            cleaned = cleaned[len("static/"):]
+
+        if not cleaned:
+            return None
+
+        # Legacy records may only store a filename, assume faculty image folder.
+        if "/" not in cleaned:
+            cleaned = f"images/faculty/{cleaned}"
+
+        return f"/static/{cleaned}"

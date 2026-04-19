@@ -1,6 +1,6 @@
 from app import create_app
 from app.extensions import db
-from app.models.user import User
+from app.models import ExamSession, User  # noqa: F401
 
 
 flask_app = create_app()
@@ -28,7 +28,7 @@ def ensure_admin_user():
         role="admin",
         is_active=True,
     )
-    admin_user.set_password("Admin@CL2025!")
+    admin_user.set_password("Admin@CL2026!")
 
     db.session.add(admin_user)
     db.session.commit()

@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
-{% block title %}Career Launcher Ahmedabad | CAT, CLAT, IPMAT, CUET Coaching{% endblock %}
-{% block meta_description %}Join Career Launcher Ahmedabad for expert coaching in CAT, CLAT, IPMAT, GMAT, CUET and Class XI to XII Mathematics with top faculty and proven results.{% endblock %}
+{% block title %}{{ get_setting('homepage_meta_title', 'Career Launcher Ahmedabad | CAT, CLAT, IPMAT, CUET Coaching') }}{% endblock %}
+{% block meta_description %}{{ get_setting('homepage_meta_description', 'Join Career Launcher Ahmedabad for expert coaching in CAT, CLAT, IPMAT, GMAT, CUET and Class XI to XII Mathematics with top faculty and proven results.') }}{% endblock %}
 
 {% block content %}
 {% set fallback_courses = [
@@ -26,11 +26,22 @@
   {'student_name': 'Aryan Trivedi', 'rank_percentile': '99.94 %ile', 'target_college': 'IIM Ahmedabad', 'testimonial': 'The mock benchmarking and targeted mentoring built real exam confidence.'}
 ] %}
 
+{% set hero_headline = get_setting('hero_headline', 'Your IIM / NLU Dream Starts HERE.') %}
+{% set hero_subheadline = get_setting('hero_subheadline', 'Expert coaching for CAT, CLAT, IPMAT, BBA and more. Join Ahmedabad\'s most trusted name in competitive exam preparation with 30+ years of legacy.') %}
+
+{% if get_setting('show_scholarship_banner', False) %}
+  <section style="background: #c0392b; color: #fff; padding: 10px 0;">
+    <div class="container text-center fw-semibold">
+      {{ get_setting('scholarship_banner_text', 'Scholarship Test Open: Check your eligibility today') }}
+    </div>
+  </section>
+{% endif %}
+
 <section class="hero-section">
   <div class="container hero-content">
     <span class="badge text-bg-danger mb-3 px-3 py-2">🏆 Ahmedabad's #1 Coaching Institute</span>
-    <h1 class="hero-title">Your IIM / NLU Dream Starts HERE.</h1>
-    <p class="hero-subtitle mt-3 mb-4">Expert coaching for CAT, CLAT, IPMAT, BBA and more. Join Ahmedabad's most trusted name in competitive exam preparation with 30+ years of legacy.</p>
+    <h1 class="hero-title">{{ hero_headline }}</h1>
+    <p class="hero-subtitle mt-3 mb-4">{{ hero_subheadline }}</p>
     <div class="d-flex flex-wrap gap-3">
       <a href="/demo" class="btn-cl-primary">Book Free Demo Class →</a>
       <a href="/courses" class="btn-cl-outline">Explore Courses</a>
@@ -249,31 +260,67 @@
       <div class="col-lg-3 col-6"><div class="mini-stat"><strong>200+</strong><br><small>CL Centers</small></div></div>
     </div>
 
-    {% if results and results|length > 0 %}
-      {% set result_items = results[:3] %}
-    {% else %}
-      {% set result_items = fallback_results %}
-    {% endif %}
-
-    <div class="row g-4">
-      {% for result_item in result_items %}
-        {% set parts = result_item.student_name.split() %}
-        {% set initials = (parts[0][0] ~ (parts[1][0] if parts|length > 1 else ''))|upper %}
-        <div class="col-lg-4">
-          <article class="result-card">
-            <div class="d-flex align-items-center gap-3 mb-3">
-              <div class="result-avatar">{{ initials }}</div>
-              <div>
-                <h6 class="mb-0 fw-bold">{{ result_item.student_name }}</h6>
-                <small class="text-muted">{{ result_item.target_college }}</small>
+    {% if testimonials and testimonials|length > 0 %}
+      {% set testimonial_items = testimonials[:3] %}
+      <div class="row g-4">
+        {% for item in testimonial_items %}
+          {% set name_parts = item.student_name.split() %}
+          {% set initials = (name_parts[0][0] ~ (name_parts[1][0] if name_parts|length > 1 else ''))|upper %}
+          <div class="col-lg-4">
+            <article class="result-card">
+              <div class="d-flex align-items-center gap-3 mb-3">
+                {% if item.student_photo_display_url %}
+                  <img
+                    src="{{ item.student_photo_display_url }}"
+                    alt="{{ item.student_name }}"
+                    class="result-avatar"
+                    style="object-fit: cover;"
+                    onerror="this.classList.add('d-none'); this.nextElementSibling.classList.remove('d-none');"
+                    loading="lazy">
+                  <div class="result-avatar d-none">{{ initials }}</div>
+                {% else %}
+                  <div class="result-avatar">{{ initials }}</div>
+                {% endif %}
+                <div>
+                  <h6 class="mb-0 fw-bold">{{ item.student_name }}</h6>
+                  <small class="text-muted">{{ item.designation or item.exam or 'Student at CL Ahmedabad' }}</small>
+                </div>
               </div>
-            </div>
-            <p class="fw-bold mb-2" style="color: var(--cl-red);">{{ result_item.rank_percentile }}</p>
-            <p class="mb-0"><em>{{ result_item.testimonial }}</em></p>
-          </article>
-        </div>
-      {% endfor %}
-    </div>
+              {% if item.rating %}
+                <p class="fw-bold mb-2" style="color: #f4b400;">{% for _ in range(item.rating) %}★{% endfor %}</p>
+              {% endif %}
+              <p class="mb-0"><em>{{ item.testimonial_text }}</em></p>
+            </article>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      {% if results and results|length > 0 %}
+        {% set result_items = results[:3] %}
+      {% else %}
+        {% set result_items = fallback_results %}
+      {% endif %}
+
+      <div class="row g-4">
+        {% for result_item in result_items %}
+          {% set parts = result_item.student_name.split() %}
+          {% set initials = (parts[0][0] ~ (parts[1][0] if parts|length > 1 else ''))|upper %}
+          <div class="col-lg-4">
+            <article class="result-card">
+              <div class="d-flex align-items-center gap-3 mb-3">
+                <div class="result-avatar">{{ initials }}</div>
+                <div>
+                  <h6 class="mb-0 fw-bold">{{ result_item.student_name }}</h6>
+                  <small class="text-muted">{{ result_item.target_college }}</small>
+                </div>
+              </div>
+              <p class="fw-bold mb-2" style="color: var(--cl-red);">{{ result_item.rank_percentile }}</p>
+              <p class="mb-0"><em>{{ result_item.testimonial }}</em></p>
+            </article>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
 
     <div class="text-center mt-4">
       <div class="d-flex flex-wrap justify-content-center gap-2">

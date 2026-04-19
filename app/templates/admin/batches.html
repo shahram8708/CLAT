@@ -1,0 +1,107 @@
+{% extends 'admin/base.html' %}
+
+{% block admin_page_title %}Batch Schedules{% endblock %}
+
+{% block admin_content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+  <span class="badge badge-soft">{{ batch_list|length }} batches</span>
+  <a href="/admin/batches/new" class="btn btn-cl-primary">Add New Batch →</a>
+</div>
+
+<div class="bg-white border rounded-3 p-3 mb-3">
+  <form method="GET" action="/admin/batches" class="row g-2 align-items-end">
+    <div class="col-md-5">
+      <label class="form-label">Course</label>
+      <select name="course_id" class="form-select">
+        <option value="">All Courses</option>
+        {% for course in courses_filter %}
+          <option value="{{ course.id }}" {% if course_filter == course.id %}selected{% endif %}>{{ course.title }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2 d-grid">
+      <button type="submit" class="btn btn-outline-primary">Filter</button>
+    </div>
+    <div class="col-md-2 d-grid">
+      <a href="/admin/batches" class="btn btn-outline-secondary">Reset</a>
+    </div>
+  </form>
+</div>
+
+<div class="bg-white border rounded-3 p-3">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle admin-table mb-0">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Batch</th>
+          <th>Course</th>
+          <th>Faculty</th>
+          <th>Start Date</th>
+          <th>Timing</th>
+          <th>End Date</th>
+          <th>Seats</th>
+          <th>Mode</th>
+          <th>Fee</th>
+          <th>Active</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for batch in batch_list %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>
+              <div class="fw-semibold">{{ batch.batch_name }}</div>
+              <div class="small text-muted">{{ batch.notes[:60] ~ '...' if batch.notes and batch.notes|length > 60 else (batch.notes or '-') }}</div>
+            </td>
+            <td>{{ batch.course.title if batch.course else '-' }}</td>
+            <td>{{ batch.faculty.name if batch.faculty else '-' }}</td>
+            <td>{{ batch.start_date.strftime('%d %b %Y') if batch.start_date else '-' }}</td>
+            <td>{{ batch.timing or '-' }}</td>
+            <td>{{ batch.end_date.strftime('%d %b %Y') if batch.end_date else '-' }}</td>
+            <td>
+              {{ batch.seats_filled or 0 }}/{{ batch.total_seats or 0 }}
+              {% if batch.is_full %}<span class="badge bg-danger ms-1">Full</span>{% endif %}
+            </td>
+            <td>{{ batch.mode|replace('_', ' ')|title }}</td>
+            <td>{% if batch.fee %}₹{{ batch.fee|format_inr }}{% else %}-{% endif %}</td>
+            <td>
+              {% if batch.is_active %}
+                <span class="badge bg-success">Active</span>
+              {% else %}
+                <span class="badge bg-secondary">Inactive</span>
+              {% endif %}
+            </td>
+            <td>
+              <div class="d-flex gap-2">
+                <a href="/admin/batches/{{ batch.id }}/edit" class="btn btn-outline-primary btn-sm">Edit</a>
+                <form method="POST" action="/admin/batches/{{ batch.id }}/delete" class="m-0 delete-batch-form">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button class="btn btn-outline-danger btn-sm" type="submit">Delete</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="12" class="text-center text-muted py-4">No batch schedules found.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block admin_js %}
+<script>
+document.querySelectorAll(".delete-batch-form").forEach(function (form) {
+  form.addEventListener("submit", function (event) {
+    if (!confirm("Delete this batch schedule?")) {
+      event.preventDefault();
+    }
+  });
+});
+</script>
+{% endblock %}

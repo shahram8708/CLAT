@@ -1,0 +1,127 @@
+{% extends 'admin/base.html' %}
+
+{% block admin_page_title %}FAQ Editor: {{ course.title }}{% endblock %}
+
+{% block admin_content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+  <div>
+    <a href="/admin/courses" class="btn btn-outline-secondary btn-sm">← Back to Courses</a>
+  </div>
+  <div class="d-flex gap-2">
+    <button type="button" id="addFaqBtn" class="btn btn-outline-primary btn-sm">Add FAQ</button>
+    <button type="button" id="saveFaqBtn" class="btn btn-cl-primary btn-sm">Save FAQs</button>
+  </div>
+</div>
+
+<div class="bg-white border rounded-3 p-3 mb-3">
+  <p class="text-muted mb-0">Keep questions concise and answers student-friendly. Empty entries are ignored while saving.</p>
+</div>
+
+<div id="faqStatusMessage" class="alert d-none" role="alert"></div>
+<div id="faqContainer" class="d-flex flex-column gap-3"></div>
+{% endblock %}
+
+{% block admin_js %}
+<script>
+(function () {
+  const csrfToken = "{{ csrf_token() }}";
+  const initialData = {{ faqs_data|tojson }};
+
+  const faqContainer = document.getElementById("faqContainer");
+  const addFaqBtn = document.getElementById("addFaqBtn");
+  const saveFaqBtn = document.getElementById("saveFaqBtn");
+  const statusMessage = document.getElementById("faqStatusMessage");
+
+  function showStatus(type, message) {
+    statusMessage.className = "alert alert-" + type;
+    statusMessage.textContent = message;
+    statusMessage.classList.remove("d-none");
+  }
+
+  function createFaqCard(item) {
+    const card = document.createElement("div");
+    card.className = "bg-white border rounded-3 p-3";
+
+    card.innerHTML =
+      '<div class="mb-2">' +
+      '  <label class="form-label">Question</label>' +
+      '  <input type="text" class="form-control faq-question" placeholder="Enter question">' +
+      '</div>' +
+      '<div class="mb-2">' +
+      '  <label class="form-label">Answer</label>' +
+      '  <textarea class="form-control faq-answer" rows="3" placeholder="Enter answer"></textarea>' +
+      '</div>' +
+      '<button type="button" class="btn btn-outline-danger btn-sm remove-faq">Remove FAQ</button>';
+
+    card.querySelector(".faq-question").value = (item && item.question) || "";
+    card.querySelector(".faq-answer").value = (item && item.answer) || "";
+
+    card.querySelector(".remove-faq").addEventListener("click", function () {
+      card.remove();
+    });
+
+    return card;
+  }
+
+  function collectPayload() {
+    const payload = [];
+
+    faqContainer.querySelectorAll(".bg-white.border.rounded-3").forEach(function (card) {
+      const question = (card.querySelector(".faq-question").value || "").trim();
+      const answer = (card.querySelector(".faq-answer").value || "").trim();
+
+      if (question && answer) {
+        payload.push({ question: question, answer: answer });
+      }
+    });
+
+    return payload;
+  }
+
+  function saveFaqs() {
+    const payload = collectPayload();
+
+    saveFaqBtn.disabled = true;
+    fetch("/admin/courses/{{ course.id }}/faqs", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken
+      },
+      body: JSON.stringify(payload)
+    })
+      .then(function (response) {
+        return response.json().then(function (data) {
+          return { ok: response.ok, data: data };
+        });
+      })
+      .then(function (result) {
+        if (!result.ok || result.data.status !== "ok") {
+          throw new Error(result.data.message || "Failed to save FAQs.");
+        }
+        showStatus("success", "FAQs saved successfully.");
+      })
+      .catch(function (error) {
+        showStatus("danger", error.message || "Unable to save FAQs.");
+      })
+      .finally(function () {
+        saveFaqBtn.disabled = false;
+      });
+  }
+
+  addFaqBtn.addEventListener("click", function () {
+    faqContainer.appendChild(createFaqCard({ question: "", answer: "" }));
+  });
+
+  saveFaqBtn.addEventListener("click", saveFaqs);
+
+  if (Array.isArray(initialData) && initialData.length > 0) {
+    initialData.forEach(function (item) {
+      faqContainer.appendChild(createFaqCard(item));
+    });
+  } else {
+    faqContainer.appendChild(createFaqCard({ question: "", answer: "" }));
+  }
+})();
+</script>
+{% endblock %}

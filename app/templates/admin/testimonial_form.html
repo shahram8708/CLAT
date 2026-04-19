@@ -1,0 +1,127 @@
+{% extends 'admin/base.html' %}
+
+{% block admin_page_title %}{% if is_new %}New Testimonial{% else %}Edit Testimonial{% endif %}{% endblock %}
+
+{% block admin_content %}
+<div class="bg-white border rounded-3" style="padding: 32px;">
+  <form method="POST" action="{% if is_new %}/admin/testimonials/new{% else %}/admin/testimonials/{{ testimonial.id }}/edit{% endif %}" enctype="multipart/form-data" id="testimonialForm" novalidate>
+    {{ form.hidden_tag() }}
+
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label" for="{{ form.student_name.id }}">{{ form.student_name.label.text }}</label>
+        {{ form.student_name(class='form-control' + (' is-invalid' if form.student_name.errors else ''), id=form.student_name.id) }}
+        {% for error in form.student_name.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+      <div class="col-md-3">
+        <label class="form-label" for="{{ form.exam.id }}">{{ form.exam.label.text }}</label>
+        {{ form.exam(class='form-select' + (' is-invalid' if form.exam.errors else ''), id=form.exam.id) }}
+      </div>
+      <div class="col-md-3">
+        <label class="form-label" for="{{ form.rating.id }}">{{ form.rating.label.text }}</label>
+        {{ form.rating(class='form-select' + (' is-invalid' if form.rating.errors else ''), id=form.rating.id) }}
+        {% for error in form.rating.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label" for="{{ form.designation.id }}">{{ form.designation.label.text }}</label>
+        {{ form.designation(class='form-control' + (' is-invalid' if form.designation.errors else ''), id=form.designation.id) }}
+        {% for error in form.designation.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+      <div class="col-md-6">
+        <label class="form-label" for="{{ form.course.id }}">{{ form.course.label.text }}</label>
+        {{ form.course(class='form-select' + (' is-invalid' if form.course.errors else ''), id=form.course.id) }}
+        {% for error in form.course.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label" for="{{ form.display_location.id }}">{{ form.display_location.label.text }}</label>
+        {{ form.display_location(class='form-select' + (' is-invalid' if form.display_location.errors else ''), id=form.display_location.id) }}
+        {% for error in form.display_location.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label" for="{{ form.video_url.id }}">{{ form.video_url.label.text }}</label>
+        {{ form.video_url(class='form-control' + (' is-invalid' if form.video_url.errors else ''), id=form.video_url.id) }}
+        {% for error in form.video_url.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+      <div class="col-md-6">
+        <label class="form-label" for="{{ form.photo_upload.id }}">{{ form.photo_upload.label.text }}</label>
+        {{ form.photo_upload(class='form-control' + (' is-invalid' if form.photo_upload.errors else ''), id=form.photo_upload.id, accept='image/png,image/jpeg,image/jpg') }}
+        {% for error in form.photo_upload.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+        {% if testimonial and testimonial.student_photo_url %}
+          <div class="form-text">Current image: {{ testimonial.student_photo_url }}</div>
+        {% endif %}
+      </div>
+
+      <div class="col-12">
+        <label class="form-label" for="{{ form.testimonial_text.id }}">{{ form.testimonial_text.label.text }}</label>
+        {{ form.testimonial_text(class='form-control' + (' is-invalid' if form.testimonial_text.errors else ''), id=form.testimonial_text.id, rows='4') }}
+        {% for error in form.testimonial_text.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label" for="{{ form.display_order.id }}">{{ form.display_order.label.text }}</label>
+        {{ form.display_order(class='form-control' + (' is-invalid' if form.display_order.errors else ''), id=form.display_order.id) }}
+        {% for error in form.display_order.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+      <div class="col-md-6 d-flex align-items-end">
+        <div class="form-check">
+          {{ form.is_active(class='form-check-input', id=form.is_active.id) }}
+          <label class="form-check-label" for="{{ form.is_active.id }}">{{ form.is_active.label.text }}</label>
+        </div>
+      </div>
+
+      <div class="col-12 d-flex gap-2 pt-2">
+        {{ form.submit(class='btn btn-cl-primary') }}
+        <a href="/admin/testimonials" class="btn btn-outline-secondary">Cancel</a>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="bg-white border rounded-3 mt-3" style="padding: 24px;">
+  <h6 class="mb-3">Live Preview</h6>
+  <div class="border rounded-3 p-3" style="background: #fafbff;">
+    <p class="mb-2" id="previewQuote">{{ form.testimonial_text.data or 'Student quote preview appears here.' }}</p>
+    <div class="fw-semibold" id="previewStudent">{{ form.student_name.data or 'Student Name' }}</div>
+    <div class="small text-muted" id="previewMeta">{{ form.designation.data or 'Student' }}{% if form.exam.data %} • {{ form.exam.data }}{% endif %}</div>
+  </div>
+</div>
+{% endblock %}
+
+{% block admin_js %}
+<script>
+(function () {
+  const quoteField = document.getElementById("{{ form.testimonial_text.id }}");
+  const studentField = document.getElementById("{{ form.student_name.id }}");
+  const designationField = document.getElementById("{{ form.designation.id }}");
+  const examField = document.getElementById("{{ form.exam.id }}");
+
+  const previewQuote = document.getElementById("previewQuote");
+  const previewStudent = document.getElementById("previewStudent");
+  const previewMeta = document.getElementById("previewMeta");
+
+  function syncPreview() {
+    previewQuote.textContent = quoteField.value || "Student quote preview appears here.";
+    previewStudent.textContent = studentField.value || "Student Name";
+
+    const metaParts = [];
+    if (designationField.value.trim()) {
+      metaParts.push(designationField.value.trim());
+    }
+    if (examField.value.trim()) {
+      metaParts.push(examField.value.trim());
+    }
+    previewMeta.textContent = metaParts.join(" • ") || "Student";
+  }
+
+  [quoteField, studentField, designationField, examField].forEach(function (el) {
+    el.addEventListener("input", syncPreview);
+    el.addEventListener("change", syncPreview);
+  });
+
+  syncPreview();
+})();
+</script>
+{% endblock %}

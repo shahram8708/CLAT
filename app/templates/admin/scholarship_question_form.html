@@ -1,0 +1,100 @@
+{% extends 'admin/base.html' %}
+
+{% block admin_page_title %}{% if is_new %}New Scholarship Question{% else %}Edit Question #{{ question.id }}{% endif %}{% endblock %}
+
+{% block admin_content %}
+<div class="bg-white border rounded-3 mb-3" style="padding: 32px;">
+  <form method="POST" action="{% if is_new %}/admin/scholarship-questions/new{% else %}/admin/scholarship-questions/{{ question.id }}/edit{% endif %}" id="questionForm" novalidate>
+    {{ form.hidden_tag() }}
+
+    <div class="mb-3">
+      <label class="form-label" for="{{ form.question_text.id }}">{{ form.question_text.label.text }}</label>
+      {{ form.question_text(class='form-control' + (' is-invalid' if form.question_text.errors else ''), id=form.question_text.id, rows='4') }}
+      {% for error in form.question_text.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label" for="{{ form.subject.id }}">{{ form.subject.label.text }}</label>
+      {{ form.subject(class='form-select' + (' is-invalid' if form.subject.errors else ''), id=form.subject.id) }}
+    </div>
+
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label" for="{{ form.option_a.id }}">{{ form.option_a.label.text }}</label>
+        {{ form.option_a(class='form-control' + (' is-invalid' if form.option_a.errors else ''), id=form.option_a.id) }}
+      </div>
+      <div class="col-md-6">
+        <label class="form-label" for="{{ form.option_b.id }}">{{ form.option_b.label.text }}</label>
+        {{ form.option_b(class='form-control' + (' is-invalid' if form.option_b.errors else ''), id=form.option_b.id) }}
+      </div>
+      <div class="col-md-6">
+        <label class="form-label" for="{{ form.option_c.id }}">{{ form.option_c.label.text }}</label>
+        {{ form.option_c(class='form-control' + (' is-invalid' if form.option_c.errors else ''), id=form.option_c.id) }}
+      </div>
+      <div class="col-md-6">
+        <label class="form-label" for="{{ form.option_d.id }}">{{ form.option_d.label.text }}</label>
+        {{ form.option_d(class='form-control' + (' is-invalid' if form.option_d.errors else ''), id=form.option_d.id) }}
+      </div>
+    </div>
+
+    <div class="row g-3 mt-1">
+      <div class="col-md-6">
+        <label class="form-label" for="{{ form.correct_answer.id }}">{{ form.correct_answer.label.text }}</label>
+        {{ form.correct_answer(class='form-select' + (' is-invalid' if form.correct_answer.errors else ''), id=form.correct_answer.id) }}
+      </div>
+      <div class="col-md-6">
+        <label class="form-label" for="{{ form.display_order.id }}">{{ form.display_order.label.text }}</label>
+        {{ form.display_order(class='form-control' + (' is-invalid' if form.display_order.errors else ''), id=form.display_order.id) }}
+      </div>
+    </div>
+
+    <div class="mt-4 d-flex gap-2">
+      {{ form.submit(class='btn btn-cl-primary') }}
+      <a href="/admin/scholarship-questions" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+  </form>
+</div>
+
+<div class="bg-white border rounded-3" style="padding: 24px;">
+  <h6 class="mb-3">Live Preview</h6>
+  <div class="border rounded-3 p-3" style="background: #fafbff;">
+    <p class="fw-semibold mb-3" id="previewQuestionText">{{ form.question_text.data or 'Question text preview appears here.' }}</p>
+    <ul class="list-group" id="previewOptions">
+      <li class="list-group-item">A. <span id="previewA">{{ form.option_a.data or 'Option A' }}</span></li>
+      <li class="list-group-item">B. <span id="previewB">{{ form.option_b.data or 'Option B' }}</span></li>
+      <li class="list-group-item">C. <span id="previewC">{{ form.option_c.data or 'Option C' }}</span></li>
+      <li class="list-group-item">D. <span id="previewD">{{ form.option_d.data or 'Option D' }}</span></li>
+    </ul>
+  </div>
+</div>
+{% endblock %}
+
+{% block admin_js %}
+<script>
+(function () {
+  const questionField = document.getElementById("{{ form.question_text.id }}");
+  const optionA = document.getElementById("{{ form.option_a.id }}");
+  const optionB = document.getElementById("{{ form.option_b.id }}");
+  const optionC = document.getElementById("{{ form.option_c.id }}");
+  const optionD = document.getElementById("{{ form.option_d.id }}");
+
+  const previewQuestion = document.getElementById("previewQuestionText");
+  const previewA = document.getElementById("previewA");
+  const previewB = document.getElementById("previewB");
+  const previewC = document.getElementById("previewC");
+  const previewD = document.getElementById("previewD");
+
+  function syncPreview() {
+    previewQuestion.textContent = questionField.value || "Question text preview appears here.";
+    previewA.textContent = optionA.value || "Option A";
+    previewB.textContent = optionB.value || "Option B";
+    previewC.textContent = optionC.value || "Option C";
+    previewD.textContent = optionD.value || "Option D";
+  }
+
+  [questionField, optionA, optionB, optionC, optionD].forEach(function (el) {
+    el.addEventListener("input", syncPreview);
+  });
+})();
+</script>
+{% endblock %}

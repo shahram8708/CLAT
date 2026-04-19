@@ -1,0 +1,184 @@
+{% extends 'admin/base.html' %}
+
+{% block admin_page_title %}Site Settings{% endblock %}
+
+{% block admin_content %}
+{% if saved %}
+  <div class="alert alert-success">Settings saved successfully. Public pages now use these values.</div>
+{% endif %}
+
+<form method="POST" action="/admin/settings" novalidate>
+  {{ form.hidden_tag() }}
+
+  <div class="row g-3">
+    <div class="col-12">
+      <div class="bg-white border rounded-3" style="padding: 24px;">
+        <h5 class="mb-3">Contact Information</h5>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label" for="{{ form.institute_name.id }}">{{ form.institute_name.label.text }}</label>
+            {{ form.institute_name(class='form-control' + (' is-invalid' if form.institute_name.errors else ''), id=form.institute_name.id) }}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="{{ form.email.id }}">{{ form.email.label.text }}</label>
+            {{ form.email(class='form-control' + (' is-invalid' if form.email.errors else ''), id=form.email.id) }}
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label" for="{{ form.phone_primary.id }}">{{ form.phone_primary.label.text }}</label>
+            {{ form.phone_primary(class='form-control' + (' is-invalid' if form.phone_primary.errors else ''), id=form.phone_primary.id) }}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label" for="{{ form.phone_secondary.id }}">{{ form.phone_secondary.label.text }}</label>
+            {{ form.phone_secondary(class='form-control' + (' is-invalid' if form.phone_secondary.errors else ''), id=form.phone_secondary.id) }}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label" for="{{ form.whatsapp_number.id }}">{{ form.whatsapp_number.label.text }}</label>
+            {{ form.whatsapp_number(class='form-control' + (' is-invalid' if form.whatsapp_number.errors else ''), id=form.whatsapp_number.id) }}
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label" for="{{ form.hours_weekday.id }}">{{ form.hours_weekday.label.text }}</label>
+            {{ form.hours_weekday(class='form-control' + (' is-invalid' if form.hours_weekday.errors else ''), id=form.hours_weekday.id) }}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="{{ form.hours_sunday.id }}">{{ form.hours_sunday.label.text }}</label>
+            {{ form.hours_sunday(class='form-control' + (' is-invalid' if form.hours_sunday.errors else ''), id=form.hours_sunday.id) }}
+          </div>
+
+          <div class="col-12">
+            <label class="form-label" for="{{ form.address.id }}">{{ form.address.label.text }}</label>
+            {{ form.address(class='form-control' + (' is-invalid' if form.address.errors else ''), id=form.address.id, rows='3') }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12">
+      <div class="bg-white border rounded-3" style="padding: 24px;">
+        <h5 class="mb-3">Social and Maps</h5>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label" for="{{ form.instagram_url.id }}">{{ form.instagram_url.label.text }}</label>
+            {{ form.instagram_url(class='form-control', id=form.instagram_url.id) }}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="{{ form.youtube_url.id }}">{{ form.youtube_url.label.text }}</label>
+            {{ form.youtube_url(class='form-control', id=form.youtube_url.id) }}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="{{ form.facebook_url.id }}">{{ form.facebook_url.label.text }}</label>
+            {{ form.facebook_url(class='form-control', id=form.facebook_url.id) }}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="{{ form.linkedin_url.id }}">{{ form.linkedin_url.label.text }}</label>
+            {{ form.linkedin_url(class='form-control', id=form.linkedin_url.id) }}
+          </div>
+          <div class="col-12">
+            <label class="form-label" for="{{ form.google_maps_embed_url.id }}">{{ form.google_maps_embed_url.label.text }}</label>
+            {{ form.google_maps_embed_url(class='form-control', id=form.google_maps_embed_url.id, rows='3') }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12">
+      <div class="bg-white border rounded-3" style="padding: 24px;">
+        <h5 class="mb-3">Homepage SEO</h5>
+        <div class="row g-3">
+          <div class="col-md-8">
+            <label class="form-label" for="{{ form.homepage_meta_title.id }}">{{ form.homepage_meta_title.label.text }}</label>
+            {{ form.homepage_meta_title(class='form-control', id=form.homepage_meta_title.id) }}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label" for="{{ form.og_image_url.id }}">{{ form.og_image_url.label.text }}</label>
+            {{ form.og_image_url(class='form-control', id=form.og_image_url.id) }}
+          </div>
+          <div class="col-12">
+            <label class="form-label" for="{{ form.homepage_meta_description.id }}">{{ form.homepage_meta_description.label.text }}</label>
+            {{ form.homepage_meta_description(class='form-control', id=form.homepage_meta_description.id, rows='3') }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12">
+      <div class="bg-white border rounded-3" style="padding: 24px;">
+        <h5 class="mb-3">Homepage Display</h5>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label" for="{{ form.hero_headline.id }}">{{ form.hero_headline.label.text }}</label>
+            {{ form.hero_headline(class='form-control', id=form.hero_headline.id) }}
+          </div>
+          <div class="col-md-6 d-flex align-items-end">
+            <div class="form-check">
+              {{ form.show_scholarship_banner(class='form-check-input', id=form.show_scholarship_banner.id) }}
+              <label class="form-check-label" for="{{ form.show_scholarship_banner.id }}">{{ form.show_scholarship_banner.label.text }}</label>
+            </div>
+          </div>
+          <div class="col-12">
+            <label class="form-label" for="{{ form.hero_subheadline.id }}">{{ form.hero_subheadline.label.text }}</label>
+            {{ form.hero_subheadline(class='form-control', id=form.hero_subheadline.id, rows='3') }}
+          </div>
+          <div class="col-12">
+            <label class="form-label" for="{{ form.scholarship_banner_text.id }}">{{ form.scholarship_banner_text.label.text }}</label>
+            {{ form.scholarship_banner_text(class='form-control', id=form.scholarship_banner_text.id) }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12">
+      <div class="bg-white border rounded-3" style="padding: 24px;">
+        <h5 class="mb-3">Course Meta Settings</h5>
+        <p class="text-muted small mb-3">These values control per-course SEO on public course detail pages.</p>
+
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead>
+              <tr>
+                <th>Course</th>
+                <th>Meta Title</th>
+                <th>Meta Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for course in courses %}
+                <tr>
+                  <td class="fw-semibold">{{ course.title }}</td>
+                  <td>
+                    <input
+                      type="text"
+                      class="form-control"
+                      name="course_meta_title_{{ course.id }}"
+                      value="{{ course.meta_title or '' }}"
+                      maxlength="160"
+                    >
+                  </td>
+                  <td>
+                    <textarea
+                      class="form-control"
+                      name="course_meta_description_{{ course.id }}"
+                      rows="2"
+                      maxlength="320"
+                    >{{ course.meta_description or '' }}</textarea>
+                  </td>
+                </tr>
+              {% else %}
+                <tr>
+                  <td colspan="3" class="text-center text-muted py-3">No courses found for SEO mapping.</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 d-flex gap-2">
+      {{ form.submit(class='btn btn-cl-primary') }}
+      <a href="/admin" class="btn btn-outline-secondary">Back to Dashboard</a>
+    </div>
+  </div>
+</form>
+{% endblock %}

@@ -18,6 +18,7 @@ from app.models.course import Course
 from app.models.faculty import Faculty
 from app.models.result import Result
 from app.models.scholarship_question import ScholarshipQuestion
+from app.models.site_setting import SiteSetting
 from app.models.test_series import TestSeries
 from app.models.user import User
 
@@ -78,8 +79,8 @@ def seed_admin_user():
     }
     admin, created = upsert_record(User, {'email': 'admin@clahmedabad.com'}, admin_values)
 
-    if created or not admin.password_hash or not admin.check_password('Admin@CL2025!'):
-        admin.set_password('Admin@CL2025!')
+    if created or not admin.password_hash or not admin.check_password('Admin@CL2026!'):
+        admin.set_password('Admin@CL2026!')
 
     return admin
 
@@ -788,6 +789,54 @@ def seed_scholarship_questions():
     db.session.add_all([ScholarshipQuestion(**question) for question in questions])
 
 
+def seed_site_settings(admin_user):
+    default_settings = {
+        "institute_name": ("Career Launcher Ahmedabad", "text", "Institute Name", "contact"),
+        "address": ("A 102, Karmyog Heights, Navrangpura, Ahmedabad - 380009", "textarea", "Address", "contact"),
+        "phone_primary": ("+919978559986", "phone", "Primary Phone", "contact"),
+        "phone_secondary": ("+916353842725", "phone", "Secondary Phone", "contact"),
+        "email": ("cl_ahmedabad@careerlauncher.com", "email", "Email", "contact"),
+        "whatsapp_number": ("919978559986", "phone", "WhatsApp Number", "contact"),
+        "hours_weekday": ("Mon-Sat 10AM-7PM", "text", "Weekday Hours", "contact"),
+        "hours_sunday": ("Sun 9AM-6PM", "text", "Sunday Hours", "contact"),
+        "instagram_url": ("https://www.instagram.com/careerlauncher", "url", "Instagram URL", "social"),
+        "youtube_url": ("https://www.youtube.com/@careerlauncher", "url", "YouTube URL", "social"),
+        "facebook_url": ("https://www.facebook.com/CareerLauncher", "url", "Facebook URL", "social"),
+        "linkedin_url": ("https://www.linkedin.com/company/career-launcher", "url", "LinkedIn URL", "social"),
+        "google_maps_embed_url": ("https://maps.google.com/?q=Career+Launcher+Ahmedabad", "url", "Google Maps Embed URL", "social"),
+        "homepage_meta_title": ("Career Launcher Ahmedabad | CAT, CLAT, IPMAT, CUET Coaching", "text", "Homepage Meta Title", "seo"),
+        "homepage_meta_description": (
+            "Join Career Launcher Ahmedabad for expert coaching in CAT, CLAT, IPMAT, GMAT, CUET and Class XI-XII Mathematics.",
+            "textarea",
+            "Homepage Meta Description",
+            "seo",
+        ),
+        "og_image_url": ("https://clahmedabad.onrender.com/static/img/og-default.jpg", "url", "OG Image URL", "seo"),
+        "hero_headline": ("Your IIM and NLU Dream Starts Here", "text", "Hero Headline", "display"),
+        "hero_subheadline": (
+            "Expert coaching for CAT, CLAT, IPMAT and more with Ahmedabad's trusted mentorship team.",
+            "textarea",
+            "Hero Subheadline",
+            "display",
+        ),
+        "show_scholarship_banner": ("1", "boolean", "Show Scholarship Banner", "display"),
+        "scholarship_banner_text": ("Up to 50% Scholarship Available", "text", "Scholarship Banner Text", "display"),
+    }
+
+    for key, (value, setting_type, label, group) in default_settings.items():
+        setting = SiteSetting.query.filter_by(key=key).first()
+        if not setting:
+            setting = SiteSetting(
+                key=key,
+                value=value,
+                setting_type=setting_type,
+                label=label,
+                group=group,
+                updated_by=admin_user.id,
+            )
+            db.session.add(setting)
+
+
 def seed_data():
     admin_user = seed_admin_user()
     seed_faculty_data()
@@ -796,6 +845,7 @@ def seed_data():
     seed_blog_posts(admin_user)
     seed_test_series_data()
     seed_scholarship_questions()
+    seed_site_settings(admin_user)
 
     db.session.commit()
     print('Seed data completed successfully.')

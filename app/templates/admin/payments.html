@@ -10,6 +10,10 @@
   </ol>
 </nav>
 
+<div class="d-flex justify-content-end mb-3">
+  <a href="/admin/payments/new" class="btn btn-cl-primary btn-sm">Record Manual Payment →</a>
+</div>
+
 <div class="row g-3 mb-3">
   <div class="col-lg-4">
     <div class="admin-stat-card h-100">
@@ -60,7 +64,7 @@
         <tr>
           <th>#ID</th>
           <th>Student Email</th>
-          <th>Test Series</th>
+          <th>Payment Item</th>
           <th>Razorpay Order ID</th>
           <th>Amount (₹)</th>
           <th>Status</th>
@@ -78,7 +82,15 @@
                 -
               {% endif %}
             </td>
-            <td>{{ test_series_name or '-' }}</td>
+            <td>
+              {% if test_series_name %}
+                {{ test_series_name }}
+              {% elif payment.test_series_id is none and payment.status == 'success' %}
+                Scholarship Enrollment
+              {% else %}
+                -
+              {% endif %}
+            </td>
             <td>{{ payment.razorpay_order_id or '-' }}</td>
             <td>₹{{ payment.amount_inr | format_inr }}</td>
             <td>

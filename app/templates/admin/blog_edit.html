@@ -18,7 +18,7 @@
 <div class="row g-3">
   <div class="col-lg-8">
     <div class="bg-white border rounded-3" style="padding: 32px;">
-      <form method="POST" action="{% if is_new %}/admin/blog/new{% else %}/admin/blog/{{ post.id }}/edit{% endif %}" id="blogPostForm" novalidate>
+      <form method="POST" action="{% if is_new %}/admin/blog/new{% else %}/admin/blog/{{ post.id }}/edit{% endif %}" id="{{ 'blogNewForm' if is_new else 'blogEditForm' }}" novalidate>
         {{ form.hidden_tag() }}
 
         <div class="mb-3">
@@ -114,7 +114,7 @@
 <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
 <script>
   (function () {
-    const form = document.getElementById("blogPostForm");
+    const form = document.getElementById("{{ 'blogNewForm' if is_new else 'blogEditForm' }}");
     const contentField = document.getElementById("content");
 
     const quill = new Quill("#quillEditor", {

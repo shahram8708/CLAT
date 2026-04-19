@@ -1,0 +1,145 @@
+{% extends 'admin/base.html' %}
+
+{% block admin_page_title %}Enrollments{% endblock %}
+
+{% block admin_content %}
+<div class="row g-3 mb-3">
+  <div class="col-lg-6">
+    <div class="admin-stat-card h-100">
+      <div class="text-muted small">Active Enrollments</div>
+      <div class="h4 mb-0">{{ total_active_enrollments }}</div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="admin-stat-card h-100">
+      <div class="text-muted small">Total Fee Collected (Active)</div>
+      <div class="h4 mb-0">₹{{ total_fee_collected|format_inr }}</div>
+    </div>
+  </div>
+</div>
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+  <div class="d-flex gap-2 flex-wrap">
+    <span class="badge badge-soft">{{ enrollments.total }} enrollment records</span>
+    {% if status_filter %}<span class="badge text-bg-light border">Status: {{ status_filter|title }}</span>{% endif %}
+  </div>
+  <a href="/admin/enrollments/new" class="btn btn-cl-primary">Add Enrollment →</a>
+</div>
+
+<div class="bg-white border rounded-3 p-3 mb-3">
+  <form method="GET" action="/admin/enrollments" class="row g-2 align-items-end">
+    <div class="col-md-4">
+      <label class="form-label">Course</label>
+      <select name="course_id" class="form-select">
+        <option value="">All Courses</option>
+        {% for course_id_value, course_label in course_choices %}
+          <option value="{{ course_id_value }}" {% if course_filter == course_id_value %}selected{% endif %}>{{ course_label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">Status</label>
+      <select name="status" class="form-select">
+        <option value="">All Statuses</option>
+        <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+        <option value="completed" {% if status_filter == 'completed' %}selected{% endif %}>Completed</option>
+        <option value="paused" {% if status_filter == 'paused' %}selected{% endif %}>Paused</option>
+      </select>
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">Student ID</label>
+      <input type="number" class="form-control" name="user_id" value="{{ user_filter or '' }}" min="1" placeholder="Optional">
+    </div>
+    <div class="col-md-2 d-flex gap-2">
+      <button type="submit" class="btn btn-outline-primary w-100">Filter</button>
+      <a href="/admin/enrollments" class="btn btn-outline-secondary w-100">Reset</a>
+    </div>
+  </form>
+</div>
+
+<div class="bg-white border rounded-3 p-3">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle admin-table mb-0">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Student</th>
+          <th>Course</th>
+          <th>Batch</th>
+          <th>Fee Paid</th>
+          <th>Scholarship</th>
+          <th>Status</th>
+          <th>Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for enrollment in enrollments.items %}
+          <tr>
+            <td>{{ enrollment.id }}</td>
+            <td>
+              <div class="fw-semibold">{{ enrollment.user.get_full_name() if enrollment.user else '-' }}</div>
+              <div class="small text-muted">{{ enrollment.user.email if enrollment.user else '-' }}</div>
+            </td>
+            <td>{{ enrollment.course.title if enrollment.course else '-' }}</td>
+            <td>{{ enrollment.batch_name or '-' }}</td>
+            <td>{% if enrollment.fee_paid is not none %}₹{{ enrollment.fee_paid|format_inr }}{% else %}-{% endif %}</td>
+            <td>{% if enrollment.scholarship_pct is not none %}{{ enrollment.scholarship_pct }}%{% else %}-{% endif %}</td>
+            <td>
+              <span class="badge text-bg-light border">{{ enrollment.status|replace('_', ' ')|title }}</span>
+            </td>
+            <td>{{ enrollment.enrolled_at.strftime('%d %b %Y, %I:%M %p') if enrollment.enrolled_at else '-' }}</td>
+            <td>
+              <div class="d-flex gap-2">
+                <a href="/admin/enrollments/{{ enrollment.id }}/edit" class="btn btn-outline-primary btn-sm">Edit</a>
+                <form method="POST" action="/admin/enrollments/{{ enrollment.id }}/delete" class="m-0 delete-enrollment-form">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button class="btn btn-outline-danger btn-sm" type="submit">Delete</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="9" class="text-center text-muted py-4">No enrollments match your filters.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if enrollments.pages > 1 %}
+    <nav class="mt-3" aria-label="Enrollment pagination">
+      <ul class="pagination mb-0">
+        <li class="page-item {% if not enrollments.has_prev %}disabled{% endif %}">
+          <a class="page-link" href="{{ url_for('admin.enrollments', page=enrollments.prev_num, course_id=course_filter, status=status_filter, user_id=user_filter) if enrollments.has_prev else '#' }}">Previous</a>
+        </li>
+        {% for page_num in enrollments.iter_pages(left_edge=1, left_current=1, right_current=2, right_edge=1) %}
+          {% if page_num %}
+            <li class="page-item {% if page_num == enrollments.page %}active{% endif %}">
+              <a class="page-link" href="{{ url_for('admin.enrollments', page=page_num, course_id=course_filter, status=status_filter, user_id=user_filter) }}">{{ page_num }}</a>
+            </li>
+          {% else %}
+            <li class="page-item disabled"><span class="page-link">…</span></li>
+          {% endif %}
+        {% endfor %}
+        <li class="page-item {% if not enrollments.has_next %}disabled{% endif %}">
+          <a class="page-link" href="{{ url_for('admin.enrollments', page=enrollments.next_num, course_id=course_filter, status=status_filter, user_id=user_filter) if enrollments.has_next else '#' }}">Next</a>
+        </li>
+      </ul>
+    </nav>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block admin_js %}
+<script>
+  document.querySelectorAll(".delete-enrollment-form").forEach(function (form) {
+    form.addEventListener("submit", function (event) {
+      if (!confirm("Delete this enrollment record?")) {
+        event.preventDefault();
+      }
+    });
+  });
+</script>
+{% endblock %}

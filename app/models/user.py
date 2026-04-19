@@ -45,6 +45,21 @@ class User(UserMixin, db.Model):
     def is_admin(self):
         return self.role == "admin"
 
+    def get_active_exam_session(self):
+        from app.models.exam_session import ExamSession
+
+        sessions = (
+            ExamSession.query.filter_by(user_id=self.id, is_submitted=False)
+            .order_by(ExamSession.started_at.desc())
+            .all()
+        )
+
+        for exam_session in sessions:
+            if not exam_session.is_expired():
+                return exam_session
+
+        return None
+
 
 @login_manager.user_loader
 def load_user(user_id):

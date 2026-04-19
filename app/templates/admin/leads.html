@@ -4,14 +4,15 @@
 
 {% block admin_content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
-  <div>
+  <div class="d-flex align-items-center gap-2">
     <span class="badge badge-soft">{{ leads.total }} total leads</span>
+    <a href="/admin/leads/new" class="btn btn-cl-primary btn-sm">Add Lead →</a>
   </div>
-  <a href="/admin/leads/export" class="btn btn-outline-secondary btn-sm">Export CSV →</a>
+  <a href="/admin/leads/export" id="exportCsvBtn" class="btn btn-outline-secondary btn-sm" data-loading-text="Preparing CSV export..." data-loading-delay="400" data-restore-delay="3000">Export Leads CSV →</a>
 </div>
 
 <div class="bg-white border rounded-3 p-3 mb-3">
-  <form method="GET" action="/admin/leads" class="row g-2 align-items-end">
+  <form id="leadsFilterForm" method="GET" action="/admin/leads" class="row g-2 align-items-end">
     <div class="col-lg-5">
       <label class="form-label mb-1">Search</label>
       <input type="text" name="q" value="{{ search_query }}" class="form-control" placeholder="Search by name, phone, email...">
@@ -27,7 +28,7 @@
       </select>
     </div>
     <div class="col-lg-2 d-grid">
-      <button class="btn btn-primary" type="submit">Filter</button>
+      <button class="btn btn-primary" type="submit" data-loading-text="Filtering...">Filter</button>
     </div>
     <div class="col-lg-2 d-grid">
       {% if status_filter or search_query %}
@@ -86,13 +87,24 @@
             <td>{{ lead.submitted_at.strftime('%d %b %Y, %I:%M %p') if lead.submitted_at else '-' }}</td>
             <td>
               <div class="d-flex align-items-center gap-2">
-                <select class="form-select form-select-sm lead-status-select" data-lead-id="{{ lead.id }}" style="min-width: 130px;">
+                <a href="/admin/leads/{{ lead.id }}/edit" class="btn btn-outline-primary btn-sm">Edit</a>
+                <select
+                  class="form-select form-select-sm lead-status-select"
+                  data-lead-id="{{ lead.id }}"
+                  data-current-status="{{ lead.status }}"
+                  data-locked="{{ 'true' if lead.status == 'enrolled' else 'false' }}"
+                  style="min-width: 130px;"
+                  {% if lead.status == 'enrolled' %}disabled{% endif %}
+                >
                   <option value="new" {% if lead.status == 'new' %}selected{% endif %}>New</option>
                   <option value="contacted" {% if lead.status == 'contacted' %}selected{% endif %}>Contacted</option>
                   <option value="enrolled" {% if lead.status == 'enrolled' %}selected{% endif %}>Enrolled</option>
                   <option value="dropped" {% if lead.status == 'dropped' %}selected{% endif %}>Dropped</option>
                 </select>
-                <span id="spinner-{{ lead.id }}" class="spinner-border spinner-border-sm text-secondary d-none" role="status" aria-hidden="true"></span>
+                <span class="spinner-border spinner-border-sm ms-1 d-none lead-status-spinner" id="spinner-lead-{{ lead.id }}" role="status" aria-hidden="true"></span>
+                {% if lead.status == 'enrolled' %}
+                  <span class="text-success small fw-semibold">Locked</span>
+                {% endif %}
               </div>
             </td>
           </tr>
@@ -134,59 +146,106 @@
   (function () {
     const csrfToken = "{{ csrf_token() }}";
 
-    function badgeMeta(status) {
-      if (status === "new") {
-        return { cls: "admin-badge-new", text: "New" };
-      }
-      if (status === "contacted") {
-        return { cls: "admin-badge-contacted", text: "Contacted" };
-      }
-      if (status === "enrolled") {
-        return { cls: "admin-badge-enrolled", text: "Enrolled" };
-      }
-      return { cls: "admin-badge-dropped", text: "Dropped" };
+    function toBadgeClass(status) {
+      return "admin-badge-" + status;
     }
 
-    document.querySelectorAll(".lead-status-select").forEach((select) => {
-      select.addEventListener("change", async function () {
-        const leadId = this.dataset.leadId;
-        const status = this.value;
-        const spinner = document.getElementById(`spinner-${leadId}`);
-        const badge = document.getElementById(`status-badge-${leadId}`);
+    function toTitleCase(status) {
+      return status.charAt(0).toUpperCase() + status.slice(1);
+    }
 
-        this.disabled = true;
+    function isLocked(select) {
+      return (select.dataset.locked || "false") === "true";
+    }
+
+    function lockSelect(select) {
+      select.dataset.locked = "true";
+      select.disabled = true;
+      select.classList.add("bg-light");
+    }
+
+    document.querySelectorAll(".lead-status-select").forEach(function (select) {
+      if (isLocked(select)) {
+        lockSelect(select);
+      }
+
+      select.addEventListener("change", function () {
+        if (isLocked(select)) {
+          select.value = select.dataset.currentStatus;
+          return;
+        }
+
+        const leadId = select.dataset.leadId;
+        const newStatus = select.value;
+        const spinner = document.getElementById("spinner-lead-" + leadId);
+
+        select.disabled = true;
         if (spinner) {
           spinner.classList.remove("d-none");
         }
 
-        try {
-          const response = await fetch(`/admin/leads/${leadId}/status`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-              "X-CSRFToken": csrfToken
-            },
-            body: new URLSearchParams({ status })
+        fetch("/admin/leads/" + leadId + "/status", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-CSRFToken": csrfToken
+          },
+          body: "status=" + encodeURIComponent(newStatus)
+        })
+          .then(function (response) {
+            return response.json().then(function (data) {
+              return { ok: response.ok, data: data };
+            });
+          })
+          .then(function (result) {
+            if (!result.ok || result.data.status !== "ok") {
+              select.value = select.dataset.currentStatus;
+              if (result.data && result.data.locked) {
+                lockSelect(select);
+                select.dataset.currentStatus = result.data.new_status || "enrolled";
+                select.value = select.dataset.currentStatus;
+              }
+              alert("Failed to update status. Please try again.");
+              return;
+            }
+
+            const badge = document.getElementById("status-badge-" + leadId);
+            if (badge) {
+              badge.className = toBadgeClass(result.data.new_status);
+              badge.textContent = toTitleCase(result.data.new_status);
+            }
+
+            select.dataset.currentStatus = result.data.new_status;
+            if (result.data.locked || result.data.new_status === "enrolled") {
+              lockSelect(select);
+            }
+
+            if (spinner) {
+              spinner.classList.add("d-none");
+              const tick = document.createElement("span");
+              tick.innerHTML = ' <i class="fas fa-check text-success"></i>';
+              tick.style.fontSize = "12px";
+              select.parentNode.appendChild(tick);
+              setTimeout(function () {
+                tick.remove();
+              }, 2000);
+            }
+          })
+          .catch(function () {
+            select.value = select.dataset.currentStatus;
+            if (spinner) {
+              spinner.classList.add("d-none");
+            }
+            alert("Network error. Please check your connection.");
+          })
+          .finally(function () {
+            if (!isLocked(select)) {
+              select.disabled = false;
+            }
+            if (spinner) {
+              spinner.classList.add("d-none");
+            }
           });
-
-          const data = await response.json();
-          if (!response.ok || data.status !== "ok") {
-            throw new Error(data.message || "Unable to update status");
-          }
-
-          if (badge) {
-            const meta = badgeMeta(data.new_status);
-            badge.className = meta.cls;
-            badge.textContent = meta.text;
-          }
-        } catch (error) {
-          alert(error.message || "Status update failed.");
-        } finally {
-          this.disabled = false;
-          if (spinner) {
-            spinner.classList.add("d-none");
-          }
-        }
       });
     });
   })();

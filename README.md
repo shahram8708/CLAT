@@ -254,7 +254,7 @@ http://localhost:5000/login
 Credentials
 ```text
 admin@clahmedabad.com
-Admin@CL2025!
+Admin@CL2026!
 ```
 Admin panel
 ```text

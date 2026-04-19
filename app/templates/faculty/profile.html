@@ -24,8 +24,8 @@
 
     <div class="row align-items-center g-4">
       <div class="col-lg-3 text-center text-lg-start">
-        {% if faculty.photo_url %}
-          <img src="{{ faculty.photo_url }}" alt="{{ faculty.name }}" class="faculty-hero-photo">
+        {% if faculty.photo_display_url %}
+          <img src="{{ faculty.photo_display_url }}" alt="{{ faculty.name }}" class="faculty-hero-photo">
         {% else %}
           <svg class="faculty-avatar-large" viewBox="0 0 150 150" aria-label="{{ faculty.name }} avatar" role="img">
             <circle cx="75" cy="75" r="75" fill="var(--cl-blue)"></circle>

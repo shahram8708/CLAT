@@ -1,0 +1,129 @@
+{% extends 'admin/base.html' %}
+
+{% block admin_page_title %}{% if is_new %}New Announcement{% else %}Edit Announcement{% endif %}{% endblock %}
+
+{% block admin_content %}
+<div class="bg-white border rounded-3" style="padding: 32px;">
+  <form method="POST" action="{% if is_new %}/admin/announcements/new{% else %}/admin/announcements/{{ announcement.id }}/edit{% endif %}" id="announcementForm" novalidate>
+    {{ form.hidden_tag() }}
+
+    <div class="row g-3">
+      <div class="col-md-8">
+        <label class="form-label" for="{{ form.title.id }}">{{ form.title.label.text }}</label>
+        {{ form.title(class='form-control' + (' is-invalid' if form.title.errors else ''), id=form.title.id) }}
+        {% for error in form.title.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+      <div class="col-md-4">
+        <label class="form-label" for="{{ form.announcement_type.id }}">{{ form.announcement_type.label.text }}</label>
+        {{ form.announcement_type(class='form-select' + (' is-invalid' if form.announcement_type.errors else ''), id=form.announcement_type.id) }}
+        {% for error in form.announcement_type.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+
+      <div class="col-12">
+        <label class="form-label" for="{{ form.message.id }}">{{ form.message.label.text }}</label>
+        {{ form.message(class='form-control' + (' is-invalid' if form.message.errors else ''), id=form.message.id, rows='4') }}
+        {% for error in form.message.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label" for="{{ form.display_location.id }}">{{ form.display_location.label.text }}</label>
+        {{ form.display_location(class='form-select' + (' is-invalid' if form.display_location.errors else ''), id=form.display_location.id) }}
+        {% for error in form.display_location.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+      <div class="col-md-6">
+        <label class="form-label" for="{{ form.cta_text.id }}">{{ form.cta_text.label.text }}</label>
+        {{ form.cta_text(class='form-control' + (' is-invalid' if form.cta_text.errors else ''), id=form.cta_text.id) }}
+        {% for error in form.cta_text.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label" for="{{ form.cta_url.id }}">{{ form.cta_url.label.text }}</label>
+        {{ form.cta_url(class='form-control' + (' is-invalid' if form.cta_url.errors else ''), id=form.cta_url.id) }}
+        {% for error in form.cta_url.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+      <div class="col-md-3">
+        <label class="form-label" for="{{ form.start_date.id }}">{{ form.start_date.label.text }}</label>
+        {{ form.start_date(class='form-control' + (' is-invalid' if form.start_date.errors else ''), id=form.start_date.id) }}
+        {% for error in form.start_date.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+      <div class="col-md-3">
+        <label class="form-label" for="{{ form.end_date.id }}">{{ form.end_date.label.text }}</label>
+        {{ form.end_date(class='form-control' + (' is-invalid' if form.end_date.errors else ''), id=form.end_date.id) }}
+        {% for error in form.end_date.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+
+      <div class="col-12 d-flex align-items-end">
+        <div class="form-check">
+          {{ form.is_active(class='form-check-input', id=form.is_active.id) }}
+          <label class="form-check-label" for="{{ form.is_active.id }}">{{ form.is_active.label.text }}</label>
+        </div>
+      </div>
+
+      <div class="col-12 d-flex gap-2 pt-2">
+        {{ form.submit(class='btn btn-cl-primary') }}
+        <a href="/admin/announcements" class="btn btn-outline-secondary">Cancel</a>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="bg-white border rounded-3 mt-3" style="padding: 24px;">
+  <h6 class="mb-3">Banner Preview</h6>
+  <div id="announcementPreview" class="rounded-3 p-3 border" style="background: #f8f9ff;">
+    <div class="fw-semibold mb-1" id="previewTitle">{{ form.title.data or 'Announcement title' }}</div>
+    <div id="previewMessage">{{ form.message.data or 'Announcement message preview will appear here.' }}</div>
+    <a id="previewCta" href="#" class="btn btn-sm btn-outline-primary mt-2" style="display: none;">CTA</a>
+  </div>
+</div>
+{% endblock %}
+
+{% block admin_js %}
+<script>
+(function () {
+  const titleField = document.getElementById("{{ form.title.id }}");
+  const messageField = document.getElementById("{{ form.message.id }}");
+  const ctaTextField = document.getElementById("{{ form.cta_text.id }}");
+  const typeField = document.getElementById("{{ form.announcement_type.id }}");
+
+  const previewWrap = document.getElementById("announcementPreview");
+  const previewTitle = document.getElementById("previewTitle");
+  const previewMessage = document.getElementById("previewMessage");
+  const previewCta = document.getElementById("previewCta");
+
+  function syncTypeColor() {
+    const currentType = typeField.value;
+    previewWrap.className = "rounded-3 p-3 border";
+
+    if (currentType === "success") {
+      previewWrap.style.background = "#eafaf2";
+    } else if (currentType === "warning") {
+      previewWrap.style.background = "#fff8e6";
+    } else if (currentType === "urgent") {
+      previewWrap.style.background = "#ffecec";
+    } else {
+      previewWrap.style.background = "#f8f9ff";
+    }
+  }
+
+  function syncPreview() {
+    previewTitle.textContent = titleField.value || "Announcement title";
+    previewMessage.textContent = messageField.value || "Announcement message preview will appear here.";
+    syncTypeColor();
+
+    if (ctaTextField.value.trim()) {
+      previewCta.style.display = "inline-block";
+      previewCta.textContent = ctaTextField.value.trim();
+    } else {
+      previewCta.style.display = "none";
+    }
+  }
+
+  [titleField, messageField, ctaTextField, typeField].forEach(function (el) {
+    el.addEventListener("input", syncPreview);
+    el.addEventListener("change", syncPreview);
+  });
+
+  syncPreview();
+})();
+</script>
+{% endblock %}

@@ -88,9 +88,9 @@
                 {% endif %}
               </td>
               <td>
-                <button type="button" class="btn btn-sm btn-outline-secondary" disabled data-bs-toggle="tooltip" data-bs-title="Coming Soon">
-                  Download Report
-                </button>
+                <a href="{{ url_for('tests.test_result', attempt_id=attempt.id) }}" class="btn btn-sm btn-outline-secondary">
+                  View Result
+                </a>
               </td>
             </tr>
           {% endfor %}

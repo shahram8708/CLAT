@@ -88,12 +88,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
   form.addEventListener("submit", async function (event) {
     event.preventDefault();
+
+    const modalSubmitBtn = document.querySelector(
+      "#demoModal .modal-footer button[type='submit'], #demoModal button.btn-cl-primary"
+    );
+    if (modalSubmitBtn && modalSubmitBtn.classList.contains("btn-loading")) {
+      return;
+    }
+
     clearFieldErrors();
     feedback.classList.add("d-none");
 
     const formData = new FormData(form);
     const csrfToken = formData.get("csrf_token") || "";
 
+    document.dispatchEvent(new CustomEvent("demoFormStart"));
     setLoading(true);
 
     try {
@@ -168,6 +177,7 @@ document.addEventListener("DOMContentLoaded", function () {
       );
     } finally {
       setLoading(false);
+      document.dispatchEvent(new CustomEvent("demoFormEnd"));
     }
   });
 });

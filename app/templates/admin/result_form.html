@@ -1,0 +1,119 @@
+{% extends 'admin/base.html' %}
+
+{% block admin_page_title %}{% if is_new %}Add New Topper Result{% else %}Edit Result: {{ result.student_name }}{% endif %}{% endblock %}
+
+{% block admin_content %}
+<div class="bg-white border rounded-3" style="padding: 32px;">
+  <form method="POST" enctype="multipart/form-data" action="{% if is_new %}/admin/results/new{% else %}/admin/results/{{ result.id }}/edit{% endif %}" id="resultForm" novalidate>
+    {{ form.hidden_tag() }}
+
+    <div class="row g-3">
+      <div class="col-12">
+        <label class="form-label" for="{{ form.student_name.id }}">{{ form.student_name.label.text }}</label>
+        {{ form.student_name(class='form-control' + (' is-invalid' if form.student_name.errors else ''), id=form.student_name.id) }}
+        {% for error in form.student_name.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label" for="{{ form.exam.id }}">{{ form.exam.label.text }}</label>
+        {{ form.exam(class='form-select' + (' is-invalid' if form.exam.errors else ''), id=form.exam.id) }}
+      </div>
+      <div class="col-md-6">
+        <label class="form-label" for="{{ form.year.id }}">{{ form.year.label.text }}</label>
+        {{ form.year(class='form-control' + (' is-invalid' if form.year.errors else ''), id=form.year.id) }}
+        {% for error in form.year.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label" for="{{ form.rank_percentile.id }}">{{ form.rank_percentile.label.text }}</label>
+        {{ form.rank_percentile(class='form-control' + (' is-invalid' if form.rank_percentile.errors else ''), id=form.rank_percentile.id) }}
+      </div>
+      <div class="col-md-6">
+        <label class="form-label" for="{{ form.target_college.id }}">{{ form.target_college.label.text }}</label>
+        {{ form.target_college(class='form-control' + (' is-invalid' if form.target_college.errors else ''), id=form.target_college.id) }}
+      </div>
+
+      <div class="col-12">
+        <label class="form-label" for="{{ form.testimonial.id }}">{{ form.testimonial.label.text }}</label>
+        {{ form.testimonial(class='form-control' + (' is-invalid' if form.testimonial.errors else ''), id=form.testimonial.id, rows='3') }}
+      </div>
+
+      <div class="col-12">
+        <label class="form-label" for="{{ form.photo_upload.id }}">{{ form.photo_upload.label.text }}</label>
+        {{ form.photo_upload(class='form-control' + (' is-invalid' if form.photo_upload.errors else ''), id=form.photo_upload.id, accept='image/png,image/jpeg,image/jpg') }}
+        {% for error in form.photo_upload.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+
+        <div class="mt-2 d-flex align-items-center gap-2">
+          {% if result and result.photo_display_url %}
+            <img id="resultPhotoPreview" src="{{ result.photo_display_url }}" alt="{{ result.student_name }} result photo" style="width:72px;height:72px;border-radius:50%;object-fit:cover;">
+          {% else %}
+            <img id="resultPhotoPreview" src="" alt="Result photo preview" style="display:none;width:72px;height:72px;border-radius:50%;object-fit:cover;">
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="col-12">
+        <label class="form-label" for="{{ form.score_details.id }}">{{ form.score_details.label.text }}</label>
+        {{ form.score_details(class='form-control' + (' is-invalid' if form.score_details.errors else ''), id=form.score_details.id) }}
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label" for="{{ form.city.id }}">{{ form.city.label.text }}</label>
+        {{ form.city(class='form-control' + (' is-invalid' if form.city.errors else ''), id=form.city.id) }}
+      </div>
+      <div class="col-md-6">
+        <label class="form-label" for="{{ form.coaching_duration.id }}">{{ form.coaching_duration.label.text }}</label>
+        {{ form.coaching_duration(class='form-control' + (' is-invalid' if form.coaching_duration.errors else ''), id=form.coaching_duration.id) }}
+      </div>
+
+      <div class="col-12">
+        <label class="form-label" for="{{ form.video_testimonial_url.id }}">{{ form.video_testimonial_url.label.text }}</label>
+        {{ form.video_testimonial_url(class='form-control' + (' is-invalid' if form.video_testimonial_url.errors else ''), id=form.video_testimonial_url.id) }}
+      </div>
+
+      <div class="col-md-6">
+        <div class="form-check mt-4">
+          {{ form.is_active(class='form-check-input', id=form.is_active.id) }}
+          <label class="form-check-label" for="{{ form.is_active.id }}">{{ form.is_active.label.text }}</label>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label" for="{{ form.display_order.id }}">{{ form.display_order.label.text }}</label>
+        {{ form.display_order(class='form-control' + (' is-invalid' if form.display_order.errors else ''), id=form.display_order.id) }}
+      </div>
+
+      <div class="col-12 d-flex gap-2 pt-2">
+        {{ form.submit(class='btn btn-cl-primary') }}
+        <a href="/admin/results" class="btn btn-outline-secondary">Cancel</a>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block admin_js %}
+<script>
+(function () {
+  const photoField = document.getElementById("{{ form.photo_upload.id }}");
+  const preview = document.getElementById("resultPhotoPreview");
+
+  if (!photoField || !preview) {
+    return;
+  }
+
+  photoField.addEventListener("change", function () {
+    const file = photoField.files && photoField.files[0];
+    if (!file) {
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function (event) {
+      preview.src = event.target.result;
+      preview.style.display = "inline-block";
+    };
+    reader.readAsDataURL(file);
+  });
+})();
+</script>
+{% endblock %}

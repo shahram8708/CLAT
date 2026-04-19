@@ -16,7 +16,7 @@
 </div>
 
 <div class="bg-white border rounded-3 p-3 mb-3">
-  <form method="GET" action="/admin/blog" class="row g-2 align-items-end">
+  <form id="blogFilterForm" method="GET" action="/admin/blog" class="row g-2 align-items-end">
     <div class="col-md-4">
       <label class="form-label mb-1">Category</label>
       <select name="category" class="form-select">
@@ -38,7 +38,7 @@
       </select>
     </div>
     <div class="col-md-2 d-grid">
-      <button class="btn btn-primary" type="submit">Filter</button>
+      <button class="btn btn-primary" type="submit" data-loading-text="Filtering...">Filter</button>
     </div>
     <div class="col-md-2 d-grid">
       {% if category_filter or status_filter %}

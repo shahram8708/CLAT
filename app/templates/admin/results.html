@@ -4,15 +4,13 @@
 
 {% block admin_content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
-  <nav aria-label="breadcrumb">
-    <ol class="breadcrumb mb-0">
-      <li class="breadcrumb-item"><a href="/admin">Admin Dashboard</a></li>
-      <li class="breadcrumb-item active">Results</li>
-    </ol>
-  </nav>
-  <a href="/results" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary">
-    <i class="fas fa-external-link-alt me-1"></i>View Public Results Page →
-  </a>
+  <div class="d-flex gap-2">
+    <a href="/admin/results/new" class="btn btn-cl-primary btn-sm">Add Result →</a>
+    <a href="/results" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary">
+      <i class="fas fa-external-link-alt me-1"></i>View Public Results Page →
+    </a>
+  </div>
+  <span class="badge badge-soft">{{ results|length }} records</span>
 </div>
 
 <div class="bg-white border rounded-3 p-3">
@@ -41,13 +39,23 @@
             <td>{{ result.rank_percentile or '-' }}</td>
             <td>{{ result.target_college or '-' }}</td>
             <td>
-              <div class="form-check form-switch">
-                <input class="form-check-input result-toggle" type="checkbox" role="switch" data-result-id="{{ result.id }}" {% if result.is_active %}checked{% endif %}>
+              <div class="d-flex align-items-center">
+                <div class="form-check form-switch">
+                  <input class="form-check-input result-active-toggle" type="checkbox" role="switch" id="result-toggle-{{ result.id }}" data-result-id="{{ result.id }}" {% if result.is_active %}checked{% endif %}>
+                </div>
+                <span class="spinner-border spinner-border-sm ms-2 d-none result-toggle-spinner" id="spinner-result-{{ result.id }}" role="status" aria-hidden="true"></span>
               </div>
             </td>
             <td>{{ result.display_order if result.display_order is not none else 0 }}</td>
             <td>
-              <span class="small text-muted" id="result-state-{{ result.id }}">{{ 'Visible' if result.is_active else 'Hidden' }}</span>
+              <div class="d-flex gap-2">
+                <a href="/admin/results/{{ result.id }}/edit" class="btn btn-outline-primary btn-sm">Edit</a>
+                <form method="POST" action="/admin/results/{{ result.id }}/delete" class="m-0 delete-result-form">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button class="btn btn-outline-danger btn-sm" type="submit">Delete</button>
+                </form>
+                <span class="small text-muted align-self-center" id="result-state-{{ result.id }}">{{ 'Visible' if result.is_active else 'Hidden' }}</span>
+              </div>
             </td>
           </tr>
         {% else %}
@@ -66,34 +74,59 @@
   (function () {
     const csrfToken = "{{ csrf_token() }}";
 
-    document.querySelectorAll(".result-toggle").forEach((toggle) => {
-      toggle.addEventListener("change", async function () {
-        const resultId = this.dataset.resultId;
-        const stateText = document.getElementById(`result-state-${resultId}`);
-        this.disabled = true;
+    document.querySelectorAll(".delete-result-form").forEach(function (form) {
+      form.addEventListener("submit", function (event) {
+        if (!confirm("Delete this result record?")) {
+          event.preventDefault();
+        }
+      });
+    });
 
-        try {
-          const response = await fetch(`/admin/results/${resultId}/toggle-active`, {
-            method: "POST",
-            headers: {
-              "X-CSRFToken": csrfToken
+    document.querySelectorAll(".result-active-toggle").forEach(function (toggle) {
+      toggle.addEventListener("change", function () {
+        const resultId = toggle.dataset.resultId;
+        const spinner = document.getElementById("spinner-result-" + resultId);
+        const stateText = document.getElementById("result-state-" + resultId);
+        const originalChecked = !toggle.checked;
+
+        toggle.disabled = true;
+        if (spinner) {
+          spinner.classList.remove("d-none");
+        }
+
+        fetch("/admin/results/" + resultId + "/toggle-active", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-CSRFToken": csrfToken
+          }
+        })
+          .then(function (response) {
+            return response.json().then(function (data) {
+              return { ok: response.ok, data: data };
+            });
+          })
+          .then(function (result) {
+            if (!result.ok || result.data.status !== "ok") {
+              toggle.checked = originalChecked;
+              alert("Failed to update. Please try again.");
+              return;
+            }
+
+            if (stateText) {
+              stateText.textContent = result.data.is_active ? "Visible" : "Hidden";
+            }
+          })
+          .catch(function () {
+            toggle.checked = originalChecked;
+            alert("Network error.");
+          })
+          .finally(function () {
+            toggle.disabled = false;
+            if (spinner) {
+              spinner.classList.add("d-none");
             }
           });
-          const data = await response.json();
-
-          if (!response.ok || data.status !== "ok") {
-            throw new Error("Unable to update result status.");
-          }
-
-          if (stateText) {
-            stateText.textContent = data.is_active ? "Visible" : "Hidden";
-          }
-        } catch (error) {
-          this.checked = !this.checked;
-          alert(error.message || "Could not update status.");
-        } finally {
-          this.disabled = false;
-        }
       });
     });
   })();

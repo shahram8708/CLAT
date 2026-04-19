@@ -4,6 +4,17 @@
 {% block title %}Contact Career Launcher Ahmedabad{% endblock %}
 {% block meta_description %}Contact Career Launcher Ahmedabad for course counseling, demo classes, scholarship details, and admissions support.{% endblock %}
 
+{% set institute_name = get_setting('institute_name', 'Career Launcher Ahmedabad') %}
+{% set address = get_setting('address', 'A 102, Karmyog Heights, Navrangpura, Ahmedabad - 380009') %}
+{% set phone_primary = get_setting('phone_primary', '+91 9978559986') %}
+{% set phone_secondary = get_setting('phone_secondary', '+91 6353842725') %}
+{% set contact_email = get_setting('email', 'cl_ahmedabad@careerlauncher.com') %}
+{% set hours_weekday = get_setting('hours_weekday', '10:00 AM to 7:00 PM') %}
+{% set hours_sunday = get_setting('hours_sunday', '9:00 AM to 6:00 PM') %}
+{% set whatsapp_number = get_setting('whatsapp_number', '+919978559986') %}
+{% set whatsapp_link_number = whatsapp_number|replace('+', '')|replace(' ', '')|replace('-', '') %}
+{% set maps_embed_url = get_setting('google_maps_embed_url', 'https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d14687.040403677278!2d72.555225!3d23.032579!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x395e84ca6d42d379%3A0xe126729ea09da55b!2sCareer%20Launcher%20Ahmedabad%20%7C%20No.%201%20coaching%20for%20CAT%2C%20CLAT%2C%20IPMAT!5e0!3m2!1sen!2sus!4v1776522520522!5m2!1sen!2sus') %}
+
 {% block content %}
 <section class="hero-section" style="min-height: 42vh;">
   <div class="container hero-content text-center">
@@ -18,23 +29,24 @@
       <div class="col-lg-4">
         <div class="cl-card h-100">
           <h5 class="fw-bold">Address</h5>
-          <p class="mb-1">A 102, Karmyog Heights</p>
-          <p class="mb-1">Navrangpura, Ahmedabad – 380009</p>
-          <a href="https://maps.google.com/?q=Navrangpura+Ahmedabad" target="_blank" rel="noopener noreferrer">Open in Google Maps</a>
+          <p class="mb-1">{{ address }}</p>
+          <a href="https://maps.google.com/?q={{ address|urlencode }}" target="_blank" rel="noopener noreferrer">Open in Google Maps</a>
         </div>
       </div>
       <div class="col-lg-4">
         <div class="cl-card h-100">
           <h5 class="fw-bold">Phone</h5>
-          <p class="mb-1"><a href="tel:+919978559986">+91 9978559986</a></p>
-          <p class="mb-1"><a href="tel:+916353842725">+91 6353842725</a></p>
+          <p class="mb-1"><a href="tel:{{ phone_primary|replace(' ', '')|replace('-', '') }}">{{ phone_primary }}</a></p>
+          {% if phone_secondary %}
+            <p class="mb-1"><a href="tel:{{ phone_secondary|replace(' ', '')|replace('-', '') }}">{{ phone_secondary }}</a></p>
+          {% endif %}
           <p class="mb-0 small text-muted">Call us during office hours</p>
         </div>
       </div>
       <div class="col-lg-4">
         <div class="cl-card h-100">
           <h5 class="fw-bold">Email</h5>
-          <p class="mb-1"><a href="mailto:cl_ahmedabad@careerlauncher.com">cl_ahmedabad@careerlauncher.com</a></p>
+          <p class="mb-1"><a href="mailto:{{ contact_email }}">{{ contact_email }}</a></p>
           <p class="mb-0 small text-muted">We respond to all queries promptly</p>
         </div>
       </div>
@@ -51,18 +63,18 @@
           <div class="table-responsive">
             <table class="table table-sm table-bordered mb-0">
               <tbody>
-                <tr><th>Monday to Saturday</th><td>10:00 AM to 7:00 PM</td></tr>
-                <tr><th>Sunday</th><td>9:00 AM to 6:00 PM</td></tr>
+                <tr><th>Monday to Saturday</th><td>{{ hours_weekday }}</td></tr>
+                <tr><th>Sunday</th><td>{{ hours_sunday }}</td></tr>
               </tbody>
             </table>
           </div>
         </div>
 
         <div class="ratio ratio-16x9 rounded overflow-hidden shadow-sm mb-3">
-          <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d14687.040403677278!2d72.555225!3d23.032579!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x395e84ca6d42d379%3A0xe126729ea09da55b!2sCareer%20Launcher%20Ahmedabad%20%7C%20No.%201%20coaching%20for%20CAT%2C%20CLAT%2C%20IPMAT!5e0!3m2!1sen!2sus!4v1776522520522!5m2!1sen!2sus" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+          <iframe src="{{ maps_embed_url }}" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
         </div>
 
-        <a href="https://wa.me/919978559986?text=Hi%2C%20I%20want%20to%20book%20a%20free%20demo%20class%20at%20CL%20Ahmedabad" target="_blank" rel="noopener noreferrer" class="btn btn-success btn-lg rounded-pill w-100">Chat on WhatsApp</a>
+        <a href="https://wa.me/{{ whatsapp_link_number }}?text=Hi%2C%20I%20want%20to%20book%20a%20free%20demo%20class%20at%20CL%20Ahmedabad" target="_blank" rel="noopener noreferrer" class="btn btn-success btn-lg rounded-pill w-100">Chat on WhatsApp</a>
       </div>
 
       <div class="col-lg-7">
@@ -74,7 +86,7 @@
               Your message has been sent successfully. Our team will contact you shortly.
             </div>
           {% else %}
-            <form action="{{ url_for('main.contact_submit') }}" method="post" novalidate>
+            <form id="contactForm" action="{{ url_for('main.contact_submit') }}" method="post" novalidate>
               {{ form.hidden_tag() }}
 
               <div class="mb-3">
@@ -123,18 +135,18 @@
 {
   "@context": "https://schema.org",
   "@type": "LocalBusiness",
-  "name": "Career Launcher Ahmedabad",
-  "telephone": "+91-9978559986",
-  "email": "cl_ahmedabad@careerlauncher.com",
+  "name": {{ institute_name|tojson }},
+  "telephone": {{ phone_primary|tojson }},
+  "email": {{ contact_email|tojson }},
   "address": {
     "@type": "PostalAddress",
-    "streetAddress": "A 102, Karmyog Heights, Navrangpura",
+    "streetAddress": {{ address|tojson }},
     "addressLocality": "Ahmedabad",
     "addressRegion": "Gujarat",
     "postalCode": "380009",
     "addressCountry": "IN"
   },
-  "openingHours": ["Mo-Sa 10:00-19:00", "Su 09:00-18:00"]
+  "openingHours": [{{ ('Mo-Sa ' ~ hours_weekday)|tojson }}, {{ ('Su ' ~ hours_sunday)|tojson }}]
 }
 </script>
 {% endblock %}

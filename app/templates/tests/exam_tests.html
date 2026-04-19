@@ -84,10 +84,24 @@
 
               <div class="d-flex flex-wrap gap-2">
                 {% if series.is_free %}
-                  <a href="/test-series/{{ exam | lower }}" class="btn btn-cl-primary">Start Free Test →</a>
+                  <a href="{{ url_for('tests.start_test', test_series_id=series.id) }}" class="btn btn-cl-primary">Start Free Test →</a>
                 {% else %}
-                  <a href="/test-series/{{ exam | lower }}" class="btn btn-cl-primary">Buy Now — ₹{{ series.price }}</a>
-                  <a href="/test-series/{{ exam | lower }}" class="btn btn-cl-outline btn-sm" style="border-color: var(--cl-navy); color: var(--cl-navy);">View Sample Test</a>
+                  {% if series.id in purchased_series_ids %}
+                    <a href="{{ url_for('tests.start_test', test_series_id=series.id) }}" class="btn btn-success">Attempt Test →</a>
+                    <a href="/dashboard/tests" class="btn btn-cl-outline btn-sm" style="border-color: var(--cl-navy); color: var(--cl-navy);">View Test History</a>
+                  {% else %}
+                    <button
+                      type="button"
+                      class="btn btn-cl-primary buy-now-btn"
+                      data-series-id="{{ series.id }}"
+                      data-price="{{ series.price }}"
+                      data-loading-text="Opening payment gateway..."
+                      data-series-name="{{ series.name }}"
+                    >
+                      Buy Now ₹{{ series.price }}
+                    </button>
+                    <a href="/test-series/{{ exam | lower }}" class="btn btn-cl-outline btn-sm" style="border-color: var(--cl-navy); color: var(--cl-navy);">View Sample Test</a>
+                  {% endif %}
                 {% endif %}
               </div>
             </article>
@@ -143,4 +157,197 @@
   </div>
 </section>
 {% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+  window.isAuthenticated = {{ current_user.is_authenticated | tojson }};
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const csrfToken = "{{ csrf_token() }}";
+
+    function showPaymentToast(message, isSuccess) {
+      const toastId = "paymentToast";
+      let toastEl = document.getElementById(toastId);
+
+      if (!toastEl) {
+        toastEl = document.createElement("div");
+        toastEl.id = toastId;
+        toastEl.className = "toast payment-toast";
+        toastEl.setAttribute("role", "status");
+        toastEl.setAttribute("aria-live", "polite");
+        toastEl.setAttribute("aria-atomic", "true");
+        toastEl.innerHTML = `
+          <div class="toast-header">
+            <strong class="me-auto">Career Launcher Ahmedabad</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+          <div class="toast-body"></div>
+        `;
+        document.body.appendChild(toastEl);
+      }
+
+      const body = toastEl.querySelector(".toast-body");
+      body.textContent = message;
+      body.className = `toast-body ${isSuccess ? "text-success" : "text-muted"}`;
+
+      const toast = bootstrap.Toast.getOrCreateInstance(toastEl, { delay: 2500 });
+      toast.show();
+    }
+
+    async function verifyPayment(payload) {
+      const response = await fetch("/payment/verify", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrfToken
+        },
+        body: JSON.stringify(payload)
+      });
+
+      return response.json();
+    }
+
+    async function createOrder(testSeriesId, amountInr) {
+      const response = await fetch("/payment/create-order", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrfToken
+        },
+        body: JSON.stringify({ test_series_id: Number(testSeriesId), amount_inr: Number(amountInr) })
+      });
+
+      const data = await response.json();
+      return { ok: response.ok, data: data };
+    }
+
+    document.querySelectorAll(".buy-now-btn").forEach((button) => {
+      button.addEventListener("click", async function () {
+        const btn = this;
+        if (btn.disabled || btn.classList.contains("btn-loading")) {
+          return;
+        }
+
+        const testSeriesId = btn.dataset.seriesId;
+        const amountInr = btn.dataset.price;
+        const seriesName = btn.dataset.seriesName;
+
+        if (!window.isAuthenticated) {
+          const nextPath = window.location.pathname + window.location.search;
+          window.location.href = "/login?next=" + encodeURIComponent(nextPath);
+          return;
+        }
+
+        const originalHTML = btn.innerHTML;
+
+        function setLoading(text) {
+          if (window.CLLoadingStates && typeof window.CLLoadingStates.setButtonLoading === "function") {
+            window.CLLoadingStates.setButtonLoading(btn, text);
+            return;
+          }
+
+          const width = btn.offsetWidth;
+          btn.style.minWidth = width + "px";
+          btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>' + text;
+          btn.disabled = true;
+          btn.classList.add("btn-loading");
+        }
+
+        function restoreButton() {
+          if (window.CLLoadingStates && typeof window.CLLoadingStates.restoreButton === "function") {
+            window.CLLoadingStates.restoreButton(btn, originalHTML);
+          } else {
+            btn.innerHTML = originalHTML;
+            btn.disabled = false;
+            btn.classList.remove("btn-loading");
+            btn.style.minWidth = "";
+          }
+
+          btn.classList.remove("btn-success");
+          btn.classList.add("btn-cl-primary");
+        }
+
+        setLoading(btn.dataset.loadingText || "Opening payment gateway...");
+
+        try {
+          const orderResult = await createOrder(testSeriesId, amountInr);
+
+          restoreButton();
+
+          if (orderResult.data.status === "already_purchased") {
+            showPaymentToast(orderResult.data.message || "You already have access to this test series.", true);
+            setTimeout(function () {
+              window.location.href = orderResult.data.redirect || "/test-series";
+            }, 1200);
+            return;
+          }
+
+          if (!orderResult.ok || orderResult.data.status !== "success") {
+            showPaymentToast(orderResult.data.message || "Failed to initiate payment. Please try again.", false);
+            return;
+          }
+
+          const orderData = orderResult.data;
+
+          const options = {
+            key: orderData.key_id,
+            amount: orderData.amount,
+            currency: orderData.currency,
+            name: "Career Launcher Ahmedabad",
+            description: seriesName,
+            order_id: orderData.order_id,
+            prefill: {
+              name: orderData.user_name,
+              email: orderData.user_email,
+              contact: orderData.user_phone
+            },
+            theme: { color: "#C0392B" },
+            handler: async function (responsePayload) {
+              setLoading("Verifying payment...");
+
+              try {
+                const verifyData = await verifyPayment({
+                  razorpay_order_id: responsePayload.razorpay_order_id,
+                  razorpay_payment_id: responsePayload.razorpay_payment_id,
+                  razorpay_signature: responsePayload.razorpay_signature
+                });
+
+                if (verifyData.status === "success") {
+                  btn.innerHTML = '<i class="fas fa-check me-2"></i>Payment Successful!';
+                  btn.disabled = true;
+                  btn.classList.add("btn-success");
+                  btn.classList.remove("btn-cl-primary", "btn-loading");
+                  btn.style.minWidth = "";
+                  setTimeout(function () {
+                    window.location.href = verifyData.redirect;
+                  }, 1500);
+                } else {
+                  restoreButton();
+                  showPaymentToast(verifyData.message || "Payment verification failed. Please contact support.", false);
+                }
+              } catch (error) {
+                restoreButton();
+                showPaymentToast(error.message || "Payment verification failed.", false);
+              }
+            },
+            modal: {
+              ondismiss: function () {
+                restoreButton();
+                showPaymentToast("Payment cancelled. You can try again anytime.", false);
+              }
+            }
+          };
+
+          const razorpayCheckout = new Razorpay(options);
+          razorpayCheckout.open();
+        } catch (error) {
+          restoreButton();
+          showPaymentToast(error.message || "Network error. Please check your connection and try again.", false);
+        }
+      });
+    });
+  });
+</script>
 {% endblock %}

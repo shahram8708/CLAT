@@ -1,7 +1,7 @@
 import json
 from datetime import datetime
 
-from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask import Blueprint, current_app, flash, redirect, render_template, request, url_for
 from flask_login import current_user
 from sqlalchemy import desc
 
@@ -10,7 +10,9 @@ from app.forms import ProfileUpdateForm
 from app.models.blog import BlogPost
 from app.models.course import Course
 from app.models.enrollment import Enrollment
+from app.models.free_resource import FreeResource
 from app.models.test_series import TestAttempt
+from app.services.enrollment_service import ensure_student_enrollments
 
 
 dashboard_bp = Blueprint("dashboard", __name__)
@@ -24,6 +26,76 @@ EXAM_CATEGORY_MAP = {
     "CUET": "cuet",
     "Boards": "general",
 }
+
+EXAM_TO_RESOURCE_CATEGORY = {
+    "CAT": "cat",
+    "CLAT": "clat",
+    "IPMAT": "ipmat",
+    "GMAT": "gmat",
+    "CUET": "cuet",
+    "Boards": "general",
+}
+
+RESOURCE_TYPE_TO_SECTION = {
+    "pdf": "papers",
+    "mock_test": "mock",
+    "link": "online",
+    "video": "online",
+}
+
+RESOURCE_TYPE_TO_LABEL = {
+    "pdf": "PDF",
+    "mock_test": "Mock Test",
+    "link": "Link",
+    "video": "Video",
+}
+
+
+def _normalize_exam(raw_exam):
+    exam_text = " ".join(str(raw_exam or "").split()).strip()
+    exam_text = exam_text.replace("–", "-").replace("—", "-")
+    if not exam_text:
+        return None
+
+    alias_map = {
+        "CAT": "CAT",
+        "CAT/MBA ENTRANCE": "CAT",
+        "MBA": "CAT",
+        "CLAT": "CLAT",
+        "CLAT/AILET/LAW": "CLAT",
+        "AILET": "CLAT",
+        "LAW": "CLAT",
+        "IPMAT": "IPMAT",
+        "IPMAT/BBA": "IPMAT",
+        "BBA": "IPMAT",
+        "GMAT": "GMAT",
+        "GMAT/GRE": "GMAT",
+        "GRE": "GMAT",
+        "CUET": "CUET",
+        "BOARDS": "Boards",
+        "CLASS XI-XII MATHEMATICS": "Boards",
+        "CLASS XI-XII MATHS": "Boards",
+        "GENERAL": "Boards",
+    }
+
+    upper_exam = exam_text.upper()
+    if upper_exam in alias_map:
+        return alias_map[upper_exam]
+
+    if "CLAT" in upper_exam or "AILET" in upper_exam:
+        return "CLAT"
+    if "IPMAT" in upper_exam or "BBA" in upper_exam:
+        return "IPMAT"
+    if "GMAT" in upper_exam or "GRE" in upper_exam:
+        return "GMAT"
+    if "CAT" in upper_exam:
+        return "CAT"
+    if "CUET" in upper_exam:
+        return "CUET"
+    if "BOARD" in upper_exam or "MATH" in upper_exam:
+        return "Boards"
+
+    return exam_text
 
 
 def login_required_check():
@@ -123,7 +195,7 @@ def _resource_catalog():
             "description": "Curated preparation support from Career Launcher national learning resources.",
             "type": "Link",
             "exam_tag": "ALL",
-            "url": "https://www.careerlauncher.com",
+            "url": "https://clahmedabad.onrender.com",
             "section": "online",
         },
         {
@@ -163,7 +235,7 @@ def _resource_catalog():
             "description": "Recorded orientation on GMAT preparation strategy and sectional planning.",
             "type": "Video",
             "exam_tag": "GMAT",
-            "url": "https://www.careerlauncher.com/video-gallery/",
+            "url": "https://clahmedabad.onrender.com/video-gallery/",
             "section": "online",
         },
     ]
@@ -171,24 +243,107 @@ def _resource_catalog():
 
 def _resources_for_exam(exam):
     all_resources = _resource_catalog()
-    if not exam:
+    normalized_exam = _normalize_exam(exam)
+    if not normalized_exam:
         return all_resources
+
     return [
         item
         for item in all_resources
-        if item.get("exam_tag") in {"ALL", exam}
+        if item.get("exam_tag") in {"ALL", normalized_exam}
     ]
+
+
+def _resource_from_model(resource):
+    resource_type = (resource.resource_type or "").strip().lower()
+    section = RESOURCE_TYPE_TO_SECTION.get(resource_type)
+    if not section:
+        return None
+
+    category = (resource.category or "general").strip().lower()
+    exam_tag = "ALL" if category == "general" else category.upper()
+
+    if resource.is_gated:
+        resource_url = url_for("main.free_resources")
+    else:
+        resource_url = url_for("main.access_free_resource", resource_id=resource.id)
+
+    return {
+        "title": resource.title,
+        "description": resource.description or "",
+        "type": RESOURCE_TYPE_TO_LABEL.get(resource_type, "Resource"),
+        "exam_tag": exam_tag,
+        "url": resource_url,
+        "year": str(resource.year) if resource.year else "",
+        "section": section,
+    }
+
+
+def _resources_from_database(exam):
+    normalized_exam = _normalize_exam(exam)
+
+    query = FreeResource.query.filter(FreeResource.is_active.is_(True))
+    if normalized_exam:
+        target_category = EXAM_TO_RESOURCE_CATEGORY.get(normalized_exam)
+        allowed_categories = {"general"}
+        if target_category:
+            allowed_categories.add(target_category)
+        query = query.filter(FreeResource.category.in_(sorted(allowed_categories)))
+
+    records = query.order_by(FreeResource.display_order.asc(), FreeResource.id.asc()).all()
+
+    items = []
+    for record in records:
+        mapped = _resource_from_model(record)
+        if mapped:
+            items.append(mapped)
+
+    return items
+
+
+def _merge_resources(primary_resources, fallback_resources):
+    merged = list(primary_resources)
+    seen_keys = {
+        (item.get("section"), (item.get("title") or "").strip().lower())
+        for item in merged
+    }
+    present_sections = {item.get("section") for item in merged}
+
+    for section_name in ("papers", "mock", "online"):
+        if section_name in present_sections:
+            continue
+
+        for item in fallback_resources:
+            if item.get("section") != section_name:
+                continue
+
+            key = (section_name, (item.get("title") or "").strip().lower())
+            if key in seen_keys:
+                continue
+
+            merged.append(item)
+            seen_keys.add(key)
+
+    return merged
 
 
 @dashboard_bp.get("")
 @dashboard_bp.get("/")
 def overview():
-    enrollments = (
+    try:
+        ensure_student_enrollments(current_user)
+    except Exception as exc:
+        db.session.rollback()
+        current_app.logger.error("Dashboard enrollment sync failed for user %s: %s", current_user.id, exc)
+
+    enrollments_query = (
         Enrollment.query.join(Course, Enrollment.course_id == Course.id)
         .filter(Enrollment.user_id == current_user.id, Enrollment.status == "active")
-        .order_by(desc(Enrollment.enrolled_at))
-        .all()
     )
+    if current_user.enrolled_exam:
+        enrollments_query = enrollments_query.filter(Course.exam_category == current_user.enrolled_exam)
+
+    enrollments = enrollments_query.order_by(desc(Enrollment.enrolled_at)).all()
 
     recent_attempts = (
         TestAttempt.query.filter_by(user_id=current_user.id)
@@ -211,12 +366,20 @@ def overview():
 
 @dashboard_bp.get("/courses")
 def courses():
-    enrollments = (
+    try:
+        ensure_student_enrollments(current_user)
+    except Exception as exc:
+        db.session.rollback()
+        current_app.logger.error("Dashboard courses enrollment sync failed for user %s: %s", current_user.id, exc)
+
+    enrollments_query = (
         Enrollment.query.join(Course, Enrollment.course_id == Course.id)
         .filter(Enrollment.user_id == current_user.id)
-        .order_by(desc(Enrollment.enrolled_at))
-        .all()
     )
+    if current_user.enrolled_exam:
+        enrollments_query = enrollments_query.filter(Course.exam_category == current_user.enrolled_exam)
+
+    enrollments = enrollments_query.order_by(desc(Enrollment.enrolled_at)).all()
 
     return render_template(
         "dashboard/courses.html",
@@ -280,8 +443,10 @@ def tests():
 
 @dashboard_bp.get("/resources")
 def resources():
-    enrolled_exam = current_user.enrolled_exam
-    resources = _resources_for_exam(enrolled_exam)
+    enrolled_exam = _normalize_exam(current_user.enrolled_exam)
+    db_resources = _resources_from_database(enrolled_exam)
+    fallback_resources = _resources_for_exam(enrolled_exam)
+    resources = _merge_resources(db_resources, fallback_resources) if db_resources else fallback_resources
 
     blog_posts = []
     category = EXAM_CATEGORY_MAP.get(enrolled_exam)
@@ -292,7 +457,7 @@ def resources():
             .limit(3)
             .all()
         )
-    elif not enrolled_exam:
+    else:
         blog_posts = (
             BlogPost.query.filter_by(is_published=True)
             .order_by(desc(BlogPost.published_at), desc(BlogPost.updated_at))

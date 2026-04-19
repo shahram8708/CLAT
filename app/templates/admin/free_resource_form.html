@@ -1,0 +1,124 @@
+{% extends 'admin/base.html' %}
+
+{% block admin_page_title %}{% if is_new %}New Free Resource{% else %}Edit: {{ form.title.data }}{% endif %}{% endblock %}
+
+{% block admin_content %}
+<div class="bg-white border rounded-3" style="padding: 32px;">
+  <form method="POST" action="{% if is_new %}/admin/free-resources/new{% else %}/admin/free-resources/{{ resource.id }}/edit{% endif %}" id="resourceForm" novalidate enctype="multipart/form-data">
+    {{ form.hidden_tag() }}
+    {{ form.url(type='hidden', id=form.url.id) }}
+
+    <div class="row g-3">
+      <div class="col-md-8">
+        <label class="form-label" for="{{ form.title.id }}">{{ form.title.label.text }}</label>
+        {{ form.title(class='form-control' + (' is-invalid' if form.title.errors else ''), id=form.title.id) }}
+        {% for error in form.title.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+      <div class="col-md-4">
+        <label class="form-label" for="{{ form.display_order.id }}">{{ form.display_order.label.text }}</label>
+        {{ form.display_order(class='form-control' + (' is-invalid' if form.display_order.errors else ''), id=form.display_order.id) }}
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label" for="{{ form.category.id }}">{{ form.category.label.text }}</label>
+        {{ form.category(class='form-select' + (' is-invalid' if form.category.errors else ''), id=form.category.id) }}
+      </div>
+      <div class="col-md-4">
+        <label class="form-label" for="{{ form.resource_type.id }}">{{ form.resource_type.label.text }}</label>
+        {{ form.resource_type(class='form-select' + (' is-invalid' if form.resource_type.errors else ''), id=form.resource_type.id) }}
+      </div>
+      <div class="col-md-4">
+        <label class="form-label" for="{{ form.delivery_mode.id }}">{{ form.delivery_mode.label.text }}</label>
+        {{ form.delivery_mode(class='form-select' + (' is-invalid' if form.delivery_mode.errors else ''), id=form.delivery_mode.id) }}
+        {% for error in form.delivery_mode.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+      <div class="col-md-4">
+        <label class="form-label" for="{{ form.is_gated.id }}">Access Type</label>
+        <div class="form-check mt-2">
+          {{ form.is_gated(class='form-check-input', id=form.is_gated.id) }}
+          <label class="form-check-label" for="{{ form.is_gated.id }}">Require email before access</label>
+        </div>
+      </div>
+
+      <div class="col-12">
+        <label class="form-label" for="{{ form.description.id }}">{{ form.description.label.text }}</label>
+        {{ form.description(class='form-control' + (' is-invalid' if form.description.errors else ''), id=form.description.id, rows='3') }}
+      </div>
+
+      <div class="col-12" id="externalUrlGroup">
+        <label class="form-label" for="{{ form.external_url.id }}">{{ form.external_url.label.text }}</label>
+        {{ form.external_url(class='form-control' + (' is-invalid' if form.external_url.errors else ''), id=form.external_url.id, placeholder='https://...') }}
+        {% for error in form.external_url.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+
+      <div class="col-12" id="pdfUploadGroup">
+        <label class="form-label" for="{{ form.pdf_upload.id }}">{{ form.pdf_upload.label.text }}</label>
+        {{ form.pdf_upload(class='form-control' + (' is-invalid' if form.pdf_upload.errors else ''), id=form.pdf_upload.id, accept='application/pdf') }}
+        {% for error in form.pdf_upload.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+        {% if not is_new and resource and resource.local_file_path %}
+          <div class="form-text">
+            Current file:
+            <a href="{{ url_for('static', filename=resource.local_file_path) }}" target="_blank" rel="noopener noreferrer">
+              {{ resource.local_file_path.split('/')[-1] }}
+            </a>
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label" for="{{ form.file_size.id }}">{{ form.file_size.label.text }}</label>
+        {{ form.file_size(class='form-control' + (' is-invalid' if form.file_size.errors else ''), id=form.file_size.id, placeholder='e.g. 2.3 MB') }}
+      </div>
+      <div class="col-md-6">
+        <label class="form-label" for="{{ form.year.id }}">{{ form.year.label.text }}</label>
+        {{ form.year(class='form-control' + (' is-invalid' if form.year.errors else ''), id=form.year.id, min='2000', max='2100') }}
+      </div>
+
+      <div class="col-12">
+        <div class="form-check">
+          {{ form.is_active(class='form-check-input', id=form.is_active.id) }}
+          <label class="form-check-label" for="{{ form.is_active.id }}">{{ form.is_active.label.text }}</label>
+        </div>
+      </div>
+
+      <div class="col-12 d-flex gap-2 pt-2">
+        {{ form.submit(class='btn btn-cl-primary') }}
+        <a href="/admin/free-resources" class="btn btn-outline-secondary">Cancel</a>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block admin_js %}
+<script>
+(function () {
+  const modeSelect = document.getElementById("{{ form.delivery_mode.id }}");
+  const externalUrlGroup = document.getElementById("externalUrlGroup");
+  const pdfUploadGroup = document.getElementById("pdfUploadGroup");
+  const externalUrlInput = document.getElementById("{{ form.external_url.id }}");
+  const pdfUploadInput = document.getElementById("{{ form.pdf_upload.id }}");
+  const resourceTypeSelect = document.getElementById("{{ form.resource_type.id }}");
+
+  function syncResourceMode() {
+    const selectedMode = modeSelect ? modeSelect.value : "upload";
+    const isLinkMode = selectedMode === "link";
+
+    externalUrlGroup.style.display = isLinkMode ? "" : "none";
+    pdfUploadGroup.style.display = isLinkMode ? "none" : "";
+
+    externalUrlInput.disabled = !isLinkMode;
+    pdfUploadInput.disabled = isLinkMode;
+
+    if (!isLinkMode && resourceTypeSelect) {
+      resourceTypeSelect.value = "pdf";
+    }
+  }
+
+  if (modeSelect) {
+    modeSelect.addEventListener("change", syncResourceMode);
+    syncResourceMode();
+  }
+})();
+</script>
+{% endblock %}

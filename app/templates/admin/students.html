@@ -10,8 +10,13 @@
   </ol>
 </nav>
 
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <span class="badge badge-soft">{{ students.total }} students</span>
+  <a href="/admin/students/new" class="btn btn-cl-primary btn-sm">Add Student →</a>
+</div>
+
 <div class="bg-white border rounded-3 p-3 mb-3">
-  <form method="GET" action="/admin/students" class="row g-2 align-items-end">
+  <form id="studentsFilterForm" method="GET" action="/admin/students" class="row g-2 align-items-end">
     <div class="col-lg-6">
       <label class="form-label mb-1">Search</label>
       <input type="text" name="q" value="{{ search_query }}" class="form-control" placeholder="Search by name, email, phone...">
@@ -29,7 +34,7 @@
       </select>
     </div>
     <div class="col-lg-2 d-grid">
-      <button class="btn btn-primary" type="submit">Filter</button>
+      <button class="btn btn-primary" type="submit" data-loading-text="Filtering...">Filter</button>
     </div>
   </form>
 </div>
@@ -45,6 +50,7 @@
           <th>Phone</th>
           <th>Exam</th>
           <th>Scholarship</th>
+          <th>Violations</th>
           <th>Status</th>
           <th>Joined</th>
           <th>Actions</th>
@@ -66,26 +72,39 @@
               {% endif %}
             </td>
             <td>
-              {% if student.is_active %}
-                <span class="badge bg-success">Active</span>
+              {% set session = student.exam_sessions | selectattr('exam_type', 'equalto', 'scholarship') | list | last %}
+              {% if session %}
+                {% if session.violation_count > 0 %}
+                  <span class="badge bg-warning text-dark">{{ session.violation_count }} violation(s)</span>
+                {% else %}
+                  <span class="text-muted small">Clean</span>
+                {% endif %}
               {% else %}
-                <span class="badge bg-secondary">Inactive</span>
+                <span class="text-muted small">No exam</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if student.is_active %}
+                <span id="student-status-badge-{{ student.id }}" class="badge bg-success">Active</span>
+              {% else %}
+                <span id="student-status-badge-{{ student.id }}" class="badge bg-secondary">Inactive</span>
               {% endif %}
             </td>
             <td>{{ student.created_at.strftime('%d %b %Y') if student.created_at else '-' }}</td>
             <td>
               <div class="d-flex align-items-center gap-2">
                 <a href="/admin/students/{{ student.id }}" class="btn btn-outline-primary btn-sm">View →</a>
-                <form method="POST" action="/admin/students/{{ student.id }}/toggle-active" class="m-0">
+                <form method="POST" action="/admin/students/{{ student.id }}/toggle-active" class="m-0 d-flex align-items-center student-toggle-form" data-student-id="{{ student.id }}">
                   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                  <button class="btn btn-outline-secondary btn-sm" type="submit">Toggle Active</button>
+                  <button class="btn btn-outline-secondary btn-sm student-active-toggle" type="submit" data-loading-text="Updating status..." data-current-active="{{ 'true' if student.is_active else 'false' }}">Toggle Active</button>
+                  <span class="spinner-border spinner-border-sm ms-2 d-none student-toggle-spinner" id="spinner-student-{{ student.id }}" role="status" aria-hidden="true"></span>
                 </form>
               </div>
             </td>
           </tr>
         {% else %}
           <tr>
-            <td colspan="9" class="text-center text-muted py-4">No students found.</td>
+            <td colspan="10" class="text-center text-muted py-4">No students found.</td>
           </tr>
         {% endfor %}
       </tbody>
@@ -114,4 +133,76 @@
     </nav>
   {% endif %}
 </div>
+{% endblock %}
+
+{% block admin_js %}
+<script>
+  (function () {
+    document.querySelectorAll(".student-toggle-form").forEach(function (form) {
+      form.addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        const studentId = form.dataset.studentId;
+        const button = form.querySelector("button[type='submit']");
+        const spinner = document.getElementById("spinner-student-" + studentId);
+        const statusBadge = document.getElementById("student-status-badge-" + studentId);
+
+        if (!button || button.disabled || button.classList.contains("btn-loading")) {
+          return;
+        }
+
+        let originalHTML = button.innerHTML;
+        if (window.CLLoadingStates && typeof window.CLLoadingStates.setButtonLoading === "function") {
+          originalHTML = window.CLLoadingStates.setButtonLoading(button, button.dataset.loadingText || "Updating status...");
+        } else {
+          button.disabled = true;
+          button.textContent = "Updating status...";
+        }
+
+        if (spinner) {
+          spinner.classList.remove("d-none");
+        }
+
+        const formData = new FormData(form);
+
+        fetch(form.action, {
+          method: "POST",
+          headers: {
+            "X-Requested-With": "XMLHttpRequest"
+          },
+          body: formData
+        })
+          .then(function (response) {
+            if (!response.ok) {
+              throw new Error("Failed to update status.");
+            }
+
+            const currentlyActive = button.dataset.currentActive === "true";
+            const newActive = !currentlyActive;
+            button.dataset.currentActive = newActive ? "true" : "false";
+
+            if (statusBadge) {
+              statusBadge.className = newActive ? "badge bg-success" : "badge bg-secondary";
+              statusBadge.textContent = newActive ? "Active" : "Inactive";
+            }
+          })
+          .catch(function () {
+            alert("Network error. Please try again.");
+          })
+          .finally(function () {
+            if (window.CLLoadingStates && typeof window.CLLoadingStates.restoreButton === "function") {
+              window.CLLoadingStates.restoreButton(button, originalHTML);
+            } else {
+              button.disabled = false;
+              button.innerHTML = originalHTML;
+            }
+
+            if (spinner) {
+              spinner.classList.add("d-none");
+            }
+          });
+      });
+    });
+  })();
+</script>
 {% endblock %}

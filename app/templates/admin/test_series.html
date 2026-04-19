@@ -1,0 +1,119 @@
+{% extends 'admin/base.html' %}
+
+{% block admin_page_title %}Test Series Management{% endblock %}
+
+{% block admin_content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+  <span class="badge badge-soft">{{ series_list|length }} test series</span>
+  <a href="/admin/test-series/new" class="btn btn-cl-primary">Add New Test Series →</a>
+</div>
+
+<div class="bg-white border rounded-3 p-3">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle admin-table mb-0">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Exam</th>
+          <th>Tests</th>
+          <th>Duration</th>
+          <th>Free or Paid</th>
+          <th>Price (INR)</th>
+          <th>Active</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for series in series_list %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ series.name }}</td>
+            <td><span class="badge text-bg-light border">{{ series.exam }}</span></td>
+            <td>{{ series.total_tests if series.total_tests is not none else '-' }}</td>
+            <td>{{ series.duration_mins ~ ' mins' if series.duration_mins is not none else '-' }}</td>
+            <td>
+              {% if series.is_free %}
+                <span class="text-success fw-semibold">FREE</span>
+              {% else %}
+                <span class="text-danger fw-semibold">PAID</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if series.is_free %}
+                <span class="text-success">FREE</span>
+              {% else %}
+                <span class="text-danger">₹{{ series.price|format_inr }}</span>
+              {% endif %}
+            </td>
+            <td>
+              <div class="form-check form-switch">
+                <input class="form-check-input series-active-toggle" type="checkbox" data-id="{{ series.id }}" {% if series.is_active %}checked{% endif %}>
+              </div>
+            </td>
+            <td>
+              <div class="d-flex gap-2">
+                <a href="/admin/test-series/{{ series.id }}/edit" class="btn btn-outline-primary btn-sm">Edit</a>
+                <form method="POST" action="/admin/test-series/{{ series.id }}/delete" class="m-0 delete-series-form">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button class="btn btn-outline-danger btn-sm" type="submit">Delete</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="9" class="text-center text-muted py-4">No test series found.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block admin_js %}
+<script>
+(function () {
+  const csrfToken = "{{ csrf_token() }}";
+
+  document.querySelectorAll(".delete-series-form").forEach(function (form) {
+    form.addEventListener("submit", function (event) {
+      if (!confirm("Delete this test series?")) {
+        event.preventDefault();
+      }
+    });
+  });
+
+  document.querySelectorAll(".series-active-toggle").forEach(function (toggle) {
+    toggle.addEventListener("change", function () {
+      const seriesId = toggle.getAttribute("data-id");
+      const previous = !toggle.checked;
+      toggle.disabled = true;
+
+      fetch(`/admin/test-series/${seriesId}/toggle-active`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrfToken
+        },
+        body: JSON.stringify({})
+      })
+        .then(function (response) {
+          if (!response.ok) {
+            throw new Error("Failed");
+          }
+          return response.json();
+        })
+        .catch(function () {
+          toggle.checked = previous;
+          alert("Unable to update status.");
+        })
+        .finally(function () {
+          toggle.disabled = false;
+        });
+    });
+  });
+})();
+</script>
+{% endblock %}

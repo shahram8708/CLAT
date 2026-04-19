@@ -1,0 +1,51 @@
+{% extends 'admin/base.html' %}
+
+{% block admin_page_title %}{% if is_new %}Add Enrollment{% else %}Edit Enrollment #{{ enrollment.id }}{% endif %}{% endblock %}
+
+{% block admin_content %}
+<div class="bg-white border rounded-3" style="padding: 32px;">
+  <form method="POST" action="{% if is_new %}/admin/enrollments/new{% else %}/admin/enrollments/{{ enrollment.id }}/edit{% endif %}" novalidate>
+    {{ form.hidden_tag() }}
+
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label" for="{{ form.user_id.id }}">{{ form.user_id.label.text }}</label>
+        {{ form.user_id(class='form-select' + (' is-invalid' if form.user_id.errors else ''), id=form.user_id.id) }}
+        {% for error in form.user_id.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+      <div class="col-md-6">
+        <label class="form-label" for="{{ form.course_id.id }}">{{ form.course_id.label.text }}</label>
+        {{ form.course_id(class='form-select' + (' is-invalid' if form.course_id.errors else ''), id=form.course_id.id) }}
+        {% for error in form.course_id.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label" for="{{ form.batch_name.id }}">{{ form.batch_name.label.text }}</label>
+        {{ form.batch_name(class='form-control' + (' is-invalid' if form.batch_name.errors else ''), id=form.batch_name.id) }}
+        {% for error in form.batch_name.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+      <div class="col-md-4">
+        <label class="form-label" for="{{ form.fee_paid.id }}">{{ form.fee_paid.label.text }}</label>
+        {{ form.fee_paid(class='form-control' + (' is-invalid' if form.fee_paid.errors else ''), id=form.fee_paid.id) }}
+        {% for error in form.fee_paid.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+      <div class="col-md-4">
+        <label class="form-label" for="{{ form.scholarship_pct.id }}">{{ form.scholarship_pct.label.text }}</label>
+        {{ form.scholarship_pct(class='form-control' + (' is-invalid' if form.scholarship_pct.errors else ''), id=form.scholarship_pct.id) }}
+        {% for error in form.scholarship_pct.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label" for="{{ form.status.id }}">{{ form.status.label.text }}</label>
+        {{ form.status(class='form-select' + (' is-invalid' if form.status.errors else ''), id=form.status.id) }}
+        {% for error in form.status.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+
+      <div class="col-12 d-flex gap-2 pt-2">
+        {{ form.submit(class='btn btn-cl-primary') }}
+        <a href="/admin/enrollments" class="btn btn-outline-secondary">Cancel</a>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}

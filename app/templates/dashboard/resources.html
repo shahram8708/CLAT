@@ -9,63 +9,89 @@
 {% set mock_resources = resources | selectattr('section', 'equalto', 'mock') | list %}
 {% set blog_slug_map = {'CAT': 'cat', 'CLAT': 'clat', 'IPMAT': 'ipmat', 'GMAT': 'gmat', 'CUET': 'cuet', 'Boards': 'general'} %}
 {% set test_slug_map = {'CAT': 'cat', 'CLAT': 'clat', 'IPMAT': 'ipmat', 'GMAT': 'gmat', 'CUET': 'cuet'} %}
-{% set blog_slug = blog_slug_map.get(current_user.enrolled_exam, '') %}
-{% set test_slug = test_slug_map.get(current_user.enrolled_exam, '') %}
+{% set blog_slug = blog_slug_map.get(enrolled_exam, '') %}
+{% set test_slug = test_slug_map.get(enrolled_exam, '') %}
 {% set blog_url = '/blog/' ~ blog_slug if blog_slug else '/blog' %}
 {% set test_url = '/test-series/' ~ test_slug if test_slug else '/test-series' %}
 
 <div class="mb-4">
   <h4 class="mb-1" style="color: var(--cl-navy);">Study Resources</h4>
-  <p class="text-muted mb-0">Resources curated for {{ current_user.enrolled_exam or 'all exams' }}</p>
+  <p class="text-muted mb-0">Resources curated for {{ enrolled_exam or 'all exams' }}</p>
 </div>
 
 <div class="dashboard-section-card">
   <h5 style="color: var(--cl-navy);">Previous Year Papers</h5>
   <div class="row g-3 mt-1">
-    {% for resource in paper_resources %}
-      {% set external = resource.url.startswith('http') %}
-      <div class="col-lg-3 col-md-4 col-6">
-        <div class="cl-card h-100 p-3">
-          <span class="badge mb-2" style="background: var(--cl-bg); color: var(--cl-navy);">{{ resource.exam_tag }}</span>
-          <p class="small text-muted mb-1">{{ resource.year }}</p>
-          <h6 class="fw-bold mb-2">{{ resource.title }}</h6>
-          <p class="small text-muted">{{ resource.description }}</p>
-          <a href="{{ resource.url }}" class="btn btn-sm btn-cl-outline w-100" {% if external %}target="_blank" rel="noopener noreferrer"{% endif %}>Download PDF</a>
+    {% if paper_resources %}
+      {% for resource in paper_resources %}
+        {% set external = resource.url.startswith('http') %}
+        <div class="col-lg-3 col-md-4 col-6">
+          <div class="cl-card h-100 p-3">
+            <span class="badge mb-2" style="background: var(--cl-bg); color: var(--cl-navy);">{{ resource.exam_tag }}</span>
+            {% if resource.year %}
+              <p class="small text-muted mb-1">{{ resource.year }}</p>
+            {% endif %}
+            <h6 class="fw-bold mb-2">{{ resource.title }}</h6>
+            <p class="small text-muted">{{ resource.description }}</p>
+            <a href="{{ resource.url }}" class="btn btn-sm btn-cl-outline w-100" {% if external %}target="_blank" rel="noopener noreferrer"{% endif %}>Download PDF</a>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <div class="col-12">
+        <div class="cl-card p-3">
+          <p class="mb-2 text-muted">No paper is available for your dashboard exam profile right now.</p>
+          <a href="/free-resources" class="btn btn-sm btn-cl-outline">Browse All Free Resources</a>
         </div>
       </div>
-    {% endfor %}
+    {% endif %}
   </div>
 </div>
 
 <div class="dashboard-section-card">
   <h5 style="color: var(--cl-navy);">Online Resources</h5>
   <div class="list-group mt-3">
-    {% for resource in online_resources %}
-      {% set external = resource.url.startswith('http') %}
-      <div class="list-group-item d-flex justify-content-between align-items-start">
-        <div>
-          <div class="fw-semibold"><i class="fa-solid fa-link me-2" style="color: var(--cl-red);"></i>{{ resource.title }}</div>
-          <p class="small text-muted mb-0">{{ resource.description }}</p>
+    {% if online_resources %}
+      {% for resource in online_resources %}
+        {% set external = resource.url.startswith('http') %}
+        <div class="list-group-item d-flex justify-content-between align-items-start">
+          <div>
+            <div class="fw-semibold"><i class="fa-solid fa-link me-2" style="color: var(--cl-red);"></i>{{ resource.title }}</div>
+            <p class="small text-muted mb-0">{{ resource.description }}</p>
+          </div>
+          <a href="{{ resource.url }}" class="text-decoration-none fw-semibold" style="color: var(--cl-red);" {% if external %}target="_blank" rel="noopener noreferrer"{% endif %}>Visit →</a>
         </div>
-        <a href="{{ resource.url }}" class="text-decoration-none fw-semibold" style="color: var(--cl-red);" {% if external %}target="_blank" rel="noopener noreferrer"{% endif %}>Visit →</a>
+      {% endfor %}
+    {% else %}
+      <div class="list-group-item">
+        <p class="small text-muted mb-0">No online resources are mapped to your current exam profile.</p>
       </div>
-    {% endfor %}
+    {% endif %}
   </div>
 </div>
 
 <div class="dashboard-section-card">
   <h5 style="color: var(--cl-navy);">Free Mock Tests</h5>
   <div class="row g-3 mt-1">
-    {% for resource in mock_resources %}
-      {% set external = resource.url.startswith('http') %}
-      <div class="col-lg-4 col-md-6">
-        <div class="cl-card h-100 p-3">
-          <h6 class="fw-bold mb-2">{{ resource.title }}</h6>
-          <p class="small text-muted">{{ resource.description }}</p>
-          <a href="{{ resource.url }}" class="btn btn-cl-primary btn-sm" {% if external %}target="_blank" rel="noopener noreferrer"{% endif %}>Start Mock →</a>
+    {% if mock_resources %}
+      {% for resource in mock_resources %}
+        {% set external = resource.url.startswith('http') %}
+        <div class="col-lg-4 col-md-6">
+          <div class="cl-card h-100 p-3">
+            <h6 class="fw-bold mb-2">{{ resource.title }}</h6>
+            <p class="small text-muted">{{ resource.description }}</p>
+            <a href="{{ resource.url }}" class="btn btn-cl-primary btn-sm" {% if external %}target="_blank" rel="noopener noreferrer"{% endif %}>Start Mock →</a>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <div class="col-12">
+        <div class="cl-card p-3">
+          <p class="mb-2 text-muted">No mock test is available for your dashboard exam profile right now.</p>
+          <a href="{{ test_url }}" class="btn btn-sm btn-cl-primary">Open Test Series</a>
         </div>
       </div>
-    {% endfor %}
+    {% endif %}
   </div>
 </div>
 

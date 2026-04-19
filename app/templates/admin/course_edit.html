@@ -1,50 +1,65 @@
 {% extends 'admin/base.html' %}
 
-{% block admin_page_title %}Edit Course: {{ course.title }}{% endblock %}
+{% block admin_page_title %}{% if is_new %}Create Course{% else %}Edit Course: {{ course.title }}{% endif %}{% endblock %}
 
 {% block admin_content %}
 <nav aria-label="breadcrumb" class="mb-3">
   <ol class="breadcrumb">
     <li class="breadcrumb-item"><a href="/admin">Admin Dashboard</a></li>
     <li class="breadcrumb-item"><a href="/admin/courses">Courses</a></li>
-    <li class="breadcrumb-item active">Edit: {{ course.title }}</li>
+    <li class="breadcrumb-item active">{% if is_new %}Create{% else %}Edit: {{ course.title }}{% endif %}</li>
   </ol>
 </nav>
 
 <div class="bg-white border rounded-3" style="padding: 32px;">
-  <h4 class="mb-4">Edit Course Details</h4>
+  <h4 class="mb-4">{% if is_new %}Create New Course{% else %}Edit Course Details{% endif %}</h4>
 
-  <form method="POST" action="/admin/courses/{{ course.id }}/edit" novalidate>
+  <form id="courseEditForm" method="POST" action="{% if is_new %}/admin/courses/new{% else %}/admin/courses/{{ course.id }}/edit{% endif %}" novalidate>
     {{ form.hidden_tag() }}
 
     <div class="row g-3">
-      <div class="col-12">
+      <div class="col-md-8">
         <label class="form-label" for="{{ form.title.id }}">{{ form.title.label.text }}</label>
-        {{ form.title(class='form-control' + (' is-invalid' if form.title.errors else '')) }}
+        {{ form.title(class='form-control' + (' is-invalid' if form.title.errors else ''), id=form.title.id) }}
         {% for error in form.title.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+      <div class="col-md-4">
+        <label class="form-label" for="{{ form.slug.id }}">{{ form.slug.label.text }}</label>
+        {{ form.slug(class='form-control' + (' is-invalid' if form.slug.errors else ''), id=form.slug.id) }}
+        {% for error in form.slug.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
       </div>
 
       <div class="col-md-6">
         <label class="form-label" for="{{ form.exam_category.id }}">{{ form.exam_category.label.text }}</label>
-        {{ form.exam_category(class='form-select' + (' is-invalid' if form.exam_category.errors else '')) }}
+        {{ form.exam_category(class='form-select' + (' is-invalid' if form.exam_category.errors else ''), id=form.exam_category.id) }}
         {% for error in form.exam_category.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
       </div>
 
       <div class="col-md-6">
         <label class="form-label" for="{{ form.mode.id }}">{{ form.mode.label.text }}</label>
-        {{ form.mode(class='form-select' + (' is-invalid' if form.mode.errors else '')) }}
+        {{ form.mode(class='form-select' + (' is-invalid' if form.mode.errors else ''), id=form.mode.id) }}
         {% for error in form.mode.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
       </div>
 
       <div class="col-12">
+        <label class="form-label" for="{{ form.exams_covered.id }}">{{ form.exams_covered.label.text }}</label>
+        {{ form.exams_covered(class='form-control' + (' is-invalid' if form.exams_covered.errors else ''), id=form.exams_covered.id) }}
+      </div>
+
+      <div class="col-12">
         <label class="form-label" for="{{ form.description.id }}">{{ form.description.label.text }}</label>
-        {{ form.description(class='form-control' + (' is-invalid' if form.description.errors else ''), rows='3') }}
+        {{ form.description(class='form-control' + (' is-invalid' if form.description.errors else ''), id=form.description.id, rows='3') }}
         {% for error in form.description.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+
+      <div class="col-12">
+        <label class="form-label" for="{{ form.long_description.id }}">{{ form.long_description.label.text }}</label>
+        {{ form.long_description(class='form-control' + (' is-invalid' if form.long_description.errors else ''), id=form.long_description.id, rows='5') }}
       </div>
 
       <div class="col-md-6">
         <label class="form-label" for="{{ form.duration.id }}">{{ form.duration.label.text }}</label>
-        {{ form.duration(class='form-control' + (' is-invalid' if form.duration.errors else '')) }}
+        {{ form.duration(class='form-control' + (' is-invalid' if form.duration.errors else ''), id=form.duration.id) }}
         {% for error in form.duration.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
       </div>
 
@@ -56,41 +71,72 @@
 
       <div class="col-md-6">
         <label class="form-label" for="{{ form.fee_min.id }}">{{ form.fee_min.label.text }}</label>
-        {{ form.fee_min(class='form-control' + (' is-invalid' if form.fee_min.errors else '')) }}
+        {{ form.fee_min(class='form-control' + (' is-invalid' if form.fee_min.errors else ''), id=form.fee_min.id) }}
         {% for error in form.fee_min.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
       </div>
 
       <div class="col-md-6">
         <label class="form-label" for="{{ form.fee_max.id }}">{{ form.fee_max.label.text }}</label>
-        {{ form.fee_max(class='form-control' + (' is-invalid' if form.fee_max.errors else '')) }}
+        {{ form.fee_max(class='form-control' + (' is-invalid' if form.fee_max.errors else ''), id=form.fee_max.id) }}
         {% for error in form.fee_max.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
       </div>
 
       <div class="col-md-6">
         <label class="form-label" for="{{ form.batch_size.id }}">{{ form.batch_size.label.text }}</label>
-        {{ form.batch_size(class='form-control' + (' is-invalid' if form.batch_size.errors else '')) }}
+        {{ form.batch_size(class='form-control' + (' is-invalid' if form.batch_size.errors else ''), id=form.batch_size.id) }}
         {% for error in form.batch_size.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
       </div>
 
       <div class="col-md-6">
         <label class="form-label" for="{{ form.display_order.id }}">{{ form.display_order.label.text }}</label>
-        {{ form.display_order(class='form-control' + (' is-invalid' if form.display_order.errors else '')) }}
+        {{ form.display_order(class='form-control' + (' is-invalid' if form.display_order.errors else ''), id=form.display_order.id) }}
         {% for error in form.display_order.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
       </div>
 
+      <div class="col-md-6">
+        <label class="form-label" for="{{ form.meta_title.id }}">{{ form.meta_title.label.text }}</label>
+        {{ form.meta_title(class='form-control' + (' is-invalid' if form.meta_title.errors else ''), id=form.meta_title.id) }}
+      </div>
+      <div class="col-md-6">
+        <label class="form-label" for="{{ form.meta_description.id }}">{{ form.meta_description.label.text }}</label>
+        {{ form.meta_description(class='form-control' + (' is-invalid' if form.meta_description.errors else ''), id=form.meta_description.id, rows='2') }}
+      </div>
+
       <div class="col-12">
-        <div class="form-check">
+        <label class="form-label" for="{{ form.prerequisite.id }}">{{ form.prerequisite.label.text }}</label>
+        {{ form.prerequisite(class='form-control' + (' is-invalid' if form.prerequisite.errors else ''), id=form.prerequisite.id, rows='2') }}
+      </div>
+
+      <div class="col-md-4">
+        <div class="form-check mt-2">
           {{ form.is_active(class='form-check-input', id=form.is_active.id) }}
           <label class="form-check-label" for="{{ form.is_active.id }}">{{ form.is_active.label.text }}</label>
         </div>
       </div>
+      <div class="col-md-4">
+        <div class="form-check mt-2">
+          {{ form.certificate_offered(class='form-check-input', id=form.certificate_offered.id) }}
+          <label class="form-check-label" for="{{ form.certificate_offered.id }}">{{ form.certificate_offered.label.text }}</label>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="form-check mt-2">
+          {{ form.emi_available(class='form-check-input', id=form.emi_available.id) }}
+          <label class="form-check-label" for="{{ form.emi_available.id }}">{{ form.emi_available.label.text }}</label>
+        </div>
+      </div>
 
-      <div class="col-12 d-flex gap-2 pt-2">
+      <div class="col-12">
+      <div class="col-12 d-flex flex-wrap gap-2 pt-2">
         {{ form.submit(class='btn btn-cl-primary') }}
         <a href="/admin/courses" class="btn btn-outline-secondary">Cancel</a>
-        <a href="/courses/{{ course.slug }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-info btn-sm ms-2">
-          <i class="fas fa-external-link-alt me-1"></i>Preview on Website →
-        </a>
+        {% if not is_new %}
+          <a href="/admin/courses/{{ course.id }}/syllabus" class="btn btn-outline-secondary">Edit Syllabus</a>
+          <a href="/admin/courses/{{ course.id }}/faqs" class="btn btn-outline-secondary">Edit FAQs</a>
+          <a href="/courses/{{ course.slug }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-info btn-sm">
+            <i class="fas fa-external-link-alt me-1"></i>Preview on Website →
+          </a>
+        {% endif %}
       </div>
     </div>
   </form>
