@@ -1,8 +1,11 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top" id="mainNavbar">
   <div class="container">
-    <a class="navbar-brand lh-sm" href="{{ url_for('main.index') }}">
-      <span class="fw-bold d-block" style="font-family: 'Poppins', sans-serif; color: var(--cl-navy);">CLA</span>
-      <small class="text-uppercase" style="font-size: 11px; color: var(--cl-blue);">Career Launcher Ahmedabad</small>
+    <a class="navbar-brand" href="{{ url_for('main.index') }}" aria-label="Career Launcher Ahmedabad">
+      <img
+        src="{{ url_for('static', filename='img/logo-name.png') }}"
+        alt="Career Launcher Ahmedabad"
+        style="height: clamp(34px, 5.4vw, 52px); width: auto; display: block;"
+      >
     </a>
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbarCollapse" aria-controls="mainNavbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
