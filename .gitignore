@@ -58,6 +58,7 @@ htmlcov/
 
 # Uploads and generated files
 app/static/uploads/
+*.pdf
 
 # Deployment
 .heroku/
