@@ -60,6 +60,13 @@ class ProductionConfig(BaseConfig):
         if not cls.SECRET_KEY:
             raise RuntimeError("SECRET_KEY environment variable is required in production.")
 
+        database_url = os.environ.get("DATABASE_URL")
+        if not database_url or not database_url.strip():
+            raise RuntimeError(
+                "DATABASE_URL environment variable is required in production. "
+                "Set it to your Render PostgreSQL connection string."
+            )
+
 
 class TestingConfig(BaseConfig):
     TESTING = True

@@ -3,6 +3,58 @@
 {% block title %}Mock Tests & Test Series — CAT, CLAT, IPMAT | Career Launcher Ahmedabad{% endblock %}
 {% block meta_description %}Practice with CL Ahmedabad's AI-powered mock tests. Full-length mocks for CAT, CLAT, IPMAT, and CUET. Free and paid series available.{% endblock %}
 
+{% block extra_head %}
+<style>
+  .test-series-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .test-series-actions .btn {
+    flex: 1 1 calc(50% - 0.25rem);
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    border-radius: 10px;
+  }
+
+  .test-series-action-secondary {
+    border-color: var(--cl-navy);
+    color: var(--cl-navy);
+    background: #fff;
+  }
+
+  .test-series-action-secondary:hover,
+  .test-series-action-secondary:focus {
+    border-color: var(--cl-navy);
+    color: var(--cl-navy);
+    background: rgba(15, 37, 68, 0.08);
+  }
+
+  .test-series-action-primary {
+    background: var(--cl-navy);
+    border-color: var(--cl-navy);
+    color: #fff;
+  }
+
+  .test-series-action-primary:hover,
+  .test-series-action-primary:focus {
+    background: #0f2544;
+    border-color: #0f2544;
+    color: #fff;
+  }
+
+  @media (max-width: 575.98px) {
+    .test-series-actions .btn {
+      flex: 1 1 100%;
+    }
+  }
+</style>
+{% endblock %}
+
 {% block content %}
 <section style="background: var(--cl-navy); padding: 80px 0;">
   <div class="container text-center">
@@ -77,23 +129,32 @@
                 <div class="mt-auto">
                   {% if series.is_free %}
                     <div class="test-price-free mb-2">FREE</div>
-                    <a href="{{ url_for('tests.start_test', test_series_id=series.id) }}" class="btn btn-sm btn-cl-outline" style="background: var(--cl-navy); border-color: var(--cl-navy); color: #fff;">Start Free Test →</a>
+                    <div class="test-series-actions">
+                      <a href="{{ url_for('tests.series_detail', test_series_id=series.id) }}" class="btn btn-sm test-series-action-secondary">View Test Page</a>
+                      <a href="{{ url_for('tests.start_test', test_series_id=series.id) }}" class="btn btn-sm test-series-action-primary">Start Free Test →</a>
+                    </div>
                   {% else %}
                     <div class="test-price-paid mb-2">₹{{ series.price }}</div>
                     {% if series.id in purchased_series_ids %}
-                      <a href="{{ url_for('tests.start_test', test_series_id=series.id) }}" class="btn btn-success btn-sm">Attempt Test →</a>
+                      <div class="test-series-actions">
+                        <a href="{{ url_for('tests.series_detail', test_series_id=series.id) }}" class="btn btn-sm test-series-action-secondary">View Test Page</a>
+                        <a href="{{ url_for('tests.start_test', test_series_id=series.id) }}" class="btn btn-success btn-sm">Attempt Test →</a>
+                      </div>
                       <p class="small text-success mt-2 mb-0">Payment received. Access is active for this test series.</p>
                     {% else %}
-                      <button
-                        type="button"
-                        class="btn btn-cl-primary btn-sm buy-now-btn"
-                        data-series-id="{{ series.id }}"
-                        data-price="{{ series.price }}"
-                        data-loading-text="Opening payment gateway..."
-                        data-series-name="{{ series.name }}"
-                      >
-                        Buy Now
-                      </button>
+                      <div class="test-series-actions">
+                        <a href="{{ url_for('tests.series_detail', test_series_id=series.id) }}" class="btn btn-sm test-series-action-secondary">View Test Page</a>
+                        <button
+                          type="button"
+                          class="btn btn-cl-primary btn-sm buy-now-btn"
+                          data-series-id="{{ series.id }}"
+                          data-price="{{ series.price }}"
+                          data-loading-text="Opening payment gateway..."
+                          data-series-name="{{ series.name }}"
+                        >
+                          Buy Now
+                        </button>
+                      </div>
                       <p class="small text-muted mt-2 mb-0">Includes full analysis + percentile report</p>
                     {% endif %}
                   {% endif %}

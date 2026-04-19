@@ -734,6 +734,52 @@ def test_result(attempt_id):
     )
 
 
+@tests_bp.get("/series/<int:test_series_id>")
+def series_detail(test_series_id):
+    test_series = TestSeries.query.filter_by(id=test_series_id, is_active=True).first_or_404()
+
+    purchased_series_ids = _get_purchased_test_series_ids()
+    is_purchased = test_series.id in purchased_series_ids
+    has_access = test_series.is_free or is_purchased
+
+    latest_attempt = None
+    if current_user.is_authenticated:
+        latest_attempt = (
+            TestAttempt.query.filter_by(user_id=current_user.id, test_id=test_series.id)
+            .order_by(
+                TestAttempt.completed_at.desc(),
+                TestAttempt.started_at.desc(),
+                TestAttempt.id.desc(),
+            )
+            .first()
+        )
+
+    exam_name = (test_series.exam or "").upper()
+    related_series = []
+    if exam_name:
+        related_series = (
+            TestSeries.query.filter(
+                TestSeries.is_active.is_(True),
+                func.upper(TestSeries.exam) == exam_name,
+                TestSeries.id != test_series.id,
+            )
+            .order_by(TestSeries.is_free.desc(), TestSeries.name.asc())
+            .limit(3)
+            .all()
+        )
+
+    return render_template(
+        "tests/series_detail.html",
+        test_series=test_series,
+        exam_name=exam_name,
+        exam_page_url=_series_exam_page_url(test_series),
+        has_access=has_access,
+        is_purchased=is_purchased,
+        latest_attempt=latest_attempt,
+        related_series=related_series,
+    )
+
+
 @tests_bp.get("/<exam>")
 def exam_tests(exam):
     exam_name = (exam or "").upper()

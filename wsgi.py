@@ -1,3 +1,7 @@
+import os
+
+from sqlalchemy.exc import SQLAlchemyError
+
 from app import create_app
 from app.extensions import db
 from app.models import ExamSession, User  # noqa: F401
@@ -6,6 +10,37 @@ from app.models import ExamSession, User  # noqa: F401
 flask_app = create_app()
 # Keep `app` for WSGI servers (e.g., gunicorn wsgi:app).
 app = flask_app
+
+
+def _to_bool(value, default=False):
+    if value is None:
+        return default
+    return str(value).strip().lower() in {"1", "true", "t", "yes", "y", "on"}
+
+
+def ensure_database_tables():
+    """Create missing tables on startup to avoid runtime OperationalError on fresh DBs."""
+    with flask_app.app_context():
+        try:
+            db.create_all()
+            flask_app.logger.info("Database tables are ready.")
+        except SQLAlchemyError as exc:
+            db.session.rollback()
+            error_text = str(exc).lower()
+            duplicate_table_markers = ("already exists", "duplicate table", "duplicate relation")
+
+            if any(marker in error_text for marker in duplicate_table_markers):
+                flask_app.logger.warning(
+                    "Database table creation raced across workers; continuing startup."
+                )
+                return
+
+            flask_app.logger.exception("Database table initialization failed.")
+            raise
+
+
+if _to_bool(os.environ.get("AUTO_CREATE_TABLES", "true"), default=True):
+    ensure_database_tables()
 
 
 def run_seeds():
